@@ -1,0 +1,22 @@
+management:
+    endpoints:
+        web:
+            base-path: /management
+            exposure:
+                include: "*"
+    metrics:
+        export:
+            graphite:
+                enabled: false
+            prometheus:
+                enabled: true
+            simple:
+                enabled: false
+
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8296

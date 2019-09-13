@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vnfm-driver
+data:
+{{- if .Values.app.config.env }}
+{{ toYaml .Values.app.config.env | indent 2 }}
+{{- end }}
+  "alm_vnfmdriver_config_name": {{ .Values.app.config.rmName }}
+  "LOG_FOLDER": "/var/lm/logs"
+{{- if .Values.app.jvmOptions }}
+  "JVM_OPTIONS": {{ .Values.app.jvmOptions }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vnfm-driver
+  labels:
+    app: vnfm-driver
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: 8296
+    targetPort: 8296
+{{- if eq .Values.service.type "NodePort" }}
+    nodePort: {{ .Values.service.nodePort }}
+{{- end }}
+    protocol: TCP
+    name: http
+  selector:
+    app: vnfm-driver
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vnfm-driver
+spec:
+  replicas: {{ .Values.app.numReplicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: vnfm-driver
+    spec:
+      containers:
+        - name: vnfm-driver
+{{- if .Values.global.docker.registryEnabled }}
+          image: {{ .Values.global.docker.registryIp }}:{{ .Values.global.docker.registryPort }}/{{ .Values.docker.image }}:{{ .Values.docker.version }}
+          imagePullPolicy: {{ .Values.global.docker.imagePullPolicy }}
+{{- else }}
+          image: {{ .Values.docker.image }}:{{ .Values.docker.version }}
+          imagePullPolicy: {{ .Values.docker.imagePullPolicy }}
+{{- end }}
+          ports:
+          - containerPort: 8296
+            protocol: TCP
+          livenessProbe:
+            failureThreshold: {{ .Values.app.livenessProbe.failureThreshold }}
+            httpGet:
+              path: /management/health
+              port: 8296
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.app.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.livenessProbe.periodSeconds }}
+          readinessProbe:
+            failureThreshold: {{ .Values.app.readinessProbe.failureThreshold }}
+            httpGet:
+              path: /management/health
+              port: 8296
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.app.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.readinessProbe.periodSeconds }}
+          envFrom:
+          - configMapRef:
+              name: vnfm-driver
