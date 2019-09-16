@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.ApiOperation;
 
 @RestController("LifecycleNotificationController")
-@RequestMapping("/api/lifecycle/notifications")
+@RequestMapping("/vnflcm/v1/notifications")
 public class LifecycleNotificationController {
 
     @PostMapping
