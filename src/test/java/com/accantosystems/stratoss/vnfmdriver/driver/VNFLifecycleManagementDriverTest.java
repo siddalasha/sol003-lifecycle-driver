@@ -1,9 +1,10 @@
 package com.accantosystems.stratoss.vnfmdriver.driver;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withCreatedEntity;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 
 import java.net.URI;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class VNFLifecycleManagementDriverTest {
     @Rule public TestName testName = new TestName();
 
     @Test
-    public void createVnfInstance() {
+    public void testCreateVnfInstance() {
         server.expect(requestTo("http://localhost:8080/vnflcm/v1/vnf_instances"))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, "application/json"))
@@ -49,30 +50,46 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void deleteVnfInstance() {
+    public void testCreateVnfInstanceWithProblemDetails() {
+        server.expect(requestTo("http://localhost:8080/vnflcm/v1/vnf_instances"))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, "application/json"))
+              .andRespond(withServerError().contentType(MediaType.APPLICATION_JSON).body("{\"status\": 500, \"detail\": \"An error has occurred\"}"));
+
+        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
+        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
+        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+
+        assertThatThrownBy(() -> driver.createVnfInstance(createVnfRequest))
+                .isInstanceOf(SOL003ResponseException.class);
     }
 
     @Test
-    public void queryAllLifecycleOperationOccurrences() {
+    public void testDeleteVnfInstance() {
     }
 
     @Test
-    public void queryLifecycleOperationOccurrence() {
+    public void testQueryAllLifecycleOperationOccurrences() {
     }
 
     @Test
-    public void createLifecycleSubscription() {
+    public void testQueryLifecycleOperationOccurrence() {
     }
 
     @Test
-    public void queryAllLifecycleSubscriptions() {
+    public void testCreateLifecycleSubscription() {
     }
 
     @Test
-    public void queryLifecycleSubscription() {
+    public void testQueryAllLifecycleSubscriptions() {
     }
 
     @Test
-    public void deleteLifecycleSubscription() {
+    public void testQueryLifecycleSubscription() {
     }
+
+    @Test
+    public void testDeleteLifecycleSubscription() {
+    }
+
 }
