@@ -29,6 +29,7 @@
 
     <properties>
         <argLine>-Djava.security.egd=file:/dev/./urandom</argLine>
+        <commons-io.version>2.6</commons-io.version>
         <docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
         <docker.registry>https://hub.docker.com</docker.registry>
         <helm.chart.name>${project.artifactId}</helm.chart.name>
@@ -54,6 +55,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-bean-validators</artifactId>

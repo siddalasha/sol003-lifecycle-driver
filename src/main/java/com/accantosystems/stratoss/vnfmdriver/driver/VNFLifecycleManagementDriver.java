@@ -83,7 +83,7 @@ public class VNFLifecycleManagementDriver {
         }
 
         // Postcondition: VNF instance created in NOT_INSTANTIATED state
-        return null;
+        return responseEntity.getBody();
         // Out of band VnfIdentifierCreationNotification should be received after this returns
     }
 
