@@ -24,7 +24,7 @@ public class LoggingAspect {
     @Autowired
     private Environment env;
 
-    @Pointcut("within(com.accantosystems.stratoss.*.driver..*) || within(com.accantosystems.stratoss.*.repository..*) || within(com.accantosystems.stratoss.*.service..*) || within(com.accantosystems.stratoss.*.web.rest..*)")
+    @Pointcut("within(com.accantosystems.stratoss.*.driver..*) || within(com.accantosystems.stratoss.*.repository..*) || within(com.accantosystems.stratoss.*.service..*) || within(com.accantosystems.stratoss.*.web..*)")
     public void loggingPointcut() {
         // No implementation needed for pointcut definition
     }

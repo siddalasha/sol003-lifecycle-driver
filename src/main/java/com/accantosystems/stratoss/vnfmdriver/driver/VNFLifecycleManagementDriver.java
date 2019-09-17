@@ -78,7 +78,7 @@ public class VNFLifecycleManagementDriver {
             throw e;
         }
 
-        if (responseEntity.getStatusCode() != HttpStatus.CREATED) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != HttpStatus.CREATED) {
             logger.error("Invalid status code [{}] received, was expecting [201 Created]", responseEntity.getStatusCode());
         }
 

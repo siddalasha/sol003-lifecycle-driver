@@ -1,4 +1,4 @@
-package com.accantosystems.stratoss.vnfmdriver.web.rest;
+package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
 import java.util.UUID;
 
