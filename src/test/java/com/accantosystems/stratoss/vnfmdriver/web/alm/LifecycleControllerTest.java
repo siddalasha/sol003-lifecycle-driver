@@ -1,4 +1,4 @@
-package com.accantosystems.stratoss.vnfmdriver.web.rest;
+package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -40,9 +40,7 @@ public class SwaggerConfiguration {
     @Value("${info.contact.name:Accanto Systems Ltd}")
     private String contactName;
 
-    private final Logger log = LoggerFactory.getLogger(SwaggerConfiguration.class);
-
-    public static final String DEFAULT_INCLUDE_PATTERN = "/api/.*";
+    private final Logger logger = LoggerFactory.getLogger(SwaggerConfiguration.class);
 
     /**
      * Swagger Springfox configuration.
@@ -51,7 +49,7 @@ public class SwaggerConfiguration {
      */
     @Bean
     public Docket swaggerSpringfoxDocket() {
-        log.debug("Starting Swagger");
+        logger.debug("Starting Swagger");
         Contact contact = new Contact(contactName, null, null);
 
         ApiInfo apiInfo = new ApiInfoBuilder()
@@ -61,7 +59,12 @@ public class SwaggerConfiguration {
                 .contact(contact)
                 .build();
 
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo).forCodeGeneration(true).genericModelSubstitutes(ResponseEntity.class).select()
-                                                      .paths(regex(DEFAULT_INCLUDE_PATTERN)).build();
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo)
+                                                      .forCodeGeneration(true)
+                                                      .genericModelSubstitutes(ResponseEntity.class)
+                                                      .select()
+                                                      .paths(regex("/api/.*"))
+                                                      .paths(regex("/vnflcm/.*"))
+                                                      .build();
     }
 }

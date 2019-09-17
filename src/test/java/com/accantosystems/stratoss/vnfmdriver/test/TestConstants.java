@@ -7,12 +7,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.assertj.core.api.Condition;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
-public interface TestConstants {
+public abstract class TestConstants {
 
-    String EMPTY_JSON = "{}";
+    public static final String EMPTY_JSON = "{}";
 
-    Condition<String> UUID_CONDITION = new Condition<String>("UUID Condition") {
+    public static final HttpEntity<String> EMPTY_JSON_ENTITY;
+
+    static {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        EMPTY_JSON_ENTITY = new HttpEntity<>(EMPTY_JSON, headers);
+    }
+
+    public static final Condition<String> UUID_CONDITION = new Condition<String>("UUID Condition") {
         @Override
         public boolean matches(String value) {
             try {
@@ -24,7 +35,7 @@ public interface TestConstants {
         }
     };
 
-    static String loadFileIntoString(final String fileName) throws IOException {
+    public static String loadFileIntoString(final String fileName) throws IOException {
         // This appears to be the fastest way to load a file into a String (circa 2017 (JDK8))
         // http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
 

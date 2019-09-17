@@ -1,4 +1,4 @@
-package com.accantosystems.stratoss.vnfmdriver.web.rest;
+package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
