@@ -73,7 +73,7 @@ public class VNFLifecycleManagementDriver {
         } catch (SOL003ResponseException e) {
             logger.error("SOL003-compliant exception", e);
             throw e;
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             logger.error("General exception", e);
             throw e;
         }
