@@ -24,6 +24,8 @@ public abstract class TestConstants {
     public static final String BASIC_AUTHORIZATION_HEADER = "Basic YmFzaWNfdXNlcjpiYXNpY19wYXNzd29yZA==";
 
     public static final String TEST_VNF_INSTANCE_ID = "cc3d9824-8267-4b1c-8456-3f1cdd94d620";
+    public static final String TEST_VNF_LCM_OP_OCC_ID = "8dbe6621-f6b9-49ba-878b-26803f107f27";
+    public static final String TEST_LCCN_SUBSCRIPTION_ID = "2fdffb76-5c74-44ab-a38f-40b302ba5ec9";
 
     public static final HttpEntity<String> EMPTY_JSON_ENTITY;
     public static final VNFMConnectionDetails VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION = new VNFMConnectionDetails(TEST_SERVER_BASE_URL, VNFMConnectionDetails.AuthenticationType.NONE);

@@ -3,6 +3,7 @@ package com.accantosystems.stratoss.vnfmdriver.driver;
 import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.BASIC_AUTHENTICATION_PASSWORD;
 import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.BASIC_AUTHENTICATION_USERNAME;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,10 @@ import com.accantosystems.stratoss.vnfmdriver.model.etsi.*;
  *                 <li>/scale</li>
  *                 <li>/scale_to_level</li>
  *                 <li>/change_flavour</li>
- *                 <li>/terminate</li>
+ *                 <li>/operate</li>
  *                 <li>/heal</li>
  *                 <li>/change_ext_conn</li>
- *                 <li>/operate</li>
+ *                 <li>/terminate</li>
  *             </ul></li>
  *         </ul></li>
  *     </ul></li>
@@ -101,6 +102,7 @@ public class VNFLifecycleManagementDriver {
 
         final ResponseEntity<VnfInstance> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);
 
+        // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
         return responseEntity.getBody();
     }
@@ -145,43 +147,202 @@ public class VNFLifecycleManagementDriver {
          - Optionally could perform HTTP GET on /vnf_lcm_op_occs/{vnfLcmOpOccId}
            - Gets 200 OK with response body of VnfLcmOpOcc:operationState=COMPLETED
        - Postcondition: <<Postcondition>>
-
-       Operation           Precondition                Task            RequestStructure                    Postcondition
-       =========           ============                ====            ================                    =============
-
-       Instantiate VNF     VNF instance created and    instantiate     InstantiateVnfRequest               VNF instance in
-                           in NOT_INSTANTIATED                                                             INSTANTIATED state
-                           state
-
-       Scale VNF           VNF instance in             scale           ScaleVnfRequest                     VNF instance still in
-                           INSTANTIATED state                                                              INSTANTIATED state and
-                                                                                                           VNF was scaled
-
-       Scale VNF to        VNF instance in             scale_to_level  ScaleVnfToLevelRequest              VNF instance still in
-       Level               INSTANTIATED state                                                              INSTANTIATED state and
-                                                                                                           VNF was scaled
-
-       Change VNF flavor   VNF instance in             change_flavour  ChangeVnfFlavourRequest             VNF instance still in
-                           INSTANTIATED state                                                              INSTANTIATED state and
-                                                                                                           VNF deployment flavour
-                                                                                                           changed
-
-       Operate VNF         VNF instance in             operate         OperateVnfRequest                   VNF instance still in
-                           INSTANTIATED state                                                              INSTANTIATED state and
-                                                                                                           VNF operational state
-                                                                                                           changed
-
-       Heal VNF            VNF instance in             heal            HealVnfRequest                      VNF instance still in
-                           INSTANTIATED state                                                              INSTANTIATED state
-
-       Change external     VNF instance in             change_ext_conn ChangeExtVnfConnectivityRequest     VNF instance still in
-       VNF connectivity    INSTANTIATED state                                                              INSTANTIATED state and
-                                                                                                           external connectivity of the
-                                                                                                           VNF is changed
-
-       Terminate VNF       VNF instance in             terminate       TerminateVnfRequest                 VNF instance in
-                           INSTANTIATED state                                                              NOT_INSTANTIATED state
      */
+
+    /**
+     * Submits an operation to the VNFM to instantiate an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance created and in NOT_INSTANTIATED state</li>
+     *     <li>Sends an {@link InstantiateVnfRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/instantiate</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance in INSTANTIATED state</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param instantiateVnfRequest request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String instantiateVnf(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final InstantiateVnfRequest instantiateVnfRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "instantiate", instantiateVnfRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to scale an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link ScaleVnfRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/scale</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and VNF was scaled</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param scaleVnfRequest       request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String scaleVnf(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final ScaleVnfRequest scaleVnfRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "scale", scaleVnfRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to scale an existing VNF instance to the specified level
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link ScaleVnfToLevelRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/scale_to_level</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and VNF was scaled</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails  VNFM connection details
+     * @param vnfInstanceId          Identifier for the {@link VnfInstance} to perform the operation on
+     * @param scaleVnfToLevelRequest request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String scaleVnfToLevel(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final ScaleVnfToLevelRequest scaleVnfToLevelRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "scale_to_level", scaleVnfToLevelRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to change the deployment flavour of an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link ChangeVnfFlavourRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/change_flavour</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and VNF deployment flavour changed</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails   VNFM connection details
+     * @param vnfInstanceId           Identifier for the {@link VnfInstance} to perform the operation on
+     * @param changeVnfFlavourRequest request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String changeVnfFlavour(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final ChangeVnfFlavourRequest changeVnfFlavourRequest)
+            throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "change_flavour", changeVnfFlavourRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to start or stop (operate) an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends an {@link OperateVnfRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/operate</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and VNF operational state changed</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param operateVnfRequest     request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String operateVnf(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final OperateVnfRequest operateVnfRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "operate", operateVnfRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to heal an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link HealVnfRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/heal</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param healVnfRequest        request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String healVnf(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final HealVnfRequest healVnfRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "heal", healVnfRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to change the external connectivity of an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link ChangeExtVnfConnectivityRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/change_ext_conn</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and external connectivity of the VNF is changed</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails           VNFM connection details
+     * @param vnfInstanceId                   Identifier for the {@link VnfInstance} to perform the operation on
+     * @param changeExtVnfConnectivityRequest request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String changeExtVnfConnectivity(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final ChangeExtVnfConnectivityRequest changeExtVnfConnectivityRequest)
+            throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "change_ext_conn", changeExtVnfConnectivityRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM to terminate an existing VNF instance
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link TerminateVnfRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/terminate</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance in NOT_INSTANTIATED state</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param terminateVnfRequest   request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String terminateVnf(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final TerminateVnfRequest terminateVnfRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(vnfmConnectionDetails, vnfInstanceId, "terminate", terminateVnfRequest);
+    }
+
+    /**
+     * Submits an operation to the VNFM on an existing VNF instance
+     *
+     * <ul>
+     *     <li>Sends &lt;&lt;RequestStructure&gt;&gt; via HTTP POST to /vnf_instances/{vnfInstanceId}/&lt;&lt;Task&gt;&gt;</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier for the {@link VnfInstance} to perform the operation on
+     * @param operationName         Name of the operation to perform (forms the URI)
+     * @param operationRequest      request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    private String callVnfLcmOperation(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId, final String operationName, final Object operationRequest)
+            throws SOL003ResponseException {
+        final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/" + vnfInstanceId + "/" + operationName;
+        final HttpHeaders headers = getHttpHeaders(vnfmConnectionDetails);
+        final HttpEntity<Object> requestEntity = new HttpEntity<>(operationRequest, headers);
+
+        final ResponseEntity<VnfInstance> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);
+
+        checkResponseEntityMatches(responseEntity, HttpStatus.ACCEPTED, false);
+        // "Location" header contains URI of the created VnfLcmOpOcc record
+        final URI location = responseEntity.getHeaders().getLocation();
+        if (location == null) {
+            throw new SOL003ResponseException("No Location header found");
+        }
+        // Return the VnfLcmOpOccId, which is the last part of the path
+        return location.getPath().substring(location.getPath().lastIndexOf("/") + 1);
+    }
 
     /**
      * Performs a query to retrieve matching VNF lifecycle operation occurrence records
@@ -189,6 +350,15 @@ public class VNFLifecycleManagementDriver {
      * <ul>
      *     <li>Sends HTTP GET request to /vnf_lcm_op_occs</li>
      *     <li>Gets 200 OK response with an array of {@link VnfLcmOpOcc} records as the response body</li>
+     * </ul>
+     * <p>
+     * The following query parameters can be supplied to the request
+     * <ul>
+     *     <li>(attribute-based filtering) - e.g. ?operationState=PROCESSING</li>
+     *     <li>all_fields</li>
+     *     <li>fields=&lt;comma-separated list&gt;</li>
+     *     <li>exclude_fields=&lt;comma-separated list&gt;</li>
+     *     <li>exclude_default</li>
      * </ul>
      *
      * @param vnfmConnectionDetails VNFM connection details
@@ -309,13 +479,18 @@ public class VNFLifecycleManagementDriver {
      * @param containsResponseBody whether the response should contain a body
      */
     private void checkResponseEntityMatches(final ResponseEntity responseEntity, final HttpStatus expectedStatusCode, final boolean containsResponseBody) {
-        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != expectedStatusCode && (!containsResponseBody || responseEntity.getBody() != null)) {
+        // Check response code matches expected value (log a warning if incorrect 2xx status seen)
+        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != expectedStatusCode) {
             // Be lenient on 2xx response codes
             logger.warn("Invalid status code [{}] received, was expecting [{}]", responseEntity.getStatusCode(), expectedStatusCode);
         } else if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             throw new SOL003ResponseException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
-        } else if (containsResponseBody && responseEntity.getBody() == null) {
+        }
+        // Check if the response body is populated (or not) as expected
+        if (containsResponseBody && responseEntity.getBody() == null) {
             throw new SOL003ResponseException("No response body");
+        } else if (!containsResponseBody && responseEntity.getBody() != null) {
+            throw new SOL003ResponseException("No response body expected");
         }
     }
 
