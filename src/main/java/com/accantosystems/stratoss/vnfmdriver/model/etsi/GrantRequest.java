@@ -59,8 +59,6 @@ public class GrantRequest {
     @ApiModel(description = "Links to resources related to this resource.")
     public static class Links {
 
-        @ApiModelProperty(name = "self", required = true, notes = "URI of this resource.")
-        private Link self;
         @ApiModelProperty(name = "VNF Lifecycle Management Operation Occurrence", required = true, notes = "Related VNF lifecycle management operation occurrence.")
         private Link vnfLcmOpOcc;
         @ApiModelProperty(name = "VNF Instance", notes = "Related VNF instance.")
