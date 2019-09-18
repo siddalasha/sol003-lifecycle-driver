@@ -38,6 +38,8 @@ public class GrantControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().getId()).isNotNull();
+        assertThat(responseEntity.getHeaders().getLocation()).isNotNull();
+        assertThat(responseEntity.getHeaders().getLocation().getPath()).isEqualTo(GRANTS_ENDPOINT + "/" + responseEntity.getBody().getId());
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 

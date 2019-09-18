@@ -22,11 +22,10 @@ public class GrantService {
 
     public Grant getGrant(String grantId) throws GrantRejectedException {
 
-        // for not we are not persisting grants so the only information we can return in the grant response is the prpvided id
+        // for not we are not persisting grants so the only information we can return in the grant response is the provided id
         Grant grant = new Grant();
         grant.setId(grantId);
         return grant;
-
     }
 
 }
