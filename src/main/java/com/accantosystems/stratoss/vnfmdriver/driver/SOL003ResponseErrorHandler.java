@@ -37,12 +37,19 @@ public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
                     ProblemDetails problemDetails = objectMapper.readValue(responseBody, ProblemDetails.class);
                     // Check mandatory fields to see if this is indeed a valid ETSI SOL003-compliant error response
                     if (problemDetails.getStatus() != null && problemDetails.getDetail() != null) {
-                        throw new SOL003ResponseException(problemDetails.getTitle(), e, problemDetails);
+                        throw new SOL003ResponseException("Received SOL003-compliant error when communicating with VNFM", e, problemDetails);
                     }
                 }
             }
-            // Else, just re-throw the original exception
-            throw e;
+            // Else, attempt to extract information out of the error response (as best as possible)
+            final String responseBody = e.getResponseBodyAsString();
+            String detailsMessage = e.getStatusText();
+            if (!StringUtils.isEmpty(responseBody)) {
+                detailsMessage += ": " + responseBody;
+            }
+            throw new SOL003ResponseException("Caught REST client exception when communicating with VNFM", new ProblemDetails(e.getRawStatusCode(), detailsMessage));
+        } catch (Exception e) {
+            throw new SOL003ResponseException("Caught general exception when communicating with VNFM", e);
         }
     }
 
