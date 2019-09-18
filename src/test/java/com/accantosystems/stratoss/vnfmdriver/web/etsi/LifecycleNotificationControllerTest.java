@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,6 +15,9 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.FailureDetails;
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
@@ -42,7 +46,7 @@ public class LifecycleNotificationControllerTest {
     }
 
     @Test
-    public void testReceiveOpOccResultNotification() throws Exception {
+    public void testReceiveOpOccCompletedNotification() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpEntity = new HttpEntity<>(loadFileIntoString("examples/VnfLcmOperationOccurrenceNotification-INSTANTIATE-COMPLETED.json"), headers);
@@ -52,7 +56,39 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(externalMessagingService).sendExecutionAsyncResponse(any());
+        final ArgumentCaptor<ExecutionAsyncResponse> argument = ArgumentCaptor.forClass(ExecutionAsyncResponse.class);
+        verify(externalMessagingService).sendExecutionAsyncResponse(argument.capture());
+
+        final ExecutionAsyncResponse asyncResponse = argument.getValue();
+        assertThat(asyncResponse).isNotNull();
+        assertThat(asyncResponse.getRequestId()).isEqualTo("8dbe6621-f6b9-49ba-878b-26803f107f27");
+        assertThat(asyncResponse.getStatus()).isEqualTo(ExecutionStatus.COMPLETE);
+        assertThat(asyncResponse.getFailureDetails()).isNull();
+        assertThat(asyncResponse.getOutputs()).isEmpty();
+    }
+
+    @Test
+    public void testReceiveOpOccFailedNotification() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> httpEntity = new HttpEntity<>(loadFileIntoString("examples/VnfLcmOperationOccurrenceNotification-INSTANTIATE-FAILED.json"), headers);
+        final ResponseEntity<Void> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                                                                    .postForEntity(NOTIFICATIONS_ENDPOINT, httpEntity, Void.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        final ArgumentCaptor<ExecutionAsyncResponse> argument = ArgumentCaptor.forClass(ExecutionAsyncResponse.class);
+        verify(externalMessagingService).sendExecutionAsyncResponse(argument.capture());
+
+        final ExecutionAsyncResponse asyncResponse = argument.getValue();
+        assertThat(asyncResponse).isNotNull();
+        assertThat(asyncResponse.getRequestId()).isEqualTo("8dbe6621-f6b9-49ba-878b-26803f107f27");
+        assertThat(asyncResponse.getStatus()).isEqualTo(ExecutionStatus.FAILED);
+        assertThat(asyncResponse.getFailureDetails()).isNotNull();
+        assertThat(asyncResponse.getFailureDetails().getFailureCode()).isEqualTo(FailureDetails.FailureCode.INTERNAL_ERROR);
+        assertThat(asyncResponse.getFailureDetails().getDescription()).isEqualTo("Error instantiating VNF");
+        assertThat(asyncResponse.getOutputs()).isEmpty();
     }
 
     @Test
