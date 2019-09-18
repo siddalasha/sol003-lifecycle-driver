@@ -2,7 +2,8 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,6 +100,8 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
     @Test
@@ -109,15 +112,19 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
     @Test
     public void testReceiveNotificationNoAuthentication() {
-        final ResponseEntity<Void> responseEntity = testRestTemplate.postForEntity(NOTIFICATIONS_ENDPOINT, EMPTY_JSON, Void.class);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.postForEntity(NOTIFICATIONS_ENDPOINT, EMPTY_JSON, ProblemDetails.class);
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(responseEntity.getBody()).isNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
     @Test
@@ -127,7 +134,9 @@ public class LifecycleNotificationControllerTest {
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(responseEntity.getBody()).isNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
     @Test
@@ -138,6 +147,8 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
     @Test
@@ -147,7 +158,9 @@ public class LifecycleNotificationControllerTest {
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(responseEntity.getBody()).isNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(responseEntity.getBody().getDetail()).isNotEmpty();
     }
 
 }
