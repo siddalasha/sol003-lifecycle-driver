@@ -2,17 +2,20 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,8 +24,8 @@ public class LifecycleNotificationControllerTest {
 
     public static final String NOTIFICATIONS_ENDPOINT = "/vnflcm/v1/notifications";
 
-    @Autowired
-    private TestRestTemplate testRestTemplate;
+    @Autowired private TestRestTemplate testRestTemplate;
+    @MockBean private ExternalMessagingService externalMessagingService;
 
     @Test
     public void testReceiveNotification() throws Exception {
@@ -34,6 +37,22 @@ public class LifecycleNotificationControllerTest {
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        verifyZeroInteractions(externalMessagingService);
+    }
+
+    @Test
+    public void testReceiveOpOccResultNotification() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> httpEntity = new HttpEntity<>(loadFileIntoString("examples/VnfLcmOperationOccurrenceNotification-INSTANTIATE-COMPLETED.json"), headers);
+        final ResponseEntity<Void> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                                                                    .postForEntity(NOTIFICATIONS_ENDPOINT, httpEntity, Void.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        verify(externalMessagingService).sendExecutionAsyncResponse(any());
     }
 
     @Test
@@ -83,7 +102,6 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(responseEntity.getBody().getDetail()).isEqualTo("billy_no_mates");
     }
 
     @Test

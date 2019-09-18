@@ -79,7 +79,9 @@ public class VNFLifecycleManagementDriver {
         }
 
         if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != HttpStatus.CREATED) {
-            logger.error("Invalid status code [{}] received, was expecting [201 Created]", responseEntity.getStatusCode());
+            logger.warn("Invalid status code [{}] received, was expecting [201 Created]", responseEntity.getStatusCode());
+        } else if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException(String.format("Invalid status code received [%s] for CreateVnfRequest", responseEntity.getStatusCode().value()));
         }
 
         // Postcondition: VNF instance created in NOT_INSTANTIATED state

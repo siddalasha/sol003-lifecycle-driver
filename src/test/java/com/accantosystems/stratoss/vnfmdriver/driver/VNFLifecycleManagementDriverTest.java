@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -99,8 +100,26 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
+        final VnfInstance vnfInstance = driver.createVnfInstance(createVnfRequest);
+
+        assertThat(vnfInstance).isNotNull();
+        assertThat(vnfInstance.getId()).isEqualTo("TEST_ID");
+    }
+
+    @Test
+    public void testCreateVnfInstanceWithInvalidResponseCode() throws Exception {
+        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andRespond(withStatus(HttpStatus.MOVED_PERMANENTLY));
+
+        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
+        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
+        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+
         assertThatThrownBy(() -> driver.createVnfInstance(createVnfRequest))
-                .isInstanceOf(RestClientException.class);
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Invalid status code received [301] for CreateVnfRequest");
     }
 
     @Test

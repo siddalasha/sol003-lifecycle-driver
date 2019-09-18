@@ -1,15 +1,23 @@
 package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
+import java.util.Collections;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.FailureDetails;
+import com.accantosystems.stratoss.vnfmdriver.model.etsi.LcmOperationStateType;
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.SOL003Notification;
+import com.accantosystems.stratoss.vnfmdriver.model.etsi.VnfLcmOperationOccurenceNotification;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +39,24 @@ public class LifecycleNotificationController {
     @ApiOperation(value = "Receives a lifecycle operation occurrence notification from a VNFM", code = 204)
     public ResponseEntity<Void> receiveNotification(@RequestBody SOL003Notification notification) {
         logger.info("Received notification:\n{}", notification);
+
+        if (notification instanceof VnfLcmOperationOccurenceNotification) {
+            final VnfLcmOperationOccurenceNotification vnfLcmOpOccNotification = (VnfLcmOperationOccurenceNotification) notification;
+            // Send an update if this is completed
+            if (vnfLcmOpOccNotification.getNotificationStatus() == VnfLcmOperationOccurenceNotification.NotificationStatus.RESULT){
+                ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(vnfLcmOpOccNotification.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap());
+                // If the operation state is anything other than COMPLETED, than assume we've failed (could be FAILED, FAILED_TEMP or ROLLED_BACK)
+                if (vnfLcmOpOccNotification.getOperationState() != LcmOperationStateType.COMPLETED) {
+                    asyncResponse.setStatus(ExecutionStatus.FAILED);
+                    // Set the failure details if we have an error message
+                    if (vnfLcmOpOccNotification.getError() != null && !StringUtils.isEmpty(vnfLcmOpOccNotification.getError().getDetail())) {
+                        asyncResponse.setFailureDetails(new FailureDetails(FailureDetails.FailureCode.INTERNAL_ERROR, vnfLcmOpOccNotification.getError().getDetail()));
+                    }
+                }
+                externalMessagingService.sendExecutionAsyncResponse(asyncResponse);
+            }
+        }
+
         return ResponseEntity.noContent().build();
     }
 
