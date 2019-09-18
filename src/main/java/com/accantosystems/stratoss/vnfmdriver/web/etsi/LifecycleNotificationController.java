@@ -38,6 +38,7 @@ public class LifecycleNotificationController {
     @PostMapping
     @ApiOperation(value = "Receives a lifecycle operation occurrence notification from a VNFM", code = 204)
     public ResponseEntity<Void> receiveNotification(@RequestBody SOL003Notification notification) {
+        // TODO This should be reduced to DEBUG level, but it assists in development testing to see all notification messages being received
         logger.info("Received notification:\n{}", notification);
 
         if (notification instanceof VnfLcmOperationOccurenceNotification) {
