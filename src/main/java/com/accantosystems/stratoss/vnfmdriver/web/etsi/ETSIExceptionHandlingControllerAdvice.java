@@ -77,23 +77,12 @@ public class ETSIExceptionHandlingControllerAdvice {
     }
 
     private ProblemDetails defaultHandle(String message, Exception cause, HttpStatus statusCode) {
-        logError(message, cause);
-        return buildProblemDetails(cause, statusCode);
-    }
-
-    private ProblemDetails buildProblemDetails(final Exception cause, final HttpStatus statusCode) {
-        final ProblemDetails problemDetails = new ProblemDetails();
-        problemDetails.setStatus(statusCode.value());
-        problemDetails.setDetail(cause.getLocalizedMessage());
-        return problemDetails;
-    }
-
-    private void logError(String message, Throwable cause) {
         if (logger.isDebugEnabled()) {
             logger.warn(message, cause);
         } else {
             logger.warn(String.format("%s: %s", message, cause.getMessage()));
         }
+        return new ProblemDetails(statusCode.value(), cause.getLocalizedMessage());
     }
 
 }

@@ -1,5 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.driver;
 
+import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.*;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,9 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.*;
 
 @Service("VNFLifecycleManagementDriver")
@@ -56,32 +61,49 @@ public class VNFLifecycleManagementDriver {
                                                .build();
     }
 
-    public VnfInstance createVnfInstance(CreateVnfRequest createVnfRequest) {
+    public VnfInstance createVnfInstance(final VNFMConnectionDetails vnfmConnectionDetails, final CreateVnfRequest createVnfRequest) {
         // Sends CreateVnfRequest message via HTTP POST to /vnf_instances
         // Gets 201 Created response with a VnfInstance as the response body
 
-        final String apiRoot = "http://localhost:8080";
-        final String url = apiRoot + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
+        final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        // TODO Add authentication here
+        if (vnfmConnectionDetails.getAuthenticationType() == VNFMConnectionDetails.AuthenticationType.BASIC) {
+            headers.setBasicAuth(vnfmConnectionDetails.getAuthenticationProperties().get(BASIC_AUTHENTICATION_USERNAME),
+                                 vnfmConnectionDetails.getAuthenticationProperties().get(BASIC_AUTHENTICATION_PASSWORD));
+        } else if (vnfmConnectionDetails.getAuthenticationType() == VNFMConnectionDetails.AuthenticationType.OAUTH2) {
+            // TODO Add OAuth2 authentication here
+        }
         final HttpEntity<CreateVnfRequest> requestEntity = new HttpEntity<>(createVnfRequest, headers);
 
         ResponseEntity<VnfInstance> responseEntity;
         try {
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);
         } catch (SOL003ResponseException e) {
-            logger.error("SOL003-compliant exception", e);
+            logger.debug("Received SOL003-compliant exception when performing a CreateVnfRequest", e);
             throw e;
+        } catch (RestClientResponseException e) {
+            final String localErrorMessage = "Caught REST client exception when performing CreateVnfRequest";
+            logger.debug(localErrorMessage, e);
+            // Attempt to extract information out of the error response (as best as possible)
+            final String responseBody = e.getResponseBodyAsString();
+            String detailsMessage = e.getStatusText();
+            if (!StringUtils.isEmpty(responseBody)) {
+                detailsMessage += ": " + responseBody;
+            }
+            throw new SOL003ResponseException(localErrorMessage, new ProblemDetails(e.getRawStatusCode(), detailsMessage));
         } catch (Exception e) {
-            logger.error("General exception", e);
-            throw e;
+            logger.debug("Caught general exception when performing CreateVnfRequest", e);
+            throw new SOL003ResponseException(e);
         }
 
-        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != HttpStatus.CREATED) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getStatusCode() != HttpStatus.CREATED && responseEntity.getBody() != null) {
+            // Be lenient on 2xx response codes
             logger.warn("Invalid status code [{}] received, was expecting [201 Created]", responseEntity.getStatusCode());
         } else if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException(String.format("Invalid status code received [%s] for CreateVnfRequest", responseEntity.getStatusCode().value()));
+            throw new SOL003ResponseException(String.format("Invalid status code [%s] received for CreateVnfRequest", responseEntity.getStatusCode().value()));
+        } else if (responseEntity.getBody() == null) {
+            throw new SOL003ResponseException("No response body for CreateVnfRequest");
         }
 
         // Postcondition: VNF instance created in NOT_INSTANTIATED state
@@ -89,7 +111,7 @@ public class VNFLifecycleManagementDriver {
         // Out of band VnfIdentifierCreationNotification should be received after this returns
     }
 
-    public void deleteVnfInstance(String vnfInstanceId) {
+    public void deleteVnfInstance(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId) {
         // Precondition: VNF instance in NOT_INSTANTIATED state
         // Sends HTTP DELETE request to /vnf_instances/{vnfInstanceId}
         // Gets 204 No Content response
@@ -149,38 +171,38 @@ public class VNFLifecycleManagementDriver {
          */
     }
 
-    public List<VnfLcmOpOcc> queryAllLifecycleOperationOccurrences() {
+    public List<VnfLcmOpOcc> queryAllLifecycleOperationOccurrences(final VNFMConnectionDetails vnfmConnectionDetails) {
         // Sends HTTP GET request to /vnf_lcm_op_occs
         // Gets 200 OK response with an array of VnfLcmOpOccs as the response body
         return null;
     }
 
-    public VnfLcmOpOcc queryLifecycleOperationOccurrence(String vnfLcmOpOccId) {
+    public VnfLcmOpOcc queryLifecycleOperationOccurrence(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfLcmOpOccId) {
         // Sends HTTP GET request to /vnf_lcm_op_occs/{vnfLcmOpOccId}
         // Gets 200 OK response with a VnfLcmOpOcc as the response body
         return null;
     }
 
-    public LccnSubscription createLifecycleSubscription(LccnSubscriptionRequest lccnSubscriptionRequest) {
+    public LccnSubscription createLifecycleSubscription(final VNFMConnectionDetails vnfmConnectionDetails, final LccnSubscriptionRequest lccnSubscriptionRequest) {
         // Sends LccnSubscriptionRequest message via HTTP POST to /subscriptions
         //    Optionally the VNFM may test the notification endpoint here
         // Gets 201 Created response with a LccnSubscription as the response body
         return null;
     }
 
-    public List<LccnSubscription> queryAllLifecycleSubscriptions() {
+    public List<LccnSubscription> queryAllLifecycleSubscriptions(final VNFMConnectionDetails vnfmConnectionDetails) {
         // Sends HTTP GET request to /subscriptions
         // Gets 200 OK response with an array of LccnSubscriptions as the response body
         return null;
     }
 
-    public LccnSubscription queryLifecycleSubscription(String subscriptionId) {
+    public LccnSubscription queryLifecycleSubscription(final VNFMConnectionDetails vnfmConnectionDetails, final String subscriptionId) {
         // Sends HTTP GET request to /subscriptions/{subscriptionId}
         // Gets 200 OK response with a LccnSubscription as the response body
         return null;
     }
 
-    public void deleteLifecycleSubscription(String subscriptionId) {
+    public void deleteLifecycleSubscription(final VNFMConnectionDetails vnfmConnectionDetails, final String subscriptionId) {
         // Sends HTTP DELETE request to /subscriptions/{subscriptionId}
         // Gets 204 No Content response
     }

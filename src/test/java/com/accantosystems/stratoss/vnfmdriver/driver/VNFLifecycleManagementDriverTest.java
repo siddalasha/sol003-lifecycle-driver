@@ -1,8 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.driver;
 
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
@@ -24,13 +23,13 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.CreateVnfRequest;
+import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.VnfInstance;
 
 @RunWith(SpringRunner.class)
 @RestClientTest({VNFLifecycleManagementDriver.class, SOL003ResponseErrorHandler.class})
 public class VNFLifecycleManagementDriverTest {
 
-    private static final String SERVER_BASE_URL = "http://localhost:8080";
     private static final String INSTANCE_ENDPOINT = "/vnflcm/v1/vnf_instances";
 
     @Autowired private VNFLifecycleManagementDriver driver;
@@ -40,10 +39,10 @@ public class VNFLifecycleManagementDriverTest {
 
     @Test
     public void testCreateVnfInstance() throws Exception {
-        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-              .andRespond(withCreatedEntity(URI.create(SERVER_BASE_URL + INSTANCE_ENDPOINT + "/TEST_ID"))
+              .andRespond(withCreatedEntity(URI.create(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT + "/TEST_ID"))
                                   .body(loadFileIntoString("examples/VnfInstance.json"))
                                   .contentType(MediaType.APPLICATION_JSON));
 
@@ -51,7 +50,27 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(createVnfRequest);
+        final VnfInstance vnfInstance = driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest);
+
+        assertThat(vnfInstance).isNotNull();
+        assertThat(vnfInstance.getId()).isEqualTo("TEST_ID");
+    }
+
+    @Test
+    public void testCreateVnfInstanceWithBasicAuth() throws Exception {
+        server.expect(requestTo(SECURE_TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andExpect(header(HttpHeaders.AUTHORIZATION, BASIC_AUTHORIZATION_HEADER))
+              .andRespond(withCreatedEntity(URI.create(SECURE_TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT + "/TEST_ID"))
+                                  .body(loadFileIntoString("examples/VnfInstance.json"))
+                                  .contentType(MediaType.APPLICATION_JSON));
+
+        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
+        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
+        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+
+        final VnfInstance vnfInstance = driver.createVnfInstance(VNFM_CONNECTION_DETAILS_BASIC_AUTHENTICATION, createVnfRequest);
 
         assertThat(vnfInstance).isNotNull();
         assertThat(vnfInstance.getId()).isEqualTo("TEST_ID");
@@ -59,7 +78,7 @@ public class VNFLifecycleManagementDriverTest {
 
     @Test
     public void testCreateVnfInstanceWithProblemDetails() throws Exception {
-        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withServerError().body(loadFileIntoString("examples/ProblemDetails.json"))
@@ -69,13 +88,16 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
-        assertThatThrownBy(() -> driver.createVnfInstance(createVnfRequest))
-                .isInstanceOf(SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest), SOL003ResponseException.class);
+
+        assertThat(exception.getProblemDetails()).isNotNull();
+        assertThat(exception.getProblemDetails().getStatus()).isEqualTo(500);
+        assertThat(exception.getProblemDetails().getDetail()).isEqualTo("An error has occurred");
     }
 
     @Test
     public void testCreateVnfInstanceWithUnknownException() {
-        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withServerError());
@@ -84,13 +106,34 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
-        assertThatThrownBy(() -> driver.createVnfInstance(createVnfRequest))
-                .isInstanceOf(RestClientException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest), SOL003ResponseException.class);
+
+        assertThat(exception.getProblemDetails()).isNotNull();
+        assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(exception.getProblemDetails().getDetail()).isEqualTo("Internal Server Error");
+    }
+
+    @Test
+    public void testCreateVnfInstanceWithUnknownExceptionAndBody() {
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andRespond(withServerError().body("This message should also appear"));
+
+        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
+        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
+        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest), SOL003ResponseException.class);
+
+        assertThat(exception.getProblemDetails()).isNotNull();
+        assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(exception.getProblemDetails().getDetail()).isEqualTo("Internal Server Error: This message should also appear");
     }
 
     @Test
     public void testCreateVnfInstanceWithInvalidSuccessCode() throws Exception {
-        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withSuccess().body(loadFileIntoString("examples/VnfInstance.json"))
@@ -100,15 +143,15 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(createVnfRequest);
+        final VnfInstance vnfInstance = driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest);
 
         assertThat(vnfInstance).isNotNull();
         assertThat(vnfInstance.getId()).isEqualTo("TEST_ID");
     }
 
     @Test
-    public void testCreateVnfInstanceWithInvalidResponseCode() throws Exception {
-        server.expect(requestTo(SERVER_BASE_URL + INSTANCE_ENDPOINT))
+    public void testCreateVnfInstanceWithInvalidResponseCode() {
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.MOVED_PERMANENTLY));
@@ -117,9 +160,25 @@ public class VNFLifecycleManagementDriverTest {
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
         createVnfRequest.setVnfInstanceName(testName.getMethodName());
 
-        assertThatThrownBy(() -> driver.createVnfInstance(createVnfRequest))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Invalid status code received [301] for CreateVnfRequest");
+        assertThatThrownBy(() -> driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest))
+                .isInstanceOf(SOL003ResponseException.class)
+                .hasMessage("Invalid status code [301] received for CreateVnfRequest");
+    }
+
+    @Test
+    public void testCreateVnfInstanceWithEmptyResponseBody() {
+        server.expect(requestTo(TEST_SERVER_BASE_URL + INSTANCE_ENDPOINT))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andRespond(withCreatedEntity(null));
+
+        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
+        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
+        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+
+        assertThatThrownBy(() -> driver.createVnfInstance(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, createVnfRequest))
+                .isInstanceOf(SOL003ResponseException.class)
+                .hasMessage("No response body for CreateVnfRequest");
     }
 
     @Test
