@@ -19,6 +19,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
             .authorizeRequests()
             .antMatchers("/vnflcm/**").hasRole("USER")
+            .antMatchers("/grant/**").hasRole("USER")
             .anyRequest().denyAll()
             .and()
             .httpBasic();

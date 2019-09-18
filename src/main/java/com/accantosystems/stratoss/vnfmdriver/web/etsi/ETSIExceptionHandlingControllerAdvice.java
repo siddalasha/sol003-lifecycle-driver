@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 
 /**
  * Handles the conversion of Exceptions thrown by SOL003-compliant Rest API calls
@@ -66,6 +67,13 @@ public class ETSIExceptionHandlingControllerAdvice {
     @ResponseBody
     protected ProblemDetails handleHttpRequestMethodNotSupportedException(HttpServletRequest req, HttpRequestMethodNotSupportedException cause) {
         return defaultHandle("Invalid method used in request", cause, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(GrantRejectedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    protected ProblemDetails handleGrantRejectedException(HttpServletRequest req, GrantRejectedException cause) {
+        return defaultHandle("Grant request was rejected", cause, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
