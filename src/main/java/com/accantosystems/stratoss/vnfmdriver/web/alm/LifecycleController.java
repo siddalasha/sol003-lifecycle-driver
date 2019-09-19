@@ -1,7 +1,5 @@
 package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
+import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -22,14 +21,19 @@ public class LifecycleController {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleController.class);
 
+    private final LifecycleManagementService lifecycleManagementService;
+
     @Autowired
-    public LifecycleController() {}
+    public LifecycleController(final LifecycleManagementService lifecycleManagementService) {
+        this.lifecycleManagementService = lifecycleManagementService;
+    }
 
     @PostMapping("/execute")
     @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest) {
         logger.info("Received request to execute a lifecycle [{}] at deployment location [{}]", executionRequest.getLifecycleName(), executionRequest.getDeploymentLocation().getName());
-        return ResponseEntity.accepted().body(new ExecutionAcceptedResponse(UUID.randomUUID().toString()));
+        final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
+        return ResponseEntity.accepted().body(executionAcceptedResponse);
     }
 
 }

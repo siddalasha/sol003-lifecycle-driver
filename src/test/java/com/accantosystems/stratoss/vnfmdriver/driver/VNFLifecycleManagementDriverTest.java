@@ -117,7 +117,7 @@ public class VNFLifecycleManagementDriverTest {
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT))
               .andExpect(method(HttpMethod.POST))
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-              .andRespond(withServerError().body("This message should also appear"));
+              .andRespond(withServerError().body(TEST_EXCEPTION_MESSAGE));
 
         final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
         createVnfRequest.setVnfdId(UUID.randomUUID().toString());
@@ -127,7 +127,7 @@ public class VNFLifecycleManagementDriverTest {
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(exception.getProblemDetails().getDetail()).isEqualTo("Internal Server Error: This message should also appear");
+        assertThat(exception.getProblemDetails().getDetail()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + TEST_EXCEPTION_MESSAGE);
     }
 
     @Test
