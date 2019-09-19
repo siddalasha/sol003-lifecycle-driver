@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestClientResponseException;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import org.etsi.sol003.common.ProblemDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component("SOL003ResponseErrorHandler")

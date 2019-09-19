@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.FailureDetails;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.LcmOperationStateType;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.SOL003Notification;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.VnfLcmOperationOccurenceNotification;
+import org.etsi.sol003.lifecyclemanagement.LcmOperationStateType;
+import org.etsi.sol003.lifecyclemanagement.LifecycleManagementNotification;
+import org.etsi.sol003.lifecyclemanagement.VnfLcmOperationOccurenceNotification;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +37,7 @@ public class LifecycleNotificationController {
 
     @PostMapping
     @ApiOperation(value = "Receives a lifecycle operation occurrence notification from a VNFM", code = 204)
-    public ResponseEntity<Void> receiveNotification(@RequestBody SOL003Notification notification) {
+    public ResponseEntity<Void> receiveNotification(@RequestBody LifecycleManagementNotification notification) {
         // TODO This should be reduced to DEBUG level, but it assists in development testing to see all notification messages being received
         logger.info("Received notification:\n{}", notification);
 

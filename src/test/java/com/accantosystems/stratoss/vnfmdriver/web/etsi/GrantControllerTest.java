@@ -14,7 +14,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.Grant;
+import org.etsi.sol003.granting.Grant;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

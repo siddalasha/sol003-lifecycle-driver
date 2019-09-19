@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.Grant;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.GrantRequest;
+import org.etsi.sol003.granting.Grant;
+import org.etsi.sol003.granting.GrantRequest;
 
 @Service("GrantService")
 public class GrantService {

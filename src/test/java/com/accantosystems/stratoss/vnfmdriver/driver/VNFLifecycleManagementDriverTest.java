@@ -8,6 +8,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.net.URI;
 import java.util.UUID;
 
+import org.etsi.sol003.lifecyclemanagement.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -20,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
-
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.*;
 
 @RunWith(SpringRunner.class)
 @RestClientTest({ VNFLifecycleManagementDriver.class, SOL003ResponseErrorHandler.class })

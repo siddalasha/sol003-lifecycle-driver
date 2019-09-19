@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import org.etsi.sol003.common.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 
 /**

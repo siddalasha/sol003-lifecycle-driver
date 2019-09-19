@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.etsi.sol003.lifecyclemanagement.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.*;
 
 /**
  * Driver implementing the ETSI SOL003 Lifecycle Management interface
@@ -67,10 +67,10 @@ public class VNFLifecycleManagementDriver {
 
     private final static Logger logger = LoggerFactory.getLogger(VNFLifecycleManagementDriver.class);
 
-    public final static String API_CONTEXT_ROOT = "/vnflcm/v1";
-    public final static String API_PREFIX_VNF_INSTANCES = "/vnf_instances";
-    public final static String API_PREFIX_OP_OCCURRENCES = "/vnf_lcm_op_occs";
-    public final static String API_PREFIX_SUBSCRIPTIONS = "/subscriptions";
+    private final static String API_CONTEXT_ROOT = "/vnflcm/v1";
+    private final static String API_PREFIX_VNF_INSTANCES = "/vnf_instances";
+    private final static String API_PREFIX_OP_OCCURRENCES = "/vnf_lcm_op_occs";
+    private final static String API_PREFIX_SUBSCRIPTIONS = "/subscriptions";
 
     private final RestTemplate restTemplate;
 

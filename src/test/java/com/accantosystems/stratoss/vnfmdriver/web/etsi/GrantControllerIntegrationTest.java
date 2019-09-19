@@ -20,9 +20,9 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.Grant;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.GrantRequest;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import org.etsi.sol003.granting.Grant;
+import org.etsi.sol003.granting.GrantRequest;
+import org.etsi.sol003.common.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantService;
 

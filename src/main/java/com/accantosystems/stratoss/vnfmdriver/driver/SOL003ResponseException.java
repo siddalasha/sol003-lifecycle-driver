@@ -2,7 +2,7 @@ package com.accantosystems.stratoss.vnfmdriver.driver;
 
 import org.springframework.web.client.RestClientException;
 
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import org.etsi.sol003.common.ProblemDetails;
 
 public class SOL003ResponseException extends RestClientException {
 

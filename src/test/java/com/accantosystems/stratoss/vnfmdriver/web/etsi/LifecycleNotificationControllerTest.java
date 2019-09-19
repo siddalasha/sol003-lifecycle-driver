@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.FailureDetails;
-import com.accantosystems.stratoss.vnfmdriver.model.etsi.ProblemDetails;
+import org.etsi.sol003.common.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
 @RunWith(SpringRunner.class)
