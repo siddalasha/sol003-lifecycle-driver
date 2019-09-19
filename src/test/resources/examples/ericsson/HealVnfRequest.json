@@ -1,0 +1,6 @@
+{
+  "cause": "vm down",
+  "additionalParams": {
+    "resourceName": "vnflaf-services"
+  }
+}

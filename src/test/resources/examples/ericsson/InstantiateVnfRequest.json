@@ -1,0 +1,90 @@
+{
+  "flavourId": "CXP123456_1-R1A01",
+  "instantiationLevelId": "instantiated",
+  "extVirtualLinks": [
+    {
+      "id": "45672c22-7c12-49ed-8a4f-e4532b3026fb",
+      "vimConnectionId": "f03a29d5-1fc6-11e9-83ea-fa163e045578",
+      "resourceId": "45672c22-5r54-49ed-8a4f-e4532b3026fb",
+      "extCps": [
+        {
+          "cpdId": "SERVICES_ExtCp",
+          "cpConfig": [
+            {
+              "cpInstanceId": "cpInstanceId111",
+              "linkPortId": "linkPortId222",
+              "cpProtocolData": [
+                {
+                  "layerProtocol": "IP_OVER_ETHERNET",
+                  "ipOverEthernet": {
+                    "macAddress": "fa:16:3e:23:fd:d7",
+                    "ipAddresses": [
+                      {
+                        "type": "IPV4",
+                        "fixedAddresses": [
+                          "131.160.162.32"
+                        ],
+                        "numDynamicAddresses": "1",
+                        "addressRange": {
+                          "minAddress": "131.160.162.32",
+                          "maxAddress": "131.160.162.36"
+                        },
+                        "subnetId": ""
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "extLinkPorts": [
+        {
+          "id": "id",
+          "resourceHandle": {
+            "vimConnectionId": "47772c22-7c12-49ed-8a4f-e7625b3026fb",
+            "resourceProviderId": "",
+            "resourceId": "45672c22-5r54-49ed-8a4f-e4532b3026fb",
+            "vimLevelResourceType": ""
+          }
+        }
+      ]
+    }
+  ],
+  "additionalParams": {
+    "additionalAttributes": {
+      "servicesImage": "ERICvnflafdevimage_CXP9032638_4.9.17",
+      "services_flavor": "m1.medium",
+      "ip_version": 4,
+      "external_net_id": "491522c2-f023-4162-b097-55a9a71972f3",
+      "external_subnet_cidr": "131.160.162.0/25",
+      "external_subnet_gateway": "131.160.162.1",
+      "external_ip_for_services_vm": "131.160.162.86",
+      "cloudManagerType": "CEE",
+      "ossType": "OSSRC",
+      "ossMasterHostName": "masterservice",
+      "ossMasterHostIP": "1.1.1.1",
+      "ossNotificationServiceHost": "notificationservice",
+      "ossNotificationServiceIP": "1.1.1.1",
+      "ossUserName": "root"
+    }
+  },
+  "vimConnectionInfo": [
+    {
+      "id": "4408b119-eb54-11e7-bae0-fa163eb90b5c",
+      "vimId": "vim1",
+      "vimType": "CEE",
+      "interfaceInfo": {
+        "identityEndPoint": "https://ieatcee01cic.athtem.eei.ericsson.se: 5000/v2.0"
+      },
+      "accessInfo": {
+        "projectId": "cab32f669c18404d8bed0fae6bf088aa",
+        "credentials": {
+          "username": "eGFuaWxwcw==",
+          "password": "RXJpY3Nzb24uLjYyNA=="
+        }
+      }
+    }
+  ]
+}

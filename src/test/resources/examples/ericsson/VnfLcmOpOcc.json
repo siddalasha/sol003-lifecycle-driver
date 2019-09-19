@@ -1,0 +1,17 @@
+{
+  "id": "",
+  "operationState": "COMPLETED",
+  "vnfInstanceId": "",
+  "stateEnteredTime": "",
+  "startTime": "",
+  "operation": "INSTANTIATE",
+  "isAutomaticInvocation": "false",
+  "operationParams": "",
+  "isCancelPending": "false",
+  "resourceChanges": {
+  },
+  _links: {
+    "self": "{apiRoot}/vnflcm/v1/vnf_lcm_op_occs/{vnfLcmOpOccId}",
+    "vnfInstance": "{apiRoot}/vnflcm/v1/vnf_instances/{vnfInstanceId}"
+  }
+}

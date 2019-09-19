@@ -405,7 +405,22 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testCreateLifecycleSubscription() {
+    public void testCreateLifecycleSubscription() throws Exception {
+        server.expect(requestTo(TEST_SERVER_BASE_URL + SUBSCRIPTIONS_ENDPOINT))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andRespond(withCreatedEntity(URI.create(TEST_SERVER_BASE_URL + SUBSCRIPTIONS_ENDPOINT + "/" + TEST_LCCN_SUBSCRIPTION_ID))
+                                  .body(loadFileIntoString("examples/LccnSubscription.json"))
+                                  .contentType(MediaType.APPLICATION_JSON));
+
+        final LccnSubscriptionRequest lccnSubscriptionRequest = new LccnSubscriptionRequest();
+        lccnSubscriptionRequest.setCallbackUri(NOTIFICATIONS_ENDPOINT);
+
+        final LccnSubscription lccnSubscription = driver.createLifecycleSubscription(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, lccnSubscriptionRequest);
+
+        assertThat(lccnSubscription).isNotNull();
+        assertThat(lccnSubscription.getId()).isEqualTo(TEST_LCCN_SUBSCRIPTION_ID);
+        assertThat(lccnSubscription.getCallbackUri()).isEqualTo(NOTIFICATIONS_ENDPOINT);
     }
 
     @Test
@@ -418,6 +433,11 @@ public class VNFLifecycleManagementDriverTest {
 
     @Test
     public void testDeleteLifecycleSubscription() {
+        server.expect(requestTo(TEST_SERVER_BASE_URL + SUBSCRIPTIONS_ENDPOINT + "/" + TEST_LCCN_SUBSCRIPTION_ID))
+              .andExpect(method(HttpMethod.DELETE))
+              .andRespond(withNoContent());
+
+        driver.deleteLifecycleSubscription(VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION, TEST_LCCN_SUBSCRIPTION_ID);
     }
 
 }

@@ -401,7 +401,15 @@ public class VNFLifecycleManagementDriver {
      * @throws SOL003ResponseException if there are any errors creating the subscription
      */
     public LccnSubscription createLifecycleSubscription(final VNFMConnectionDetails vnfmConnectionDetails, final LccnSubscriptionRequest lccnSubscriptionRequest) throws SOL003ResponseException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_SUBSCRIPTIONS;
+        final HttpHeaders headers = getHttpHeaders(vnfmConnectionDetails);
+        final HttpEntity<LccnSubscriptionRequest> requestEntity = new HttpEntity<>(lccnSubscriptionRequest, headers);
+
+        final ResponseEntity<LccnSubscription> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, LccnSubscription.class);
+
+        // "Location" header also includes URI of the created instance
+        checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
+        return responseEntity.getBody();
     }
 
     /**
@@ -450,7 +458,15 @@ public class VNFLifecycleManagementDriver {
      * @throws SOL003ResponseException if there are any errors deleting the LccnSubscription
      */
     public void deleteLifecycleSubscription(final VNFMConnectionDetails vnfmConnectionDetails, final String subscriptionId) throws SOL003ResponseException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_SUBSCRIPTIONS + "/{subscriptionId}";
+        final HttpHeaders headers = getHttpHeaders(vnfmConnectionDetails);
+        final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        final Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("subscriptionId", subscriptionId);
+
+        final ResponseEntity<Void> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
+
+        checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
 
     /**

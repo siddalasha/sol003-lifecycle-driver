@@ -1,0 +1,20 @@
+{
+  "id": "0000-0002-0000-0001",
+  "vnfInstanceName": "CSCF-1",
+  "vnfInstanceDescription": "A fine VNF",
+  "vnfdId": "CXP123456_1-R1A01",
+  "vnfProvider": "Ericsson",
+  "vnfProductName": "CSCF",
+  "vnfSoftwareVersion": "R1A01",
+  "vnfdVersion": "1.0",
+  "vnfPkgId": "316aa140-c99a-4a08-b8f5-8e2cb73c83e8",
+  "instantiationState": "NOT_INSTANTIATED",
+  "_links": {
+    "self": {
+      "href": "{apiRoot}/vnflcm/v1/vnf_instances"
+    },
+    "instantiate": {
+      "href": "{apiRoot}/vnflcm/v1/vnf_instances/{vnfInstanceId}"
+    }
+  }
+}

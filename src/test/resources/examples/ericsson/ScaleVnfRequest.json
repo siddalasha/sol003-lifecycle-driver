@@ -1,0 +1,8 @@
+{
+  "type": "SCALE_OUT",
+  "aspectId": "FSB",
+  "numberOfSteps": 2,
+  "additionalParams": {
+    "node_type": "sgsnl"
+  }
+}

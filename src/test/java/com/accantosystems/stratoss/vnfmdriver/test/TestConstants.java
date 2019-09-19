@@ -20,6 +20,7 @@ public abstract class TestConstants {
 
     public static final String TEST_SERVER_BASE_URL = "http://localhost:8080";
     public static final String SECURE_TEST_SERVER_BASE_URL = "https://localhost:8080";
+    public static final String NOTIFICATIONS_ENDPOINT = "http://localhost:8080/vnflcm/v1/notifications";
     public static final String EMPTY_JSON = "{}";
     public static final String BASIC_AUTHORIZATION_HEADER = "Basic YmFzaWNfdXNlcjpiYXNpY19wYXNzd29yZA==";
 
