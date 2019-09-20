@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.assertj.core.api.Condition;
@@ -71,6 +72,20 @@ public abstract class TestConstants {
                 result.write(buffer, 0, length);
             }
             return result.toString(StandardCharsets.UTF_8.name());
+        }
+    }
+
+    public static String loadZipIntoBase64String(final String fileName) throws IOException {
+        try (
+                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                InputStream inputStream = TestConstants.class.getResourceAsStream(fileName.startsWith("/") ? fileName : "/" + fileName)
+        ) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                result.write(buffer, 0, length);
+            }
+            return Base64.getEncoder().encodeToString(result.toByteArray());
         }
     }
 
