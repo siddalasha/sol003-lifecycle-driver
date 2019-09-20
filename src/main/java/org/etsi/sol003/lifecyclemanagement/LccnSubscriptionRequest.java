@@ -1,5 +1,7 @@
 package org.etsi.sol003.lifecyclemanagement;
 
+import org.etsi.sol003.common.SubscriptionAuthentication;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 

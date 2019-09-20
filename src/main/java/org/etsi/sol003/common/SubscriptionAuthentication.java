@@ -1,4 +1,4 @@
-package org.etsi.sol003.lifecyclemanagement;
+package org.etsi.sol003.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
