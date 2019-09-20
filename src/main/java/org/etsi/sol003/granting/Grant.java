@@ -44,13 +44,13 @@ public class Grant {
     @ApiModelProperty(name = "Storage Reservation Identifier", notes = "Information that identifies a reservation applicable to the storage resource requirements of the corresponding grant request.")
     private String storageReservationId;
     @ApiModelProperty(name = "List of Resources to Add", notes = "List of resources that are approved to be added, with one entry per resource.")
-    private List<ResourceDefinition> addResources;
+    private List<GrantInfo> addResources;
     @ApiModelProperty(name = "List of Resources to Temporarily Instantiate", notes = "List of resources that are approved to be temporarily instantiated during the runtime of the lifecycle operation, with one entry per resource.")
-    private List<ResourceDefinition> tempResources;
+    private List<GrantInfo> tempResources;
     @ApiModelProperty(name = "List of Resources to Remove", notes = "List of resources that are approved to be removed, with one entry per resource.")
-    private List<ResourceDefinition> removeResources;
+    private List<GrantInfo> removeResources;
     @ApiModelProperty(name = "List of Resources to Update", notes = "List of resources that are approved to be modified, with one entry per resource.")
-    private List<ResourceDefinition> updateResources;
+    private List<GrantInfo> updateResources;
     @ApiModelProperty(name = "VIM Assets", notes = "Information about assets for the VNF that are managed by the NFVO in the VIM, such as software images and virtualised compute resource flavours.")
     private VimAssets vimAssets;
     @ApiModelProperty(name = "External Virtual Links", notes = "Information about external VLs to connect the VNF to.")
@@ -71,7 +71,7 @@ public class Grant {
 
         @ApiModelProperty(name = "Compute Resource Flavours", notes = "Mappings between virtual compute descriptors defined in the VNFD and compute resource flavours managed in the VIM.")
         private List<VimComputeResourceFlavour> computeResourceFlavours;
-        @ApiModelProperty(name = "Software Images", required = true, notes = "Mappings between software images defined in the VNFD and software images managed in the VIM.")
+        @ApiModelProperty(name = "Software Images", notes = "Mappings between software images defined in the VNFD and software images managed in the VIM.")
         private List<VimSoftwareImage> softwareImages;
     }
 

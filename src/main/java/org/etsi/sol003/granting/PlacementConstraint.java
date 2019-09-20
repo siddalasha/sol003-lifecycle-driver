@@ -1,7 +1,10 @@
 package org.etsi.sol003.granting;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,7 +25,8 @@ public class PlacementConstraint {
     @ApiModelProperty(name = "Scope", required = true, notes = "The scope of the placement constraint indicating the category of the \"place\" where the constraint applies.")
     private Scope scope;
     @ApiModelProperty(name = "Resource Reference", required = true, notes = "References to resources in the constraint rule.")
-    private ConstraintResourceRef resource;
+    @JsonProperty("resource")
+    private List<ConstraintResourceRef> resources;
 
     /**
      * Represents Affinity or Anti-affinity

@@ -36,7 +36,7 @@ public class GrantRequest {
     @ApiModelProperty(name = "Automatic Invocation", required = true, notes = "Set to true if this VNF LCM operation occurrence  has been triggered by an automated procedure inside the VNFM (i.e. ScaleVnf ScaleVnfToLevel triggered by auto-scale, HealVnf triggered by auto-heal). Set to false otherwise.")
     @JsonProperty("isAutomaticInvocation")
     private boolean automaticInvocation;
-    @ApiModelProperty(name = "Instantiation Level Id", required = true, notes = "If operation=INSTANTIATE, the identifier of the instantiation level may be provided as an alternative way to define the resources to be added. This attribute shall only be used if operation=INSTANTIATE.")
+    @ApiModelProperty(name = "Instantiation Level Id", notes = "If operation=INSTANTIATE, the identifier of the instantiation level may be provided as an alternative way to define the resources to be added. This attribute shall only be used if operation=INSTANTIATE.")
     private String instantiationLevelId;
     @ApiModelProperty(name = "List of Resources to Add", notes = "List of resource definitions in the VNFD for resources to be added by the LCM operation which is related to this grant request, with one entry per resource.")
     private List<ResourceDefinition> addResources;
@@ -64,7 +64,7 @@ public class GrantRequest {
 
         @ApiModelProperty(name = "VNF Lifecycle Management Operation Occurrence", required = true, notes = "Related VNF lifecycle management operation occurrence.")
         private Link vnfLcmOpOcc;
-        @ApiModelProperty(name = "VNF Instance", notes = "Related VNF instance.")
+        @ApiModelProperty(name = "VNF Instance", required = true, notes = "Related VNF instance.")
         private Link vnfInstance;
 
     }

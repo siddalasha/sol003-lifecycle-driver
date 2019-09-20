@@ -20,7 +20,7 @@ import lombok.Data;
 public class PkgmNotificationsFilter {
 
     @ApiModelProperty(name = "Notification Types", notes = "Match particular notification types.")
-    private List<NotificationTypes> notificationTypes;
+    private List<NotificationType> notificationTypes;
     @ApiModelProperty(name = "VNF Providers", notes = "Match VNF packages from a provider that is listed as part of this attribute.")
     @JsonProperty("vnfProvider")
     private List<String> vnfProviders;
@@ -31,15 +31,15 @@ public class PkgmNotificationsFilter {
     private List<String> vnfdIds;
     @ApiModelProperty(name = "Onboarded VNF Package Identifiers", notes = "Match VNF packages with a package identifier listed in the attribute. May be present if the \"notificationTypes\" attribute contains the value \"VnfPackageChangeNotification\", and shall be absent otherwise.")
     @JsonProperty("onboardedVnfPkgId")
-    private List<String>  onboardedVnfPkgIds;
-    @ApiModelProperty(name = "Operational States",  notes = "Match particular operational state of the onboarded VNF package. May be present if the \"notificationTypes\" attribute contains the value \"VnfPackageChangeNotification\", and shall be absent otherwise.")
+    private List<String> onboardedVnfPkgIds;
+    @ApiModelProperty(name = "Operational States", notes = "Match particular operational state of the onboarded VNF package. May be present if the \"notificationTypes\" attribute contains the value \"VnfPackageChangeNotification\", and shall be absent otherwise.")
     @JsonProperty("operationalState")
     private List<PackageOperationalStateType> operationalStates;
-    @ApiModelProperty(name = "Operational States",  notes = "Match particular usage state of the onboarded VNF package. May be present if the \"notificationTypes\" attribute contains the value \"VnfPackageChangeNotification\", and shall be absent otherwise.")
+    @ApiModelProperty(name = "Operational States", notes = "Match particular usage state of the onboarded VNF package. May be present if the \"notificationTypes\" attribute contains the value \"VnfPackageChangeNotification\", and shall be absent otherwise.")
     @JsonProperty("usageState")
     private List<PackageUsageStateType> usageStates;
 
-    public static enum NotificationTypes {
+    public static enum NotificationType {
         VnfPackageOnboardingNotification,
         VnfPackageChangeNotification
     }

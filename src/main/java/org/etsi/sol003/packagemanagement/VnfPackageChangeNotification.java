@@ -25,7 +25,7 @@ public class VnfPackageChangeNotification {
     private String id;
     @ApiModelProperty(name = "Notification Type", required = true, notes = "Discriminator for the different notification types. Shall be set to \"VnfPackageChangeNotification\" for this notification type.")
     private String notificationType;
-    @ApiModelProperty(name = "Subscription Identifier",  notes = "Identifier of the subscription that this notification relates to.")
+    @ApiModelProperty(name = "Subscription Identifier", notes = "Identifier of the subscription that this notification relates to.")
     private String subscriptionId;
     @ApiModelProperty(name = "Notification Time", required = true, notes = "Date-time of the generation of the notification.")
     private OffsetDateTime timeStamp;

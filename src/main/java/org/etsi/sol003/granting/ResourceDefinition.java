@@ -18,7 +18,7 @@ import lombok.Data;
 @ApiModel(description = "Represents a subscription request related to notifications about VNF lifecycle changes.")
 public class ResourceDefinition {
 
-    @ApiModelProperty(name = "Id", required = true, notes = "Identifier of this \"ResourceDefinition\" structure, unique at least within the scope of the \"GrantRequest\" structure.")
+    @ApiModelProperty(name = "Identifier", required = true, notes = "Identifier of this \"ResourceDefinition\" structure, unique at least within the scope of the \"GrantRequest\" structure.")
     private String id;
     @ApiModelProperty(name = "Type", required = true, notes = "Type of the resource definition referenced.")
     private ResourceDefinitionType type;

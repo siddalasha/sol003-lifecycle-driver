@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/grant/v1/grants")
 public class GrantController {
 
-    private GrantService grantService;
-
     private final static Logger logger = LoggerFactory.getLogger(GrantController.class);
+
+    private final GrantService grantService;
 
     @Autowired
     public GrantController(GrantService grantService) {
