@@ -25,6 +25,6 @@ public class ExtVirtualLinkInfo {
     @ApiModelProperty(name = "Resource Handle", required = true, notes = "Reference to the resource realizing this VL.")
     private ResourceHandle resourceHandle;
     @ApiModelProperty(name = "Link Ports", notes = "Link ports of this VL.")
-    private List<ExtLinkPort> linkPorts;
+    private List<ExtLinkPortInfo> extLinkPorts;
 
 }

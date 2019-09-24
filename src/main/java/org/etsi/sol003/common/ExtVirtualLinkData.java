@@ -2,6 +2,8 @@ package org.etsi.sol003.common;
 
 import java.util.List;
 
+import org.etsi.sol003.lifecyclemanagement.ExtLinkPortData;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -28,5 +30,7 @@ public class ExtVirtualLinkData {
     private String resourceId;
     @ApiModelProperty(name = "External Connection Points", required = true, notes = "External CPs of the VNF to be connected to this external VL.")
     private List<VnfExtCpData> extCps;
+    @ApiModelProperty(name = "External Link Ports", notes = "Externally provided link ports to be used to connect external connection points to this external VL. If this attribute is not present, the VNFM shall create the link ports on the external VL.")
+    private List<ExtLinkPortData> extLinkPorts;
 
 }

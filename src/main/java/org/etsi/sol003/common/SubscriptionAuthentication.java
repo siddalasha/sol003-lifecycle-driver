@@ -25,13 +25,22 @@ public class SubscriptionAuthentication {
 
     public enum AuthType {
         /**
-         * In every POST request that sends a notification, use HTTP Basic authentication with the client credentials.
+         * The API producer shall pass its client credentials in every POST
+         * request that sends a notification.
          */
         BASIC,
         /**
-         * In every POST request that sends a notification, use an OAuth 2.0 Bearer token, obtained using the client credentials grant type
+         * The API producer shall include that access token as a Bearer token
+         * in every POST request that sends a notification.
          */
-        OAUTH2_CLIENT_CREDENTIALS
+        OAUTH2_CLIENT_CREDENTIALS,
+        /**
+         * The API producer (client) shall use its TLS certificate to create a
+         * mutually authenticated TLS session with the API consumer (server)
+         * and further the API consumer will do the authorization based on the
+         * API producer's certificate.
+         */
+        TLS_CERT
     }
 
     /**

@@ -29,7 +29,7 @@ public class ChangeVnfFlavourRequest {
     private String instantiationLevelId;
     @ApiModelProperty(name = "External Virtual Link Information", notes = "Information about external VLs to connect the VNF to.")
     private List<ExtVirtualLinkData> extVirtualLinks;
-    @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about internal VLs that are managed by other entities than the VNFM.")
+    @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about internal VLs that are managed by the NFVO.")
     private List<ExtManagedVirtualLinkData> extManagedVirtualLinks;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external / externally-managed virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
     private List<VimConnectionInfo> vimConnectionInfo;

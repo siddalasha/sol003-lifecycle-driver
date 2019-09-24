@@ -10,19 +10,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * Represents an external CP.
+ * Represents configuration information for external CPs created from a CPD.
  */
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Represents an external CP.")
+@ApiModel(description = "Represents configuration information for external CPs created from a CPD.")
 public class VnfExtCpData {
 
     @ApiModelProperty(name = "CPD Id", required = true, notes = "The identifier of the CPD in the VNFD.")
     private String cpdId;
-    @ApiModelProperty(name = "Fixed IP Addresses", notes = "List of (fixed) network addresses that need to be configured on the CP. This attribute shall be present if fixed addresses need to be configured.")
-    private List<FixedNetworkAddressData> fixedAddresses;
-    @ApiModelProperty(name = "Dynamic IP Addresses", notes = "List of network addresses to be assigned dynamically. This attribute shall be present if dynamic addresses need to be configured.")
-    private List<DynamicNetworkAddressData> dynamicAddresses;
+    @ApiModelProperty(name = "CP Configuration", required = true, notes = "List of instance data that need to be configured on the CP instances created from the respective CPD.")
+    private List<VnfExtCpConfig> cpConfig;
 
 }

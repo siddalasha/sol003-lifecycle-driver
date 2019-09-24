@@ -16,7 +16,7 @@ import lombok.Data;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel(description = "Represents a link port of an internal VL of a VNF.")
-public class VnfLinkPort {
+public class VnfLinkPortInfo {
 
     @ApiModelProperty(name = "Id", required = true, notes = "Identifier of this link port as provided by the entity that has created the link port.")
     private String id;

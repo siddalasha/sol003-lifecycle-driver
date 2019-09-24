@@ -1,5 +1,7 @@
 package org.etsi.sol003.lifecyclemanagement;
 
+import java.util.Map;
+
 import org.etsi.sol003.common.ResourceHandle;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,6 +28,8 @@ public class AffectedVirtualStorage {
     private ChangeType changeType;
     @ApiModelProperty(name = "Storage Resource", required = true, notes = "Reference to the VirtualStorage resource. Detailed information is (for new and modified resources) or has been (for removed resources) available from the VIM.")
     private ResourceHandle storageResource;
+    @ApiModelProperty(name = "Metadata", notes = "Metadata about this resource. The content of this attribute shall be a copy of the content of the \"metadata\" attribute of the VnfcResourceInfo structure.")
+    private Map<String, String> metadata;
 
     public enum ChangeType {
         ADDED, REMOVED, MODIFIED, TEMPORARY
