@@ -1,4 +1,4 @@
-print('Generating CreateVnfRequest message for ETSI SOL003 v2.3.1');
+print('Generating CreateVnfRequest message for ETSI SOL003 v2.4.1');
 
 var message = {};
 message['vnfdId'] = 'xyz-xyz-xyz-xyz';

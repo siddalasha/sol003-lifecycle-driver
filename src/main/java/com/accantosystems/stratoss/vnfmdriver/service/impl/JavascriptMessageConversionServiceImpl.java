@@ -1,24 +1,39 @@
 package com.accantosystems.stratoss.vnfmdriver.service.impl;
 
-import javax.script.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
-import org.etsi.sol003.lifecyclemanagement.CreateVnfRequest;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionService;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
 @Service("JavascriptMessageConversionServiceImpl")
 public class JavascriptMessageConversionServiceImpl implements MessageConversionService {
 
     private final static Logger logger = LoggerFactory.getLogger(JavascriptMessageConversionServiceImpl.class);
+    public static final String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
 
-    @Override public String generateMessageFromRequest(final ExecutionRequest executionRequest, final String script) throws MessageConversionException {
+    @Override public String generateMessageFromRequest(final ExecutionRequest executionRequest) throws MessageConversionException {
+        final String script = getScriptFromExecutionRequest(executionRequest, executionRequest.getLifecycleName());
+        logger.debug("Found script, contents are\n{}", script);
+
         try {
             // Retrieve a Javascript engine (should be Nashorn in JRE 8+)
             final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByMimeType("application/javascript");
@@ -44,4 +59,40 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
             throw new MessageConversionException("Exception caught executing a script", e);
         }
     }
+
+    private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptPrefix) {
+        final String scriptName = scriptPrefix + ".js";
+
+        // Attempt to extract the script from the executionRequest passed in
+        if (!StringUtils.isEmpty(executionRequest.getLifecycleScripts())) {
+            // lifecycleScripts should contain (if not empty) a Base64 encoded Zip file of all scripts concerning the VNFM driver
+            byte[] decodedByteArray = Base64.getDecoder().decode(executionRequest.getLifecycleScripts());
+
+            try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedByteArray))) {
+                ZipEntry entry = zis.getNextEntry();
+                while (entry != null) {
+                    logger.debug("Found zip entry: {}", entry);
+                    if (scriptName.equalsIgnoreCase(entry.getName())) {
+                        logger.debug("Found script [{}], extracting contents...", entry.getName());
+                        return IOUtils.toString(zis, Charset.defaultCharset());
+                    }
+                    // Get the next entry for the loop
+                    entry = zis.getNextEntry();
+                }
+            } catch (IOException e) {
+                logger.error("Exception raised reading lifecycle scripts", e);
+            }
+        }
+
+        // If we can't find it in the zip file, try searching in out default locations
+        final String interfaceVersion = executionRequest.getProperties().getOrDefault("interfaceVersion", DEFAULT_ETSI_SOL003_VERSION);
+        try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/scripts/" + interfaceVersion + "/" + scriptName)) {
+            return IOUtils.toString(inputStream, Charset.defaultCharset());
+        } catch (IOException e) {
+            logger.error("Exception raised looking up default lifecycle script", e);
+        }
+
+        throw new IllegalArgumentException(String.format("Unable to find a script called [%s]", scriptName));
+    }
+
 }

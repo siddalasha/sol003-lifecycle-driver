@@ -108,25 +108,21 @@ public class VNFLifecycleManagementDriver {
         return responseEntity.getBody();
     }
 
-    public VnfInstance createVnfInstance(final VNFMConnectionDetails vnfmConnectionDetails, final String createVnfRequest) throws SOL003ResponseException {
-        return null;
-    }
-
-        /**
-         * Deletes a VNF instance record from the VNFM
-         *
-         * <ul>
-         *     <li>Precondition: VNF instance in NOT_INSTANTIATED state</li>
-         *     <li>Sends HTTP DELETE request to /vnf_instances/{vnfInstanceId}</li>
-         *     <li>Gets 204 No Content response</li>
-         *     <li>Postcondition: VNF instance resource removed</li>
-         *     <li>Out of band {@link VnfIdentifierDeletionNotification} should be received after this returns</li>
-         * </ul>
-         *
-         * @param vnfmConnectionDetails VNFM connection details
-         * @param vnfInstanceId         Identifier of the {@link VnfInstance} record to delete
-         * @throws SOL003ResponseException if there are any errors deleting the VNF instance
-         */
+    /**
+     * Deletes a VNF instance record from the VNFM
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in NOT_INSTANTIATED state</li>
+     *     <li>Sends HTTP DELETE request to /vnf_instances/{vnfInstanceId}</li>
+     *     <li>Gets 204 No Content response</li>
+     *     <li>Postcondition: VNF instance resource removed</li>
+     *     <li>Out of band {@link VnfIdentifierDeletionNotification} should be received after this returns</li>
+     * </ul>
+     *
+     * @param vnfmConnectionDetails VNFM connection details
+     * @param vnfInstanceId         Identifier of the {@link VnfInstance} record to delete
+     * @throws SOL003ResponseException if there are any errors deleting the VNF instance
+     */
     public void deleteVnfInstance(final VNFMConnectionDetails vnfmConnectionDetails, final String vnfInstanceId) throws SOL003ResponseException {
         final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/{vnfInstanceId}";
         final HttpHeaders headers = getHttpHeaders(vnfmConnectionDetails);

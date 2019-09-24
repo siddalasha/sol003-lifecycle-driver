@@ -45,16 +45,10 @@ public class LifecycleManagementService {
                     logger.debug("Found zip entry: {}", entry);
                     if ("Instantiate.js".equalsIgnoreCase(entry.getName())) {
                         // How do we get content?
-                        try {
-                            final String script = executionRequest.getProperties().get("script");
-                            final String message = messageConversionService.generateMessageFromRequest(executionRequest, script);
-                            final VNFMConnectionDetails vnfmConnectionDetails = new VNFMConnectionDetails("https://geoffs-awesome-server:8080", VNFMConnectionDetails.AuthenticationType.BASIC);
-                            vnfmConnectionDetails.getAuthenticationProperties().put("username", "bob");
-                            vnfmConnectionDetails.getAuthenticationProperties().put("password", "secretpassw0rd");
-                            vnfLifecycleManagementDriver.createVnfInstance(vnfmConnectionDetails, message);
-                        } catch (MessageConversionException e) {
-                            logger.error("Error converting message for sending", e);
-                        }
+                        final VNFMConnectionDetails vnfmConnectionDetails = new VNFMConnectionDetails("https://geoffs-awesome-server:8080", VNFMConnectionDetails.AuthenticationType.BASIC);
+                        vnfmConnectionDetails.getAuthenticationProperties().put("username", "bob");
+                        vnfmConnectionDetails.getAuthenticationProperties().put("password", "secretpassw0rd");
+                        vnfLifecycleManagementDriver.createVnfInstance(vnfmConnectionDetails, new CreateVnfRequest());
                     }
 
                     // Get the next entry for the loop
