@@ -20,6 +20,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers("/vnflcm/**").hasRole("USER")
             .antMatchers("/grant/**").hasRole("USER")
+            .antMatchers("/vnfpkgm/**").hasRole("USER")
             .anyRequest().denyAll()
             .and()
             .httpBasic();
