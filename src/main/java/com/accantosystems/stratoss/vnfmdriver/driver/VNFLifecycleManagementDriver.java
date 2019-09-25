@@ -98,6 +98,7 @@ public class VNFLifecycleManagementDriver {
     public VnfInstance createVnfInstance(final VNFMConnectionDetails vnfmConnectionDetails, final CreateVnfRequest createVnfRequest) throws SOL003ResponseException {
         final String url = vnfmConnectionDetails.getApiRoot() + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
         final HttpHeaders headers = getHttpHeaders(vnfmConnectionDetails);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<CreateVnfRequest> requestEntity = new HttpEntity<>(createVnfRequest, headers);
 
         final ResponseEntity<VnfInstance> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);

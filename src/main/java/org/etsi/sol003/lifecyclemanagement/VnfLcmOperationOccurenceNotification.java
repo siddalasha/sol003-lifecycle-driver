@@ -29,7 +29,7 @@ public class VnfLcmOperationOccurenceNotification implements LifecycleManagement
     private String id;
     @ApiModelProperty(name = "Notification Type", required = true, notes = "Discriminator for the different notification types. Shall be set to \"VnfLcmOperationOccurrenceNotification\" for this notification type.")
     private final String notificationType = TYPE;
-    @ApiModelProperty(name = "Subscription Id", notes = "Identifier of the subscription that this notification relates to.")
+    @ApiModelProperty(name = "Subscription Id", required = true, notes = "Identifier of the subscription that this notification relates to.")
     private String subscriptionId;
     @ApiModelProperty(name = "Notification Time", required = true, notes = "Date-time of the generation of the notification.")
     private OffsetDateTime timeStamp;
@@ -53,7 +53,7 @@ public class VnfLcmOperationOccurenceNotification implements LifecycleManagement
     @ApiModelProperty(name = "Affected Virtual Storage", notes = "Information about virtualised storage instances that were affected during the lifecycle operation.")
     private List<AffectedVirtualStorage> affectedVirtualStorages;
     @ApiModelProperty(name = "Changed Information", notes = "Information about the changed VNF instance information, including changed VNF configurable properties. Shall be present if the \"notificationStatus\" is set to \"RESULT\" and the operation has performed any changes to VNF instance information, including VNF configurable properties. Shall be absent otherwise.")
-    private VnfInfoModifications changedInfo;
+    private VnfInfoModificationRequest changedInfo;
     @ApiModelProperty(name = "Changed External Connectivity", notes = "Information about changed external connectivity, if this notification represents the result of a lifecycle operation occurrence. Shall be present if the \"notificationStatus\" is set to \"RESULT\" and the \"operation\" is set to \"CHANGE_EXT_CONN\". Shall be absent otherwise.")
     private List<ExtVirtualLinkInfo> changedExtConnectivity;
     @ApiModelProperty(name = "Error", notes = "Details of the latest error, if one has occurred during executing the LCM operation. Shall be present if the \"operationState\" attribute is \"FAILED_TEMP\" or \"FAILED\", and shall be absent otherwise.")

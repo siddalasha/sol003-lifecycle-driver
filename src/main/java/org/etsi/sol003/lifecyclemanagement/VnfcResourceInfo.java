@@ -51,8 +51,10 @@ public class VnfcResourceInfo {
         private String cpdId;
         @ApiModelProperty(name = "VNF External Connection Point Id", notes = "When the VNFC CP is exposed as external CP of the VNF, the identifier of this external VNF CP.")
         private String vnfExtCpId;
-        @ApiModelProperty(name = "Network Addresses", notes = "List of network addresses that have been configured (statically or dynamically) on the CP.")
-        private List<NetworkAddressInfo> addresses;
+        @ApiModelProperty(name = "Connection Point Protocol Information", notes = "Network protocol information for this CP.")
+        private CpProtocolInfo cpProtocolInfo;
+        @ApiModelProperty(name = "VNF Link Port Id", notes = "Identifier of the \"vnfLinkPorts\" structure in the \"vnfVirtualLinkResourceInfo\" structure. Shall be present if the CP is associated to a link port.")
+        private String vnfLinkPortId;
 
     }
 

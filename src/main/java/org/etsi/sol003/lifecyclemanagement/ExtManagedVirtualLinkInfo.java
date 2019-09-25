@@ -27,6 +27,6 @@ public class ExtManagedVirtualLinkInfo {
     @ApiModelProperty(name = "Network Resource", required = true, notes = "Reference to the VirtualNetwork resource.")
     private ResourceHandle networkResource;
     @ApiModelProperty(name = "Link Ports", notes = "Link ports of this VL.")
-    private List<ExtLinkPort> vnfLinkPorts;
+    private List<ExtLinkPortInfo> vnfLinkPorts;
 
 }

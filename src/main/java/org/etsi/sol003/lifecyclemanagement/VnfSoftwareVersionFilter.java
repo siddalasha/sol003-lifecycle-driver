@@ -19,7 +19,7 @@ import lombok.Data;
 public class VnfSoftwareVersionFilter {
 
     @ApiModelProperty(name = "Software Version", required = true, notes = "Software version to match.")
-    private String vnfSoftwareVersions;
+    private String vnfSoftwareVersion;
     @ApiModelProperty(name = "VNFD Version Filters", notes = "If present, match VNF instances that belong to VNF products with certain VNFD versions, a certain software version and a certain product name, from one particular provider.")
     private List<String> vnfdVersions;
 

@@ -20,9 +20,9 @@ public class OperateVnfRequest {
 
     @ApiModelProperty(name = "Flavour Id", required = true, notes = "The desired operational state (i.e. started or stopped) to change the VNF to.")
     private VnfOperationalStateType changeStateTo;
-    @ApiModelProperty(name = "Stop Type", notes = "It signals whether forceful or graceful stop is requested. Ignored if changeStateTo=STARTED.")
+    @ApiModelProperty(name = "Stop Type", notes = "It signals whether forceful or graceful stop is requested.")
     private StopType stopType;
-    @ApiModelProperty(name = "Graceful Stop Timeout", notes = "The time interval (in seconds) to wait for the VNF to be taken out of service during graceful stop, before stopping the VNF. Ignored if changeStateTo=STARTED.")
+    @ApiModelProperty(name = "Graceful Stop Timeout", notes = "The time interval (in seconds) to wait for the VNF to be taken out of service during graceful stop, before stopping the VNF.")
     private Integer gracefulStopTimeout;
     @ApiModelProperty(name = "Additional Parameters", notes = "Additional parameters passed by the NFVO as input to the process, specific to the VNF of which the operation status is changed, as declared in the VNFD as part of \"OperateVnfOpConfig\".")
     private Map<String, String> additionalParams;

@@ -40,7 +40,7 @@ public class VnfInstance {
     @ApiModelProperty(name = "VNFD Version", required = true, notes = "Identifies the version of the VNFD. The value is copied from the VNFD.")
     private String vnfdVersion;
     @ApiModelProperty(name = "Onboarded VNF Package Information Id", required = true, notes = "Identifier of information held by the NFVO about the specific VNF package on which the VNF is based.")
-    private String onboardedVnfPkgInfoId;
+    private String vnfPkgId;
     @ApiModelProperty(name = "VNF Configurable Properties", notes = "Current values of the configurable properties of the VNF instance.")
     private Map<String, String> vnfConfigurableProperties;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance. This attribute shall only be supported and present if VNF-related resource management in direct mode is applicable.")
@@ -98,8 +98,10 @@ public class VnfInstance {
         private String id;
         @ApiModelProperty(name = "External CPD Id", required = true, notes = "Identifier of the external CPD, VnfExtCpd, in the VNFD.")
         private String cpdId;
-        @ApiModelProperty(name = "Flavour Id", notes = "List of network addresses that have been configured (statically or dynamically) on the CP.")
-        private List<NetworkAddressInfo> addresses;
+        @ApiModelProperty(name = "CP Protocol Information", notes = "Network protocol information for this CP.")
+        private List<CpProtocolInfo> cpProtocolInfo;
+        @ApiModelProperty(name = "External Link Port Id", notes = "Identifier of the \"extLinkPortInfo\" structure inside the \"extVirtualLinkInfo\" structure. Shall be present if the CP is associated to a link port.")
+        private String extLinkPortId;
 
     }
 

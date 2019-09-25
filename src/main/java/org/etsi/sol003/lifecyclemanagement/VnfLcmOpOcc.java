@@ -64,7 +64,7 @@ public class VnfLcmOpOcc {
     @ApiModelProperty(name = "Resource Changes", notes = "This attribute contains information about the cumulative changes to virtualised resources that were performed so far by the LCM operation since its start, if applicable.")
     private ResourceChanges resourceChanges;
     @ApiModelProperty(name = "Changed Information", notes = "Information about the changed VNF instance information, including VNF configurable properties, if applicable.")
-    private VnfInfoModifications changedInfo;
+    private VnfInfoModificationRequest changedInfo;
     @ApiModelProperty(name = "Changed External Connectivity", notes = "Information about changed external connectivity, if applicable.")
     private List<ExtVirtualLinkInfo> changedExtConnectivity;
     @ApiModelProperty(name = "Links", required = true, notes = "Links to resources related to this resource.")

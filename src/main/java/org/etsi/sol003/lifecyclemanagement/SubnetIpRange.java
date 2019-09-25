@@ -17,8 +17,8 @@ import lombok.Data;
 public class SubnetIpRange {
 
     @ApiModelProperty(name = "Lowest IP Address", required = true, notes = "Lowest IP address belonging to the range.")
-    private String minIpAddress;
-    @ApiModelProperty(name = "Highest Subnet Id", required = true, notes = "Highest IP address belonging to the range.")
-    private String maxIpAddress;
+    private String minAddress;
+    @ApiModelProperty(name = "Highest IP Address", required = true, notes = "Highest IP address belonging to the range.")
+    private String maxAddress;
 
 }
