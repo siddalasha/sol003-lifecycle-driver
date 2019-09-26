@@ -14,7 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
+import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 
 public abstract class TestConstants {
@@ -50,18 +50,18 @@ public abstract class TestConstants {
         TEST_DL_NO_AUTH.getProperties().put(VNFM_SERVER_URL, TEST_SERVER_BASE_URL);
 
         TEST_DL_BASIC_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
-        TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_TYPE, VNFMConnectionDetails.AuthenticationType.BASIC.toString());
+        TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.BASIC.toString());
         TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_USERNAME, "basic_user");
         TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_PASSWORD, "basic_password");
 
         TEST_DL_OAUTH2_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
-        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_TYPE, VNFMConnectionDetails.AuthenticationType.OAUTH2.toString());
+        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.OAUTH2.toString());
         TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_ACCESS_TOKEN_URI, "http://localhost:15080/oauth/token");
         TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_CLIENT_ID, "LmClient");
         TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_CLIENT_SECRET, "pass123");
 
         TEST_DL_SESSION_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
-        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_TYPE, VNFMConnectionDetails.AuthenticationType.SESSION.toString());
+        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.COOKIE.toString());
         TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_URL, "http://localhost:15080/login");
         TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_USERNAME, "Administrator");
         TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_PASSWORD, "TestPassw0rd");

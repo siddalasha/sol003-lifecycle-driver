@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;

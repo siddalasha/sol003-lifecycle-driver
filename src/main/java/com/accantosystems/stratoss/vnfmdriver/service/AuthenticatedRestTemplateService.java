@@ -19,11 +19,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseErrorHandler;
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails.AuthenticationType;
+import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
-import com.accantosystems.stratoss.vnfmdriver.security.CookieCredentials;
 import com.accantosystems.stratoss.vnfmdriver.security.CookieAuthenticatedRestTemplate;
+import com.accantosystems.stratoss.vnfmdriver.security.CookieCredentials;
 
 @Service("AuthenticatedRestTemplateService")
 public class AuthenticatedRestTemplateService {
@@ -53,17 +52,32 @@ public class AuthenticatedRestTemplateService {
                            .findFirst()
                            .ifPresent(cachedRestTemplates::remove);
 
+        checkProperty(deploymentLocation, VNFM_SERVER_URL);
+
+        final String authenticationTypeString = deploymentLocation.getProperties().getOrDefault(AUTHENTICATION_TYPE, AuthenticationType.NONE.toString());
+        final AuthenticationType authenticationType = AuthenticationType.valueOfIgnoreCase(authenticationTypeString);
+        if (authenticationType == null) {
+            throw new IllegalArgumentException(String.format("Invalid authentication type specified [%s]", authenticationTypeString));
+        }
+
         final RestTemplate restTemplate;
-        final VNFMConnectionDetails connectionDetails = getConnectionDetails(deploymentLocation);
-        switch (connectionDetails.getAuthenticationType()) {
+        switch (authenticationType) {
             case BASIC:
-                restTemplate = getBasicAuthenticatedRestTemplate(connectionDetails);
+                checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
+                checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
+                restTemplate = getBasicAuthenticatedRestTemplate(deploymentLocation);
                 break;
             case OAUTH2:
-                restTemplate = getOAuth2RestTemplate(connectionDetails);
+                checkProperty(deploymentLocation, AUTHENTICATION_ACCESS_TOKEN_URI);
+                checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_ID);
+                checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_SECRET);
+                restTemplate = getOAuth2RestTemplate(deploymentLocation);
                 break;
-            case SESSION:
-                restTemplate = getSessionBasedRestTemplate(connectionDetails);
+            case COOKIE:
+                checkProperty(deploymentLocation, AUTHENTICATION_URL);
+                checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
+                checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
+                restTemplate = getCookieAuthenticatedRestTemplate(deploymentLocation);
                 break;
             default:
                 restTemplate = getUnauthenticatedRestTemplate();
@@ -73,49 +87,9 @@ public class AuthenticatedRestTemplateService {
         return restTemplate;
     }
 
-    private VNFMConnectionDetails getConnectionDetails(ResourceManagerDeploymentLocation deploymentLocation) {
-        final String vnfmServerUrl = deploymentLocation.getProperties().get(VNFM_SERVER_URL);
-        if (StringUtils.isEmpty(vnfmServerUrl)) {
-            throw new IllegalArgumentException(String.format("Deployment Location must specify a value for [%s]", VNFM_SERVER_URL));
-        }
-        final String authenticationTypeString = deploymentLocation.getProperties().getOrDefault(AUTHENTICATION_TYPE, AuthenticationType.NONE.toString());
-        final AuthenticationType authenticationType = AuthenticationType.valueOfIgnoreCase(authenticationTypeString);
-        if (authenticationType == null) {
-            throw new IllegalArgumentException(String.format("Invalid authentication type specified [%s]", authenticationTypeString));
-        }
-
-        final VNFMConnectionDetails vnfmConnectionDetails = new VNFMConnectionDetails(vnfmServerUrl, authenticationType);
-
-        switch(authenticationType) {
-            case BASIC:
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_USERNAME, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_PASSWORD, true);
-                break;
-            case OAUTH2:
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_ACCESS_TOKEN_URI, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_CLIENT_ID, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_CLIENT_SECRET, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_GRANT_TYPE, false);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_SCOPE, false);
-                break;
-            case SESSION:
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_URL, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_USERNAME_TOKEN_NAME, false);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_PASSWORD_TOKEN_NAME, false);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_USERNAME, true);
-                copyProperty(vnfmConnectionDetails, deploymentLocation, AUTHENTICATION_PASSWORD, true);
-                break;
-        }
-
-        return vnfmConnectionDetails;
-    }
-
-    private void copyProperty(VNFMConnectionDetails vnfmConnectionDetails, ResourceManagerDeploymentLocation deploymentLocation, String propertyName, boolean throwIfEmpty) {
-        final String propertyValue = deploymentLocation.getProperties().get(propertyName);
-        if (throwIfEmpty && StringUtils.isEmpty(propertyValue)) {
+    private void checkProperty(ResourceManagerDeploymentLocation deploymentLocation, String propertyName) {
+        if (StringUtils.isEmpty(deploymentLocation.getProperties().get(propertyName))) {
             throw new IllegalArgumentException(String.format("Deployment Location properties must specify a value for [%s]", propertyName));
-        } else if (StringUtils.hasText(propertyValue)) {
-            vnfmConnectionDetails.getAuthenticationProperties().put(propertyName, propertyValue);
         }
     }
 
@@ -124,34 +98,34 @@ public class AuthenticatedRestTemplateService {
         return restTemplateBuilder.build();
     }
 
-    private RestTemplate getBasicAuthenticatedRestTemplate(final VNFMConnectionDetails connectionDetails) {
+    private RestTemplate getBasicAuthenticatedRestTemplate(final ResourceManagerDeploymentLocation deploymentLocation) {
         logger.info("Configuring Basic Authentication RestTemplate.");
-        return restTemplateBuilder.basicAuthentication(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_USERNAME),
-                                                       connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_PASSWORD))
+        return restTemplateBuilder.basicAuthentication(deploymentLocation.getProperties().get(AUTHENTICATION_USERNAME),
+                                                       deploymentLocation.getProperties().get(AUTHENTICATION_PASSWORD))
                                   .build();
     }
 
-    private RestTemplate getOAuth2RestTemplate(final VNFMConnectionDetails connectionDetails) {
+    private RestTemplate getOAuth2RestTemplate(final ResourceManagerDeploymentLocation deploymentLocation) {
         final ClientCredentialsResourceDetails resourceDetails = new ClientCredentialsResourceDetails();
-        resourceDetails.setAccessTokenUri(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_ACCESS_TOKEN_URI));
-        resourceDetails.setClientId(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_CLIENT_ID));
-        resourceDetails.setClientSecret(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_CLIENT_SECRET));
-        resourceDetails.setGrantType(connectionDetails.getAuthenticationProperties().getOrDefault(AUTHENTICATION_GRANT_TYPE, "client_credentials"));
-        if (StringUtils.hasText(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_SCOPE))) {
-            resourceDetails.setScope(Arrays.asList(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_SCOPE).split(",")));
+        resourceDetails.setAccessTokenUri(deploymentLocation.getProperties().get(AUTHENTICATION_ACCESS_TOKEN_URI));
+        resourceDetails.setClientId(deploymentLocation.getProperties().get(AUTHENTICATION_CLIENT_ID));
+        resourceDetails.setClientSecret(deploymentLocation.getProperties().get(AUTHENTICATION_CLIENT_SECRET));
+        resourceDetails.setGrantType(deploymentLocation.getProperties().getOrDefault(AUTHENTICATION_GRANT_TYPE, "client_credentials"));
+        if (StringUtils.hasText(deploymentLocation.getProperties().get(AUTHENTICATION_SCOPE))) {
+            resourceDetails.setScope(Arrays.asList(deploymentLocation.getProperties().get(AUTHENTICATION_SCOPE).split(",")));
         }
 
         logger.info("Configuring OAuth2 authenticated RestTemplate.");
         return restTemplateBuilder.configure(new OAuth2RestTemplate(resourceDetails));
     }
 
-    private RestTemplate getSessionBasedRestTemplate(final VNFMConnectionDetails connectionDetails) {
+    private RestTemplate getCookieAuthenticatedRestTemplate(final ResourceManagerDeploymentLocation deploymentLocation) {
         CookieCredentials cookieCredentials = new CookieCredentials();
-        cookieCredentials.setAuthenticationUrl(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_URL));
-        cookieCredentials.setUsernameTokenName(connectionDetails.getAuthenticationProperties().getOrDefault(AUTHENTICATION_USERNAME_TOKEN_NAME, "IDToken1"));
-        cookieCredentials.setPasswordTokenName(connectionDetails.getAuthenticationProperties().getOrDefault(AUTHENTICATION_PASSWORD_TOKEN_NAME, "IDToken2"));
-        cookieCredentials.setUsername(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_USERNAME));
-        cookieCredentials.setPassword(connectionDetails.getAuthenticationProperties().get(AUTHENTICATION_PASSWORD));
+        cookieCredentials.setAuthenticationUrl(deploymentLocation.getProperties().get(AUTHENTICATION_URL));
+        cookieCredentials.setUsernameTokenName(deploymentLocation.getProperties().getOrDefault(AUTHENTICATION_USERNAME_TOKEN_NAME, "IDToken1"));
+        cookieCredentials.setPasswordTokenName(deploymentLocation.getProperties().getOrDefault(AUTHENTICATION_PASSWORD_TOKEN_NAME, "IDToken2"));
+        cookieCredentials.setUsername(deploymentLocation.getProperties().get(AUTHENTICATION_USERNAME));
+        cookieCredentials.setPassword(deploymentLocation.getProperties().get(AUTHENTICATION_PASSWORD));
 
         logger.info("Configuring Cookie authenticated RestTemplate.");
         return restTemplateBuilder.configure(new CookieAuthenticatedRestTemplate(cookieCredentials));
