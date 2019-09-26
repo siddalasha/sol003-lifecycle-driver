@@ -2,6 +2,7 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.etsi.sol003.common.ProblemDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import org.etsi.sol003.common.ProblemDetails;
+import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
+import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
 
 /**
  * Handles the conversion of Exceptions thrown by SOL003-compliant Rest API calls
@@ -56,10 +58,10 @@ public class ETSIExceptionHandlingControllerAdvice {
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     @ResponseBody
     protected ProblemDetails handleHttpMediaTypeNotAcceptableException(HttpServletRequest req, HttpMediaTypeNotAcceptableException cause) {
-        return defaultHandle("Invalid content provided to request", cause, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        return defaultHandle("Invalid content provided to request", cause, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -74,6 +76,34 @@ public class ETSIExceptionHandlingControllerAdvice {
     @ResponseBody
     protected ProblemDetails handleGrantRejectedException(HttpServletRequest req, GrantRejectedException cause) {
         return defaultHandle("Grant request was rejected", cause, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(NotImplementedException.class)
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseBody
+    protected ProblemDetails handleNotImplementedException(HttpServletRequest req, NotImplementedException cause) {
+        return defaultHandle("Method not yet implemented", cause, HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ExceptionHandler(ResponseTypeNotAcceptableException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ResponseBody
+    protected ProblemDetails handleResponseTypeNotAcceptableException(HttpServletRequest req, ResponseTypeNotAcceptableException cause) {
+        return defaultHandle("The requested response type was not acceptable", cause, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(PackageStateConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    protected ProblemDetails handlePackageStateConflictException(HttpServletRequest req, PackageStateConflictException cause) {
+        return defaultHandle("The operation cannot be executed currently, due to a conflict with the state of the resource.", cause, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ContentRangeNotSatisfiableException.class)
+    @ResponseStatus(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+    @ResponseBody
+    protected ProblemDetails handleContentRangeNotSatisfiableException(HttpServletRequest req, ContentRangeNotSatisfiableException cause) {
+        return defaultHandle("The byte range passed in the \"Range\" header did not match any available byte range in the VNF package file.", cause, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
     }
 
     @ExceptionHandler(Exception.class)
