@@ -17,7 +17,7 @@ public class ResourceManagerDeploymentLocation {
     @ApiModelProperty(position = 2, example = "default-rm::Cloud", value = "Type identifier for the deployment location")
     private String type;
     @ApiModelProperty(position = 3, example = "", value = "Properties required to gain access to the deployment location VIM", required = true)
-    private Map<String, Object> properties = new HashMap<>();
+    private Map<String, String> properties = new HashMap<>();
 
     public ResourceManagerDeploymentLocation() {
         super();
@@ -45,18 +45,17 @@ public class ResourceManagerDeploymentLocation {
         this.type = type;
     }
 
-    public Map<String, Object> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, Object> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 
     @Override
     public String toString() {
-        return "ResourceManagerDeploymentLocation [name=" + name + ", type=" + type + ", infrastructureSpecificProperties=" + properties.toString()
-                + "]";
+        return "ResourceManagerDeploymentLocation [name=" + name + ", type=" + type + ", infrastructureSpecificProperties=" + properties.toString() + "]";
     }
 
 }

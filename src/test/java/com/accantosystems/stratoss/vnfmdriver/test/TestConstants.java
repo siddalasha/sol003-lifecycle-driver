@@ -1,7 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.test;
 
-import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.BASIC_AUTHENTICATION_PASSWORD;
-import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.BASIC_AUTHENTICATION_USERNAME;
+import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,15 +14,18 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
+import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 
 public abstract class TestConstants {
 
-
     public static final String TEST_SERVER_BASE_URL = "http://localhost:8080";
     public static final String SECURE_TEST_SERVER_BASE_URL = "https://localhost:8080";
     public static final String BASIC_AUTHORIZATION_HEADER = "Basic YmFzaWNfdXNlcjpiYXNpY19wYXNzd29yZA==";
+    public static final String TEST_SESSION_COOKIE = "JSESSIONID=Rg3vHJZnehYLjVg7qi3bZjzg; Domain=foo.com; Path=/; Expires=Wed, 13 Jan 2021 22:23:01 GMT; Secure; HttpOnly";
+    public static final String TEST_SESSION_TOKEN = "JSESSIONID=Rg3vHJZnehYLjVg7qi3bZjzg";
+    public static final String TEST_ACCESS_TOKEN = "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3";
+    public static final String TEST_ACCESS_TOKEN_RESPONSE = "{\"access_token\":\"MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3\",\"token_type\":\"bearer\",\"expires_in\":3600,\"refresh_token\":\"IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk\",\"scope\":\"none\"}";
     public static final String NOTIFICATIONS_ENDPOINT = "http://localhost:8080/vnflcm/v1/notifications";
     public static final String EMPTY_JSON = "{}";
     public static final String TEST_EXCEPTION_MESSAGE = "TestExceptionMessage";
@@ -33,18 +35,36 @@ public abstract class TestConstants {
     public static final String TEST_LCCN_SUBSCRIPTION_ID = "2fdffb76-5c74-44ab-a38f-40b302ba5ec9";
     public static final String TEST_VNF_PKG_ID = "1472c841-c4ac-418c-bd45-e2e7f7638336";
 
-    public static final ResourceManagerDeploymentLocation TEST_DL = new ResourceManagerDeploymentLocation("test-location", "etsi-sol003");
+    public static final ResourceManagerDeploymentLocation TEST_DL_NO_AUTH = new ResourceManagerDeploymentLocation("test-location", "etsi-sol003");
+    public static final ResourceManagerDeploymentLocation TEST_DL_BASIC_AUTH = new ResourceManagerDeploymentLocation("test-basic-location", "etsi-sol003");
+    public static final ResourceManagerDeploymentLocation TEST_DL_OAUTH2_AUTH = new ResourceManagerDeploymentLocation("test-oauth2-location", "etsi-sol003");
+    public static final ResourceManagerDeploymentLocation TEST_DL_SESSION_AUTH = new ResourceManagerDeploymentLocation("test-session-location", "etsi-sol003");
+
     public static final HttpEntity<String> EMPTY_JSON_ENTITY;
-    public static final VNFMConnectionDetails VNFM_CONNECTION_DETAILS_NO_AUTHENTICATION = new VNFMConnectionDetails(TEST_SERVER_BASE_URL, VNFMConnectionDetails.AuthenticationType.NONE);
-    public static final VNFMConnectionDetails VNFM_CONNECTION_DETAILS_BASIC_AUTHENTICATION = new VNFMConnectionDetails(SECURE_TEST_SERVER_BASE_URL, VNFMConnectionDetails.AuthenticationType.BASIC);
 
     static {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         EMPTY_JSON_ENTITY = new HttpEntity<>(EMPTY_JSON, headers);
 
-        VNFM_CONNECTION_DETAILS_BASIC_AUTHENTICATION.getAuthenticationProperties().put(BASIC_AUTHENTICATION_USERNAME, "basic_user");
-        VNFM_CONNECTION_DETAILS_BASIC_AUTHENTICATION.getAuthenticationProperties().put(BASIC_AUTHENTICATION_PASSWORD, "basic_password");
+        TEST_DL_NO_AUTH.getProperties().put(VNFM_SERVER_URL, TEST_SERVER_BASE_URL);
+
+        TEST_DL_BASIC_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
+        TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.BASIC.toString());
+        TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_USERNAME, "basic_user");
+        TEST_DL_BASIC_AUTH.getProperties().put(AUTHENTICATION_PASSWORD, "basic_password");
+
+        TEST_DL_OAUTH2_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
+        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.OAUTH2.toString());
+        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_ACCESS_TOKEN_URI, "http://localhost:15080/oauth/token");
+        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_CLIENT_ID, "LmClient");
+        TEST_DL_OAUTH2_AUTH.getProperties().put(AUTHENTICATION_CLIENT_SECRET, "pass123");
+
+        TEST_DL_SESSION_AUTH.getProperties().put(VNFM_SERVER_URL, SECURE_TEST_SERVER_BASE_URL);
+        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_TYPE, AuthenticationType.COOKIE.toString());
+        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_URL, "http://localhost:15080/login");
+        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_USERNAME, "Administrator");
+        TEST_DL_SESSION_AUTH.getProperties().put(AUTHENTICATION_PASSWORD, "TestPassw0rd");
     }
 
     public static final Condition<String> UUID_CONDITION = new Condition<String>("UUID Condition") {

@@ -14,7 +14,7 @@ public class JavascriptMessageConversionServiceImplTest {
     public void testGenerateMessageFromRequestUsingProvidedScript() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Instantiate");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
         executionRequest.setLifecycleScripts(loadZipIntoBase64String("examples/lifecyclescripts.zip"));
 
@@ -28,7 +28,7 @@ public class JavascriptMessageConversionServiceImplTest {
     public void testGenerateMessageFromRequestUsingSpecifiedVersion() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Instantiate");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
         executionRequest.getProperties().put("interfaceVersion", "2.5.1");
 
@@ -42,7 +42,7 @@ public class JavascriptMessageConversionServiceImplTest {
     public void testGenerateMessageFromRequestUsingDefault() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Create");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl();

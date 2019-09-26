@@ -1,6 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
-import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_DL;
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_DL_NO_AUTH;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_EXCEPTION_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +40,7 @@ public class LifecycleControllerTest {
     public void testExecuteLifecycle() {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
 
         when(lifecycleManagementService.executeLifecycle(any())).thenReturn(new ExecutionAcceptedResponse(UUID.randomUUID().toString()));
 
@@ -57,7 +57,7 @@ public class LifecycleControllerTest {
     public void testExecuteLifecycleReturnsErrorInfo() {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
 
         when(lifecycleManagementService.executeLifecycle(any())).thenThrow(new RuntimeException(TEST_EXCEPTION_MESSAGE));
 

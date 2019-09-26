@@ -3,28 +3,24 @@ package com.accantosystems.stratoss.vnfmdriver.service;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
-import com.accantosystems.stratoss.vnfmdriver.service.impl.JavascriptMessageConversionServiceImpl;
 
 public class LifecycleManagementServiceTest {
 
     @Test
     public void testExecuteLifecycle() {
-        final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(null, null);
+        final VNFLifecycleManagementDriver mockDriver = mock(VNFLifecycleManagementDriver.class);
+        final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(mockDriver);
 
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
-        executionRequest.setDeploymentLocation(TEST_DL);
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
 
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
 

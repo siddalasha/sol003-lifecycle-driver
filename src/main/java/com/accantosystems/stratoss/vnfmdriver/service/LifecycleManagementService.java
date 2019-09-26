@@ -1,63 +1,36 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.VNFM_SERVER_URL;
 
 import org.etsi.sol003.lifecyclemanagement.CreateVnfRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
-import com.accantosystems.stratoss.vnfmdriver.model.VNFMConnectionDetails;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 
 @Service("LifecycleManagementService")
 public class LifecycleManagementService {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleManagementService.class);
 
-    private final MessageConversionService messageConversionService;
     private final VNFLifecycleManagementDriver vnfLifecycleManagementDriver;
 
     @Autowired
-    public LifecycleManagementService(MessageConversionService messageConversionService, VNFLifecycleManagementDriver vnfLifecycleManagementDriver) {
-        this.messageConversionService = messageConversionService;
+    public LifecycleManagementService(VNFLifecycleManagementDriver vnfLifecycleManagementDriver) {
         this.vnfLifecycleManagementDriver = vnfLifecycleManagementDriver;
     }
 
     public ExecutionAcceptedResponse executeLifecycle(ExecutionRequest executionRequest) {
         logger.info("Processing execution request");
 
-        if (!StringUtils.isEmpty(executionRequest.getLifecycleScripts())) {
-            // lifecycleScripts should contain (if not empty) a Base64 encoded Zip file of all scripts concerning the VNFM driver
-            byte[] decodedByteArray = Base64.getDecoder().decode(executionRequest.getLifecycleScripts());
-
-            try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedByteArray))) {
-                ZipEntry entry = zis.getNextEntry();
-                while (entry != null) {
-                    logger.debug("Found zip entry: {}", entry);
-                    if ("Instantiate.js".equalsIgnoreCase(entry.getName())) {
-                        // How do we get content?
-                        final VNFMConnectionDetails vnfmConnectionDetails = new VNFMConnectionDetails("https://geoffs-awesome-server:8080", VNFMConnectionDetails.AuthenticationType.BASIC);
-                        vnfmConnectionDetails.getAuthenticationProperties().put("username", "bob");
-                        vnfmConnectionDetails.getAuthenticationProperties().put("password", "secretpassw0rd");
-                        vnfLifecycleManagementDriver.createVnfInstance(vnfmConnectionDetails, new CreateVnfRequest());
-                    }
-
-                    // Get the next entry for the loop
-                    entry = zis.getNextEntry();
-                }
-            } catch (IOException e) {
-                logger.error("Exception raised reading lifecycle scripts", e);
-            }
-        }
+        final ResourceManagerDeploymentLocation deploymentLocation = new ResourceManagerDeploymentLocation("dummy-dl", "dummy");
+        deploymentLocation.getProperties().put(VNFM_SERVER_URL, "https://geoffs-awesome-server:8080");
+        vnfLifecycleManagementDriver.createVnfInstance(deploymentLocation, new CreateVnfRequest());
 
         return null;
     }
