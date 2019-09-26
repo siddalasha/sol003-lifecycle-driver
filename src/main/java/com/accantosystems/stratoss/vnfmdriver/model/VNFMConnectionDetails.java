@@ -13,7 +13,17 @@ public class VNFMConnectionDetails {
     private final Map<String, String> authenticationProperties = new HashMap<>();
 
     public enum AuthenticationType {
-        NONE, BASIC, OAUTH2
+        NONE, BASIC, OAUTH2, SESSION;
+
+        public static AuthenticationType valueOfIgnoreCase(String value) {
+            for (AuthenticationType type : AuthenticationType.values()) {
+                if (type.name().equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            return null;
+        }
+
     }
 
 }
