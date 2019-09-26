@@ -40,6 +40,8 @@ public class PackageManagementControllerTest {
     public static final String PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/package_content";
     public static final String PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/artifacts/{artifactPath}";
 
+    private static final String VNF_PACKAGE_FILENAME = "examples/VnfPackage-vMRF.zip";
+
     @MockBean
     private PackageManagementService packageManagementService;
 
@@ -82,7 +84,7 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFDAsZip() throws Exception {
 
-        byte[] vnfdAsByteArray = loadFileIntoByteArray("examples/Vnfd.zip");
+        byte[] vnfdAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
         ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfdAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
@@ -125,7 +127,7 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFDAsZipAndYaml() throws Exception {
 
-        byte[] vnfdAsByteArray = loadFileIntoByteArray("examples/Vnfd.zip");
+        byte[] vnfdAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
         ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfdAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
@@ -175,7 +177,7 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFPackageContent() throws Exception {
 
-        byte[] vnfPackageAsByteArray = loadFileIntoByteArray("examples/VnfPackage.zip");
+        byte[] vnfPackageAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
         ByteArrayResource vnfPackageAsResource = new ByteArrayResource(vnfPackageAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
