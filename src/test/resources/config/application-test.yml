@@ -1,0 +1,3 @@
+vnfmdriver:
+  packageManagement:
+    packageRepositoryUrl: file:./src/test/resources/examples/VnfPackage-{vnfPackageId}.zip

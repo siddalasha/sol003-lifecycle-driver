@@ -14,6 +14,7 @@ public class VNFMDriverProperties {
 
     private final Topics topics = new Topics();
     private final Logging logging = new Logging();
+    private final PackageManagement packageManagement = new PackageManagement();
 
     public Topics getTopics() {
         return topics;
@@ -21,6 +22,10 @@ public class VNFMDriverProperties {
 
     public Logging getLogging() {
         return logging;
+    }
+
+    public PackageManagement getPackageManagement() {
+        return packageManagement;
     }
 
     public static class Topics {
@@ -44,6 +49,19 @@ public class VNFMDriverProperties {
 
         public void setLoggingRequestInterceptMaxBodySize(int loggingRequestInterceptMaxBodySize) {
             this.loggingRequestInterceptMaxBodySize = loggingRequestInterceptMaxBodySize;
+        }
+    }
+
+    public static class PackageManagement {
+
+        private String packageRepositoryUrl;
+
+        public String getPackageRepositoryUrl() {
+            return packageRepositoryUrl;
+        }
+
+        public void setPackageRepositoryUrl(String packageRepositoryUrl) {
+            this.packageRepositoryUrl = packageRepositoryUrl;
         }
     }
 

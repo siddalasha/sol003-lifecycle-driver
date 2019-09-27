@@ -1,5 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoByteArray;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,6 +39,8 @@ public class PackageManagementControllerTest {
     public static final String PACKAGE_MANAGEMENT_VNFD_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/vnfd";
     public static final String PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/package_content";
     public static final String PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/artifacts/{artifactPath}";
+
+    private static final String VNF_PACKAGE_FILENAME = "examples/VnfPackage-vMRF.zip";
 
     @MockBean
     private PackageManagementService packageManagementService;
@@ -81,8 +84,8 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFDAsZip() throws Exception {
 
-        String vnfd = loadFileIntoString("examples/Vnfd.zip");
-        ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfd.getBytes());
+        byte[] vnfdAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
+        ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfdAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
 
@@ -97,7 +100,7 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfd.getBytes());
+        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfdAsByteArray);
     }
 
     @Test
@@ -124,8 +127,8 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFDAsZipAndYaml() throws Exception {
 
-        String vnfd = loadFileIntoString("examples/Vnfd.zip");
-        ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfd.getBytes());
+        byte[] vnfdAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
+        ByteArrayResource vnfdAsResource = new ByteArrayResource(vnfdAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
 
@@ -140,7 +143,7 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfd.getBytes());
+        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfdAsByteArray);
     }
 
     @Test
@@ -174,8 +177,8 @@ public class PackageManagementControllerTest {
     @Test
     public void testRequestVNFPackageContent() throws Exception {
 
-        String vnfPackage = loadFileIntoString("examples/VnfPackage.zip");
-        ByteArrayResource vnfPackageAsResource = new ByteArrayResource(vnfPackage.getBytes());
+        byte[] vnfPackageAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
+        ByteArrayResource vnfPackageAsResource = new ByteArrayResource(vnfPackageAsByteArray);
 
         String vnfPkgId = UUID.randomUUID().toString();
 
@@ -190,7 +193,7 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackage.getBytes());
+        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackageAsByteArray);
     }
 
     @Test

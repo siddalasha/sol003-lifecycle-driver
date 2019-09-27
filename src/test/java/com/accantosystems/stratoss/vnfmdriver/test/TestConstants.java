@@ -96,6 +96,20 @@ public abstract class TestConstants {
         }
     }
 
+    public static byte[] loadFileIntoByteArray(final String fileName) throws IOException {
+
+        try (
+             ByteArrayOutputStream result = new ByteArrayOutputStream();
+             InputStream inputStream = TestConstants.class.getResourceAsStream(fileName.startsWith("/") ? fileName : "/" + fileName)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                result.write(buffer, 0, length);
+            }
+            return result.toByteArray();
+        }
+    }
+
     public static String loadZipIntoBase64String(final String fileName) throws IOException {
         try (
                 ByteArrayOutputStream result = new ByteArrayOutputStream();
