@@ -9,9 +9,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 import java.net.URI;
-import java.util.UUID;
 
-import org.etsi.sol003.lifecyclemanagement.*;
+import org.etsi.sol003.lifecyclemanagement.LccnSubscription;
+import org.etsi.sol003.lifecyclemanagement.LccnSubscriptionRequest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -57,14 +57,11 @@ public class VNFLifecycleManagementDriverTest {
                                   .body(loadFileIntoString("examples/VnfInstance.json"))
                                   .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
 
-        assertThat(vnfInstance).isNotNull();
-        assertThat(vnfInstance.getId()).isEqualTo(TEST_VNF_INSTANCE_ID);
+        assertThat(vnfInstanceResponse).isNotNull();
     }
 
     @Test
@@ -79,14 +76,11 @@ public class VNFLifecycleManagementDriverTest {
                                   .body(loadFileIntoString("examples/VnfInstance.json"))
                                   .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(TEST_DL_BASIC_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_BASIC_AUTH, createVnfRequest);
 
-        assertThat(vnfInstance).isNotNull();
-        assertThat(vnfInstance.getId()).isEqualTo(TEST_VNF_INSTANCE_ID);
+        assertThat(vnfInstanceResponse).isNotNull();
     }
 
     @Test
@@ -108,14 +102,11 @@ public class VNFLifecycleManagementDriverTest {
                                   .body(loadFileIntoString("examples/VnfInstance.json"))
                                   .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(TEST_DL_OAUTH2_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_OAUTH2_AUTH, createVnfRequest);
 
-        assertThat(vnfInstance).isNotNull();
-        assertThat(vnfInstance.getId()).isEqualTo(TEST_VNF_INSTANCE_ID);
+        assertThat(vnfInstanceResponse).isNotNull();
     }
 
     @Test
@@ -136,14 +127,11 @@ public class VNFLifecycleManagementDriverTest {
                                   .body(loadFileIntoString("examples/VnfInstance.json"))
                                   .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(TEST_DL_SESSION_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_SESSION_AUTH, createVnfRequest);
 
-        assertThat(vnfInstance).isNotNull();
-        assertThat(vnfInstance.getId()).isEqualTo(TEST_VNF_INSTANCE_ID);
+        assertThat(vnfInstanceResponse).isNotNull();
     }
 
     @Test
@@ -156,9 +144,7 @@ public class VNFLifecycleManagementDriverTest {
               .andRespond(withServerError().body(loadFileIntoString("examples/ProblemDetails.json"))
                                            .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
         SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
 
@@ -168,7 +154,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testCreateVnfInstanceWithUnknownException() {
+    public void testCreateVnfInstanceWithUnknownException() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT))
@@ -176,9 +162,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withServerError());
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
         SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
 
@@ -188,7 +172,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testCreateVnfInstanceWithUnknownExceptionAndBody() {
+    public void testCreateVnfInstanceWithUnknownExceptionAndBody() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT))
@@ -196,9 +180,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withServerError().body(TEST_EXCEPTION_MESSAGE));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
         SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
 
@@ -217,18 +199,15 @@ public class VNFLifecycleManagementDriverTest {
               .andRespond(withSuccess().body(loadFileIntoString("examples/VnfInstance.json"))
                                        .contentType(MediaType.APPLICATION_JSON));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final VnfInstance vnfInstance = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
 
-        assertThat(vnfInstance).isNotNull();
-        assertThat(vnfInstance.getId()).isEqualTo(TEST_VNF_INSTANCE_ID);
+        assertThat(vnfInstanceResponse).isNotNull();
     }
 
     @Test
-    public void testCreateVnfInstanceWithInvalidResponseCode() {
+    public void testCreateVnfInstanceWithInvalidResponseCode() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT))
@@ -236,9 +215,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.MOVED_PERMANENTLY));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
         assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest))
                 .isInstanceOf(SOL003ResponseException.class)
@@ -246,7 +223,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testCreateVnfInstanceWithEmptyResponseBody() {
+    public void testCreateVnfInstanceWithEmptyResponseBody() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT))
@@ -254,9 +231,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withCreatedEntity(null));
 
-        final CreateVnfRequest createVnfRequest = new CreateVnfRequest();
-        createVnfRequest.setVnfdId(UUID.randomUUID().toString());
-        createVnfRequest.setVnfInstanceName(testName.getMethodName());
+        final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
         assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest))
                 .isInstanceOf(SOL003ResponseException.class)
@@ -306,7 +281,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testInstantiateVnf() {
+    public void testInstantiateVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/instantiate"))
@@ -314,9 +289,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final InstantiateVnfRequest instantiateVnfRequest = new InstantiateVnfRequest();
-        instantiateVnfRequest.setFlavourId("Chocolate");
-        instantiateVnfRequest.setInstantiationLevelId("Level 1");
+        final String instantiateVnfRequest = loadFileIntoString("examples/InstantiateVnfRequest.json");
 
         final String vnfLcmOpOccId = driver.instantiateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, instantiateVnfRequest);
 
@@ -324,7 +297,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testInstantiateVnfNoLocationHeaderReturned() {
+    public void testInstantiateVnfNoLocationHeaderReturned() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/instantiate"))
@@ -332,9 +305,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED));
 
-        final InstantiateVnfRequest instantiateVnfRequest = new InstantiateVnfRequest();
-        instantiateVnfRequest.setFlavourId("Chocolate");
-        instantiateVnfRequest.setInstantiationLevelId("Level 1");
+        final String instantiateVnfRequest = loadFileIntoString("examples/InstantiateVnfRequest.json");
 
         SOL003ResponseException exception = catchThrowableOfType(() -> driver.instantiateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, instantiateVnfRequest),
                                                                  SOL003ResponseException.class);
@@ -354,12 +325,9 @@ public class VNFLifecycleManagementDriverTest {
               .andRespond(withServerError().body(loadFileIntoString("examples/ProblemDetails.json"))
                                            .contentType(MediaType.APPLICATION_JSON));
 
-        final InstantiateVnfRequest instantiateVnfRequest = new InstantiateVnfRequest();
-        instantiateVnfRequest.setFlavourId("Chocolate");
-        instantiateVnfRequest.setInstantiationLevelId("Level 1");
+        final String instantiateVnfRequest = loadFileIntoString("examples/InstantiateVnfRequest.json");
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.instantiateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, instantiateVnfRequest),
-                                                                 SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.instantiateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, instantiateVnfRequest), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -367,7 +335,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testScaleVnf() {
+    public void testScaleVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/scale"))
@@ -375,10 +343,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final ScaleVnfRequest scaleVnfRequest = new ScaleVnfRequest();
-        scaleVnfRequest.setType(ScaleType.SCALE_OUT);
-        scaleVnfRequest.setNumberOfSteps(1);
-        scaleVnfRequest.setAspectId("South-facing");
+        final String scaleVnfRequest = loadFileIntoString("examples/ScaleVnfRequest.json");
 
         final String vnfLcmOpOccId = driver.scaleVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, scaleVnfRequest);
 
@@ -386,7 +351,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testScaleVnfToLevel() {
+    public void testScaleVnfToLevel() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/scale_to_level"))
@@ -394,8 +359,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final ScaleVnfToLevelRequest scaleVnfToLevelRequest = new ScaleVnfToLevelRequest();
-        scaleVnfToLevelRequest.setInstantiationLevelId("Level 2");
+        final String scaleVnfToLevelRequest = loadFileIntoString("examples/ScaleVnfToLevelRequest.json");
 
         final String vnfLcmOpOccId = driver.scaleVnfToLevel(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, scaleVnfToLevelRequest);
 
@@ -403,7 +367,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testChangeVnfFlavour() {
+    public void testChangeVnfFlavour() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/change_flavour"))
@@ -411,8 +375,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final ChangeVnfFlavourRequest changeVnfFlavourRequest = new ChangeVnfFlavourRequest();
-        changeVnfFlavourRequest.setNewFlavourId("Vanilla");
+        final String changeVnfFlavourRequest = loadFileIntoString("examples/ChangeVnfFlavourRequest.json");
 
         final String vnfLcmOpOccId = driver.changeVnfFlavour(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, changeVnfFlavourRequest);
 
@@ -420,7 +383,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testStartVnf() {
+    public void testStartVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/operate"))
@@ -428,8 +391,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final OperateVnfRequest operateVnfRequest = new OperateVnfRequest();
-        operateVnfRequest.setChangeStateTo(VnfOperationalStateType.STARTED);
+        final String operateVnfRequest = loadFileIntoString("examples/OperateVnfRequest-START.json");
 
         final String vnfLcmOpOccId = driver.operateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, operateVnfRequest);
 
@@ -437,7 +399,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testStopVnf() {
+    public void testStopVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/operate"))
@@ -445,10 +407,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final OperateVnfRequest operateVnfRequest = new OperateVnfRequest();
-        operateVnfRequest.setChangeStateTo(VnfOperationalStateType.STOPPED);
-        operateVnfRequest.setStopType(StopType.GRACEFUL);
-        operateVnfRequest.setGracefulStopTimeout(300);
+        final String operateVnfRequest = loadFileIntoString("examples/OperateVnfRequest-STOP.json");
 
         final String vnfLcmOpOccId = driver.operateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, operateVnfRequest);
 
@@ -456,7 +415,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testHealVnf() {
+    public void testHealVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/heal"))
@@ -464,8 +423,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final HealVnfRequest healVnfRequest = new HealVnfRequest();
-        healVnfRequest.setCause("Because its broken?");
+        final String healVnfRequest = loadFileIntoString("examples/HealVnfRequest.json");
 
         final String vnfLcmOpOccId = driver.healVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, healVnfRequest);
 
@@ -473,7 +431,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testChangeExtVnfConnectivity() {
+    public void testChangeExtVnfConnectivity() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/change_ext_conn"))
@@ -481,7 +439,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final ChangeExtVnfConnectivityRequest changeExtVnfConnectivityRequest = new ChangeExtVnfConnectivityRequest();
+        final String changeExtVnfConnectivityRequest = loadFileIntoString("examples/ChangeExtVnfConnectivityRequest.json");
 
         final String vnfLcmOpOccId = driver.changeExtVnfConnectivity(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, changeExtVnfConnectivityRequest);
 
@@ -489,7 +447,7 @@ public class VNFLifecycleManagementDriverTest {
     }
 
     @Test
-    public void testTerminateVnf() {
+    public void testTerminateVnf() throws Exception {
         final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
 
         server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/terminate"))
@@ -497,9 +455,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
 
-        final TerminateVnfRequest terminateVnfRequest = new TerminateVnfRequest();
-        terminateVnfRequest.setTerminationType(TerminationType.GRACEFUL);
-        terminateVnfRequest.setGracefulTerminationTimeout(300);
+        final String terminateVnfRequest = loadFileIntoString("examples/TerminateVnfRequest.json");
 
         final String vnfLcmOpOccId = driver.terminateVnf(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, terminateVnfRequest);
 

@@ -4,10 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -28,10 +28,10 @@ import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionService;
 public class JavascriptMessageConversionServiceImpl implements MessageConversionService {
 
     private final static Logger logger = LoggerFactory.getLogger(JavascriptMessageConversionServiceImpl.class);
-    public static final String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
+    private static final String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
 
-    @Override public String generateMessageFromRequest(final ExecutionRequest executionRequest) throws MessageConversionException {
-        final String script = getScriptFromExecutionRequest(executionRequest, executionRequest.getLifecycleName());
+    @Override public String generateMessageFromRequest(final String messageType, final ExecutionRequest executionRequest) throws MessageConversionException {
+        final String script = getScriptFromExecutionRequest(executionRequest, messageType);
         logger.debug("Found script, contents are\n{}", script);
 
         try {
@@ -60,8 +60,33 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
         }
     }
 
-    private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptPrefix) {
-        final String scriptName = scriptPrefix + ".js";
+    @Override public Map<String, String> extractPropertiesFromMessage(String messageType, ExecutionRequest executionRequest, String message) throws MessageConversionException {
+        final String script = getScriptFromExecutionRequest(executionRequest, messageType);
+        logger.debug("Found script, contents are\n{}", script);
+
+        try {
+            // Retrieve a Javascript engine (should be Nashorn in JRE 8+)
+            final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByMimeType("application/javascript");
+            logger.debug("Retrieved an instance of a [{}] script engine", scriptEngine);
+
+            // Create a new bindings object and attach objects to be used by the scripts
+            final Bindings bindings = scriptEngine.createBindings();
+            bindings.put("message", message);
+            bindings.put("logger", logger);
+            final Map<String, String> outputs = new HashMap<>();
+            bindings.put("outputs", outputs);
+
+            logger.debug("Preparing to run script");
+            scriptEngine.eval(script, bindings);
+            logger.info("Script successfully run, outputs are [{}]", outputs);
+            return outputs;
+        } catch (ScriptException e) {
+            throw new MessageConversionException("Exception caught executing a script", e);
+        }
+    }
+
+    private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptName) {
+        final String fullScriptName = scriptName + ".js";
 
         // Attempt to extract the script from the executionRequest passed in
         if (!StringUtils.isEmpty(executionRequest.getLifecycleScripts())) {
@@ -72,7 +97,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
                 ZipEntry entry = zis.getNextEntry();
                 while (entry != null) {
                     logger.debug("Found zip entry: {}", entry);
-                    if (scriptName.equalsIgnoreCase(entry.getName())) {
+                    if (fullScriptName.equalsIgnoreCase(entry.getName())) {
                         logger.debug("Found script [{}], extracting contents...", entry.getName());
                         return IOUtils.toString(zis, Charset.defaultCharset());
                     }
@@ -86,13 +111,13 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
         // If we can't find it in the zip file, try searching in out default locations
         final String interfaceVersion = executionRequest.getProperties().getOrDefault("interfaceVersion", DEFAULT_ETSI_SOL003_VERSION);
-        try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/scripts/" + interfaceVersion + "/" + scriptName)) {
+        try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/scripts/" + interfaceVersion + "/" + fullScriptName)) {
             return IOUtils.toString(inputStream, Charset.defaultCharset());
         } catch (IOException e) {
             logger.error("Exception raised looking up default lifecycle script", e);
         }
 
-        throw new IllegalArgumentException(String.format("Unable to find a script called [%s]", scriptName));
+        throw new IllegalArgumentException(String.format("Unable to find a script called [%s]", fullScriptName));
     }
 
 }

@@ -13,42 +13,42 @@ public class JavascriptMessageConversionServiceImplTest {
     @Test
     public void testGenerateMessageFromRequestUsingProvidedScript() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
-        executionRequest.setLifecycleName("Instantiate");
+        executionRequest.setLifecycleName("Configure");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
         executionRequest.setLifecycleScripts(loadZipIntoBase64String("examples/lifecyclescripts.zip"));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl();
-        final String message = messageConversionService.generateMessageFromRequest(executionRequest);
+        final String message = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
 
-        assertThat(message).isEqualTo("{\"vnfdId\":\"123-123-123-123\",\"vnfInstanceName\":\"Instantiate\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+        assertThat(message).isEqualTo("{\"vnfdId\":\"123-123-123-123\",\"vnfInstanceName\":\"Configure\",\"vnfInstanceDescription\":\"testing testing 123\"}");
     }
 
     @Test
     public void testGenerateMessageFromRequestUsingSpecifiedVersion() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
-        executionRequest.setLifecycleName("Instantiate");
+        executionRequest.setLifecycleName("Configure");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
         executionRequest.getProperties().put("interfaceVersion", "2.5.1");
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl();
-        final String message = messageConversionService.generateMessageFromRequest(executionRequest);
+        final String message = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
 
-        assertThat(message).isEqualTo("{\"vnfdId\":\"xxx-xxx-xxx-xxx\",\"vnfInstanceName\":\"Instantiate\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+        assertThat(message).isEqualTo("{\"vnfdId\":\"xxx-xxx-xxx-xxx\",\"vnfInstanceName\":\"Configure\",\"vnfInstanceDescription\":\"testing testing 123\"}");
     }
 
     @Test
     public void testGenerateMessageFromRequestUsingDefault() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
-        executionRequest.setLifecycleName("Create");
+        executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getProperties().put("description", "testing testing 123");
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl();
-        final String message = messageConversionService.generateMessageFromRequest(executionRequest);
+        final String message = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
 
-        assertThat(message).isEqualTo("{\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Create\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+        assertThat(message).isEqualTo("{\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
     }
 
 

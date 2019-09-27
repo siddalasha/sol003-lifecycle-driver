@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,14 @@ class CookieAuthenticator {
                     final List<String> setCookieHeaderValues = authenticationResponse.getHeaders().get(SET_COOKIE_HEADER_NAME);
                     logger.debug("Authentication request returned the following cookies [{}]", setCookieHeaderValues);
                     if (setCookieHeaderValues != null) {
+                        List<HttpCookie> sessionCookies = setCookieHeaderValues.stream()
+                                                                               .flatMap(c -> HttpCookie.parse(c).stream())
+                                                                               .filter(c -> c.getName().matches(".*SESSION.*"))
+                                                                               .collect(Collectors.toList());
                         // What if we get multiple cookies here?
-                        return setCookieHeaderValues.stream().flatMap(c -> HttpCookie.parse(c).stream()).findFirst().orElseThrow(() -> new AccessDeniedException("Cannot parse cookie"));
+                        if (!sessionCookies.isEmpty()) {
+                            return sessionCookies.get(0);
+                        }
                     }
                 }
             }

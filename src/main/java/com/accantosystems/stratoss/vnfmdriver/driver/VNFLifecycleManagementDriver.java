@@ -92,13 +92,13 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfInstance} record
      * @throws SOL003ResponseException if there are any errors creating the VNF instance
      */
-    public VnfInstance createVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final CreateVnfRequest createVnfRequest) throws SOL003ResponseException {
+    public String createVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String createVnfRequest) throws SOL003ResponseException {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        final HttpEntity<CreateVnfRequest> requestEntity = new HttpEntity<>(createVnfRequest, headers);
+        final HttpEntity<String> requestEntity = new HttpEntity<>(createVnfRequest, headers);
 
-        final ResponseEntity<VnfInstance> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);
+        final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
@@ -163,8 +163,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String instantiateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final InstantiateVnfRequest instantiateVnfRequest)
-            throws SOL003ResponseException {
+    public String instantiateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String instantiateVnfRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "instantiate", instantiateVnfRequest);
     }
 
@@ -184,7 +183,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String scaleVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final ScaleVnfRequest scaleVnfRequest) throws SOL003ResponseException {
+    public String scaleVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String scaleVnfRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "scale", scaleVnfRequest);
     }
 
@@ -204,8 +203,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String scaleVnfToLevel(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final ScaleVnfToLevelRequest scaleVnfToLevelRequest)
-            throws SOL003ResponseException {
+    public String scaleVnfToLevel(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String scaleVnfToLevelRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "scale_to_level", scaleVnfToLevelRequest);
     }
 
@@ -225,8 +223,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String changeVnfFlavour(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final ChangeVnfFlavourRequest changeVnfFlavourRequest)
-            throws SOL003ResponseException {
+    public String changeVnfFlavour(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String changeVnfFlavourRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "change_flavour", changeVnfFlavourRequest);
     }
 
@@ -246,7 +243,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String operateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final OperateVnfRequest operateVnfRequest) throws SOL003ResponseException {
+    public String operateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String operateVnfRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "operate", operateVnfRequest);
     }
 
@@ -266,7 +263,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String healVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final HealVnfRequest healVnfRequest) throws SOL003ResponseException {
+    public String healVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String healVnfRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "heal", healVnfRequest);
     }
 
@@ -286,9 +283,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String changeExtVnfConnectivity(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId,
-                                           final ChangeExtVnfConnectivityRequest changeExtVnfConnectivityRequest)
-            throws SOL003ResponseException {
+    public String changeExtVnfConnectivity(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String changeExtVnfConnectivityRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "change_ext_conn", changeExtVnfConnectivityRequest);
     }
 
@@ -308,7 +303,7 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    public String terminateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final TerminateVnfRequest terminateVnfRequest) throws SOL003ResponseException {
+    public String terminateVnf(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String terminateVnfRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "terminate", terminateVnfRequest);
     }
 
@@ -327,13 +322,13 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfLcmOpOcc} record identifier
      * @throws SOL003ResponseException if there are any errors creating the operation request
      */
-    private String callVnfLcmOperation(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String operationName, final Object operationRequest)
+    private String callVnfLcmOperation(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String operationName, final String operationRequest)
             throws SOL003ResponseException {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/" + vnfInstanceId + "/" + operationName;
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
-        final HttpEntity<Object> requestEntity = new HttpEntity<>(operationRequest, headers);
+        final HttpEntity<String> requestEntity = new HttpEntity<>(operationRequest, headers);
 
-        final ResponseEntity<VnfInstance> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, VnfInstance.class);
+        final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         checkResponseEntityMatches(responseEntity, HttpStatus.ACCEPTED, false);
         // "Location" header contains URI of the created VnfLcmOpOcc record

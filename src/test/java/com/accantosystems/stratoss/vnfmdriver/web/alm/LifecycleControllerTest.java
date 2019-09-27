@@ -37,7 +37,7 @@ public class LifecycleControllerTest {
     private LifecycleManagementService lifecycleManagementService;
 
     @Test
-    public void testExecuteLifecycle() {
+    public void testExecuteLifecycle() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
@@ -54,7 +54,7 @@ public class LifecycleControllerTest {
     }
 
     @Test
-    public void testExecuteLifecycleReturnsErrorInfo() {
+    public void testExecuteLifecycleReturnsErrorInfo() throws Exception {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);

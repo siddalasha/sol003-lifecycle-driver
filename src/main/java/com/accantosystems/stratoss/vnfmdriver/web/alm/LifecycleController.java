@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
+import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -30,7 +31,7 @@ public class LifecycleController {
 
     @PostMapping("/execute")
     @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
-    public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest) {
+    public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest) throws MessageConversionException {
         logger.info("Received request to execute a lifecycle [{}] at deployment location [{}]", executionRequest.getLifecycleName(), executionRequest.getDeploymentLocation().getName());
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
         return ResponseEntity.accepted().body(executionAcceptedResponse);
