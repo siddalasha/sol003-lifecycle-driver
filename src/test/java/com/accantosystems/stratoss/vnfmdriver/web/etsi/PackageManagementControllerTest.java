@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
+import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 import com.accantosystems.stratoss.vnfmdriver.test.TestConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
@@ -38,7 +39,7 @@ public class PackageManagementControllerTest {
     public static final String PACKAGE_MANAGEMENT_VNF_PKG_INFO_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}";
     public static final String PACKAGE_MANAGEMENT_VNFD_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/vnfd";
     public static final String PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/package_content";
-    public static final String PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/artifacts/{artifactPath}";
+    public static final String PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT = PACKAGE_MANAGEMENT_BASE_ENDPOINT + "/{vnfPkgId}/artifacts/";
 
     private static final String VNF_PACKAGE_FILENAME = "examples/VnfPackage-vMRF.zip";
 
@@ -154,7 +155,7 @@ public class PackageManagementControllerTest {
         // Check with no Accept types specified
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
-        ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+        ResponseEntity<?> responseEntity = testRestTemplate.withBasicAuth("user", "password")
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
@@ -171,6 +172,14 @@ public class PackageManagementControllerTest {
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+
+        // Check when Accept type of text/plain but multiple vnfds found within the package
+        when(packageManagementService.getVnfdAsYaml(eq(vnfPkgId))).thenThrow(new UnexpectedPackageContentsException("Unexpected package contents"));
+        headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
+        httpEntity = new HttpEntity<>(headers);
+        responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -203,14 +212,15 @@ public class PackageManagementControllerTest {
         ByteArrayResource vnfPackageArtifactAsResource = new ByteArrayResource(vnfPackageArtifact.getBytes());
 
         String vnfPkgId = UUID.randomUUID().toString();
-        String artifactPath = "Vnfd.yaml";
+        String artifactPath = "Definitions/Vnfd.yaml";
 
         when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), nullable(String.class))).thenReturn(vnfPackageArtifactAsResource);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId, artifactPath);
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);

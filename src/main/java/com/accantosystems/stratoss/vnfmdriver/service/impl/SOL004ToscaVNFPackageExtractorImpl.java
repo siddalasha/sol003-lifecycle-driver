@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractionException;
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractor;
-import com.accantosystems.stratoss.vnfmdriver.web.etsi.ResponseTypeNotAcceptableException;
 
 @Service("SOL004ToscaVNFPackageExtractor")
-public class SOL004ToscaVNFPackageExtractor extends VNFPackageExtractor {
+public class SOL004ToscaVNFPackageExtractorImpl extends VNFPackageExtractor {
 
-    private final static Logger logger = LoggerFactory.getLogger(SOL004ToscaVNFPackageExtractor.class);
+    private final static Logger logger = LoggerFactory.getLogger(SOL004ToscaVNFPackageExtractorImpl.class);
 
     public static final String PATH_TOSCA_METADATA_DIRECTORY = "TOSCA-Metadata/";
     public static final String PATH_TOSCA_METADATA = PATH_TOSCA_METADATA_DIRECTORY + "TOSCA.meta";
@@ -29,6 +29,7 @@ public class SOL004ToscaVNFPackageExtractor extends VNFPackageExtractor {
     public static final String KEY_VNF_PACKAGE_VERSION = "vnf_package_version";
     public static final String KEY_VNF_RELEASE_DATA_TIME = "vnf_release_date_time";
 
+    @Override
     public VnfPkgInfo populateVnfPackageInfo(String vnfPkgId, Resource vnfPackageZip) {
 
         logger.info("Extracting VNF package info from VNF package with id [{}]", vnfPkgId);
@@ -59,7 +60,8 @@ public class SOL004ToscaVNFPackageExtractor extends VNFPackageExtractor {
         return vnfPkgInfo;
     }
 
-    public String extractVnfdAsYaml(String vnfPkgId, Resource vnfPackageZip) throws ResponseTypeNotAcceptableException {
+    @Override
+    public String extractVnfdAsYaml(String vnfPkgId, Resource vnfPackageZip) throws UnexpectedPackageContentsException {
 
         logger.info("Extracting VNFD yaml from VNF package with id [{}]", vnfPkgId);
 
@@ -71,7 +73,7 @@ public class SOL004ToscaVNFPackageExtractor extends VNFPackageExtractor {
             if (definitions.isEmpty()) {
                 throw new VNFPackageExtractionException(String.format("Unable to find any Definitions within VnfPackage with id [%s]", vnfPkgId));
             } else if (definitions.size() > 1) {
-                throw new ResponseTypeNotAcceptableException(String.format("Found multiple VNFDs when expecting only one within VnfPackage with id [%s]", vnfPkgId));
+                throw new UnexpectedPackageContentsException(String.format("Found multiple VNFDs when expecting only one within VnfPackage with id [%s]", vnfPkgId));
             }
             Entry<String, byte[]> definitionEntry = definitions.entrySet().iterator().next();
             logger.info("Located VNFD yaml on path [{}] from VNF package with id [{}]", definitionEntry.getKey(), vnfPkgId);
@@ -82,7 +84,8 @@ public class SOL004ToscaVNFPackageExtractor extends VNFPackageExtractor {
         return null;
     }
 
-    public Resource extractVnfdAsZip(String vnfPkgId, Resource vnfPackageZip) throws ResponseTypeNotAcceptableException {
+    @Override
+    public Resource extractVnfdAsZip(String vnfPkgId, Resource vnfPackageZip) {
 
         logger.info("Extracting VNFD zip package from VNF package with id [{}]", vnfPkgId);
 

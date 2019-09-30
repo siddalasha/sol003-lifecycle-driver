@@ -3,6 +3,8 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
+import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -63,7 +66,7 @@ public class PackageManagementController {
 
     @GetMapping(path = "/{vnfPkgId}/vnfd", produces = { MediaType.TEXT_PLAIN_VALUE, CONTENT_TYPE_APPLICATION_ZIP })
     @ApiOperation(value = "Reads the content of the VNFD within a VNF package.", notes = "This resource represents the VNFD contained in an on-boarded VNF package. The client can use this resource to obtain the content of the VNFD.")
-    public ResponseEntity<?> getVnfd(@RequestHeader("Accept") List<String> acceptHeader, @PathVariable String vnfPkgId) throws ResponseTypeNotAcceptableException {
+    public ResponseEntity<?> getVnfd(@RequestHeader("Accept") List<String> acceptHeader, @PathVariable String vnfPkgId) {
 
         logger.info("Received VNFD Get request for package id [{}]", vnfPkgId);
 
@@ -80,18 +83,23 @@ public class PackageManagementController {
         }
 
         if (acceptsZip) {
-            // if application/zip is accepted (even if text/plain is also accepted) then return all as zip
+            // application/zip is accepted (even if text/plain is also accepted) then return all as zip
             Resource zipResource = packageManagementService.getVnfdAsZip(vnfPkgId);
             HttpHeaders headers = new HttpHeaders();
             // TODO set content length: headers.setContentLength(?);
             headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_ZIP));
             return new ResponseEntity<Resource>(zipResource, headers, HttpStatus.OK);
         } else {
-            // only text/plain is accepted. Return as YAML only
-            String vnfd = packageManagementService.getVnfdAsYaml(vnfPkgId);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_YAML));
-            return new ResponseEntity<String>(vnfd, headers, HttpStatus.OK);
+            // text/plain is the only accepted type. Return as YAML only
+            try {
+                String vnfd = packageManagementService.getVnfdAsYaml(vnfPkgId);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_YAML));
+                return new ResponseEntity<String>(vnfd, headers, HttpStatus.OK);
+            } catch (UnexpectedPackageContentsException e) {
+                throw new ResponseTypeNotAcceptableException(String.format("The contents of the VNF Package were unexpected for the given Accept HTTP header: [%s]", String.join(",", acceptHeader)),
+                                                             e);
+            }
         }
 
     }
@@ -112,10 +120,17 @@ public class PackageManagementController {
 
     }
 
-    @GetMapping(path = "/{vnfPkgId}/artifacts/{artifactPath}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    // The actual mapping we want is "/{vnfPkgId}/artifacts/{artifactPath}" but it's not possible to match on this when the artifact path contains "/" characters (even when encoded)
+    // This path filter seems to be the only way to match on these URLs - https://stackoverflow.com/questions/51108291
+    @GetMapping(path = { "/{vnfPkgId}/artifacts/**" }, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ApiOperation(value = "Reads the content content of an artifact within a VNF package.", notes = "This resource represents an individual artifact contained in a VNF package. The client can use this resource to fetch the content of the artifact.")
     public ResponseEntity<Resource> getVnfPackageArtifact(@RequestHeader(value = "Content-Range", required = false) String contentRange, @PathVariable String vnfPkgId,
-                                                          @PathVariable String artifactPath) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
+                                                          HttpServletRequest request) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
+
+        // Need to manually extract the artifactPath from the request URI to ensure it supports slashes within it
+        String requestPath = request.getRequestURI();
+        int index = requestPath.indexOf("/artifacts/") + "/artifacts/".length();
+        String artifactPath = request.getRequestURI().substring(index);
 
         logger.info("Received VNF Package Artifact Get request for package id [{}], artifact path [] and content range []", vnfPkgId, artifactPath, contentRange);
 

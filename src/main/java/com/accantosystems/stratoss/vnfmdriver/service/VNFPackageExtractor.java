@@ -15,17 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-import com.accantosystems.stratoss.vnfmdriver.web.etsi.ResponseTypeNotAcceptableException;
-
 public abstract class VNFPackageExtractor {
 
     private final static Logger logger = LoggerFactory.getLogger(VNFPackageExtractor.class);
 
     public abstract VnfPkgInfo populateVnfPackageInfo(String vnfPkgId, Resource vnfPackageZip);
 
-    public abstract String extractVnfdAsYaml(String vnfPkgId, Resource vnfPackageZip) throws ResponseTypeNotAcceptableException;
+    public abstract String extractVnfdAsYaml(String vnfPkgId, Resource vnfPackageZip) throws UnexpectedPackageContentsException;
 
-    public abstract Resource extractVnfdAsZip(String vnfPkgId, Resource vnfPackageZip) throws ResponseTypeNotAcceptableException;
+    public abstract Resource extractVnfdAsZip(String vnfPkgId, Resource vnfPackageZip);
 
     public Resource extractVnfPackageArtifact(String vnfPkgId, String artifactPath, Resource vnfPackageZip) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
 

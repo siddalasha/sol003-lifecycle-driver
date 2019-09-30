@@ -10,7 +10,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryDriver;
-import com.accantosystems.stratoss.vnfmdriver.web.etsi.ResponseTypeNotAcceptableException;
 
 @Service("PackageManagementService")
 public class PackageManagementService {
@@ -37,7 +36,7 @@ public class PackageManagementService {
         return vnfPkgInfo;
     }
 
-    public String getVnfdAsYaml(String vnfPkgId) throws ResponseTypeNotAcceptableException {
+    public String getVnfdAsYaml(String vnfPkgId) throws UnexpectedPackageContentsException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         String vnfd = vnfPackageExtractor.extractVnfdAsYaml(vnfPkgId, vnfPackageZip);
@@ -45,7 +44,7 @@ public class PackageManagementService {
 
     }
 
-    public Resource getVnfdAsZip(String vnfPkgId) throws ResponseTypeNotAcceptableException {
+    public Resource getVnfdAsZip(String vnfPkgId) {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         Resource vnfdPackage = vnfPackageExtractor.extractVnfdAsZip(vnfPkgId, vnfPackageZip);
