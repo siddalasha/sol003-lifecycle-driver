@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryDriver;
 
 @Service("PackageManagementService")
@@ -25,7 +26,7 @@ public class PackageManagementService {
         this.vnfPackageExtractor = vnfPackageExtractor;
     }
 
-    public VnfPkgInfo getVnfPackageInfo(String vnfPkgId) {
+    public VnfPkgInfo getVnfPackageInfo(String vnfPkgId) throws VNFPackageNotFoundException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         VnfPkgInfo vnfPkgInfo = vnfPackageExtractor.populateVnfPackageInfo(vnfPkgId, vnfPackageZip);
@@ -36,7 +37,7 @@ public class PackageManagementService {
         return vnfPkgInfo;
     }
 
-    public String getVnfdAsYaml(String vnfPkgId) throws UnexpectedPackageContentsException {
+    public String getVnfdAsYaml(String vnfPkgId) throws UnexpectedPackageContentsException, VNFPackageNotFoundException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         String vnfd = vnfPackageExtractor.extractVnfdAsYaml(vnfPkgId, vnfPackageZip);
@@ -44,20 +45,21 @@ public class PackageManagementService {
 
     }
 
-    public Resource getVnfdAsZip(String vnfPkgId) {
+    public Resource getVnfdAsZip(String vnfPkgId) throws VNFPackageNotFoundException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         Resource vnfdPackage = vnfPackageExtractor.extractVnfdAsZip(vnfPkgId, vnfPackageZip);
         return vnfdPackage;
     }
 
-    public Resource getVnfPackageContent(String vnfPkgId, String contentRange) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
+    public Resource getVnfPackageContent(String vnfPkgId, String contentRange) throws PackageStateConflictException, ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         // TODO handle content range
         return vnfPackageZip;
     }
 
-    public Resource getVnfPackageArtifact(String vnfPkgId, String artifactPath, String contentRange) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
+    public Resource getVnfPackageArtifact(String vnfPkgId, String artifactPath, String contentRange) throws PackageStateConflictException, ContentRangeNotSatisfiableException,
+                                                                                                     VNFPackageNotFoundException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         Resource vnfArtifact = vnfPackageExtractor.extractVnfPackageArtifact(vnfPkgId, artifactPath, vnfPackageZip);

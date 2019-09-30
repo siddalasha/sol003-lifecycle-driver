@@ -24,7 +24,7 @@ public class VNFPackageRepositoryDriver {
         this.vnfmDriverProperties = vnfmDriverProperties;
     }
 
-    public Resource getVnfPackage(String vnfPackageId) {
+    public Resource getVnfPackage(String vnfPackageId) throws VNFPackageNotFoundException {
 
         // TODO some local caching would be nice
 
@@ -41,7 +41,7 @@ public class VNFPackageRepositoryDriver {
             UrlResource vnfPackage = new UrlResource(vnfDownloadPath);
 
             if (!vnfPackage.exists()) {
-                throw new VNFPackageRepositoryException(String.format("VNF Package not found in repository at location [%s].", vnfDownloadPath));
+                throw new VNFPackageNotFoundException(String.format("VNF Package not found in repository at location [%s].", vnfDownloadPath));
             }
 
             logger.info(" VNF Package found at location {}", vnfDownloadPath);

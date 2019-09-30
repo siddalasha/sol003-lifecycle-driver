@@ -2,9 +2,13 @@ package com.accantosystems.stratoss.vnfmdriver.service.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import org.etsi.sol003.packagemanagement.VnfPackageArtifactInfo;
+import org.etsi.sol003.packagemanagement.VnfPackageSoftwareImageInfo;
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +19,29 @@ import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsE
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractionException;
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractor;
 
+/**
+ * Implementation of a VNF Package Extractor that understands the format as specified in spec ETSI GS NFV-SOL 004 V2.4.1, supporting only the "CSAR with the TOSCA-Metadata directory" variant
+ * <p>
+ * Below is an example of a CSAR directory structure for NFV including the TOSCA-Metadata, Definitions, Files and Scripts directories.
+ * <p>
+ * TOSCA-Metadata<br>
+ * ----TOSCA.meta<br>
+ * Definitions<br>
+ * ----MRF.yaml<br>
+ * ----OtherTemplates (e.g., type definitions)<br>
+ * Files<br>
+ * ----ChangeLog.txt<br>
+ * ----MRF.cert<br>
+ * ----image(s)<br>
+ * ----other artifacts<br>
+ * ----Tests<br>
+ * --------file(s)<br>
+ * ----Licenses<br>
+ * --------file(s)<br>
+ * Scripts<br>
+ * ---- install.sh<br>
+ * MRF.mf
+ */
 @Service("SOL004ToscaVNFPackageExtractor")
 public class SOL004ToscaVNFPackageExtractorImpl extends VNFPackageExtractor {
 
@@ -52,6 +79,25 @@ public class SOL004ToscaVNFPackageExtractorImpl extends VNFPackageExtractor {
             Map<String, String> entryManifest = parseManifestFile(new String(entryManifestByteArray));
             vnfPkgInfo.setVnfProductName(entryManifest.get(KEY_VNF_PRODUCT_NAME));
             vnfPkgInfo.setVnfProvider(entryManifest.get(KEY_VNF_PROVIDER_ID));
+
+            List<String> packageArtifacts = listPackageArtifacts(vnfPackageZip, "Files");
+
+            // TODO This isn't the right list of 'additional artifacts'. Not sure exactly how to extract the specific list from the package
+            List<VnfPackageArtifactInfo> additionalArtifacts = packageArtifacts.stream().map(artifactPath -> {
+                VnfPackageArtifactInfo info = new VnfPackageArtifactInfo();
+                info.setArtifactPath(artifactPath);
+                return info;
+            }).collect(Collectors.toList());
+            vnfPkgInfo.setAdditionalArtifacts(additionalArtifacts);
+
+            // TODO This isn't the right list of 'software images'. Not sure exactly how to extract the specific list from the package. Also need to populate more info on the
+            // VnfPackageSoftwareImageInfo
+            List<VnfPackageSoftwareImageInfo> softwareImages = packageArtifacts.stream().map(artifactPath -> {
+                VnfPackageSoftwareImageInfo info = new VnfPackageSoftwareImageInfo();
+                info.setImagePath(artifactPath);
+                return info;
+            }).collect(Collectors.toList());
+            vnfPkgInfo.setSoftwareImages(softwareImages);
 
         } catch (IOException e) {
             handleGenericExtractionException(e, vnfPkgId);

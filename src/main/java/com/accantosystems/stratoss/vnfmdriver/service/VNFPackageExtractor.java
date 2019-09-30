@@ -2,7 +2,9 @@ package com.accantosystems.stratoss.vnfmdriver.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
@@ -73,6 +75,20 @@ public abstract class VNFPackageExtractor {
             }
         }
         return artifactResources;
+    }
+
+    protected List<String> listPackageArtifacts(Resource zipPackage, String artifactPathStartsWith) throws IOException {
+        List<String> zipContents = new ArrayList<String>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(zipPackage.getInputStream())) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (!zipEntry.isDirectory() && zipEntry.getName().startsWith(artifactPathStartsWith)) {
+                    zipContents.add(zipEntry.getName());
+                }
+            }
+        }
+        return zipContents;
     }
 
     private byte[] extractBytesFromZipEntry(ZipInputStream zipInputStream) throws IOException {

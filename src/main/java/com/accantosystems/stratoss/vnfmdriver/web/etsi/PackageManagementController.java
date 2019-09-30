@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
@@ -55,7 +56,7 @@ public class PackageManagementController {
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Reads the information of an individual VNF package", notes = "Queries the information of the VNF packages matching the filter.")
-    public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws NotImplementedException {
+    public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws NotImplementedException, VNFPackageNotFoundException {
 
         logger.info("Received Individual VNF package Info Get request.");
 
@@ -66,7 +67,7 @@ public class PackageManagementController {
 
     @GetMapping(path = "/{vnfPkgId}/vnfd", produces = { MediaType.TEXT_PLAIN_VALUE, CONTENT_TYPE_APPLICATION_ZIP })
     @ApiOperation(value = "Reads the content of the VNFD within a VNF package.", notes = "This resource represents the VNFD contained in an on-boarded VNF package. The client can use this resource to obtain the content of the VNFD.")
-    public ResponseEntity<?> getVnfd(@RequestHeader("Accept") List<String> acceptHeader, @PathVariable String vnfPkgId) {
+    public ResponseEntity<?> getVnfd(@RequestHeader("Accept") List<String> acceptHeader, @PathVariable String vnfPkgId) throws VNFPackageNotFoundException {
 
         logger.info("Received VNFD Get request for package id [{}]", vnfPkgId);
 
@@ -108,7 +109,7 @@ public class PackageManagementController {
     @ApiOperation(value = "Reads the content of a VNF package identified by the VNF package identifier allocated by the NFVO.", notes = "This resource represents a VNF package identified by the VNF package identifier allocated by the NFVO. The client can use this resource to fetch the content of the VNF package.")
     public ResponseEntity<Resource> getVnfPackageContent(@RequestHeader(value = "Content-Range", required = false) String contentRange,
                                                          @PathVariable String vnfPkgId) throws PackageStateConflictException,
-                                                                                        ContentRangeNotSatisfiableException {
+                                                                                        ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
 
         logger.info("Received VNF Package Content Get request for package id [{}] and content range []", vnfPkgId, contentRange);
 
@@ -125,7 +126,7 @@ public class PackageManagementController {
     @GetMapping(path = { "/{vnfPkgId}/artifacts/**" }, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ApiOperation(value = "Reads the content content of an artifact within a VNF package.", notes = "This resource represents an individual artifact contained in a VNF package. The client can use this resource to fetch the content of the artifact.")
     public ResponseEntity<Resource> getVnfPackageArtifact(@RequestHeader(value = "Content-Range", required = false) String contentRange, @PathVariable String vnfPkgId,
-                                                          HttpServletRequest request) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
+                                                          HttpServletRequest request) throws PackageStateConflictException, ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
 
         // Need to manually extract the artifactPath from the request URI to ensure it supports slashes within it
         String requestPath = request.getRequestURI();

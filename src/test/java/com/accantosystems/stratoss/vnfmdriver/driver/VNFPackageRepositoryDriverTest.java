@@ -25,7 +25,7 @@ public class VNFPackageRepositoryDriverTest {
     private VNFPackageRepositoryDriver vnfPackageDriver;
 
     @Test
-    public void testGetVnfPackage() throws IOException {
+    public void testGetVnfPackage() throws IOException, VNFPackageNotFoundException {
 
         Resource vnfPackage = vnfPackageDriver.getVnfPackage("vMRF");
         assertThat(ByteStreams.toByteArray(vnfPackage.getInputStream())).isNotEmpty();
@@ -36,7 +36,7 @@ public class VNFPackageRepositoryDriverTest {
 
         assertThatThrownBy(() -> {
             vnfPackageDriver.getVnfPackage("not-present-id");
-        }).isInstanceOf(VNFPackageRepositoryException.class)
+        }).isInstanceOf(VNFPackageNotFoundException.class)
                 .hasMessageStartingWith("VNF Package not found in repository at location");
     }
 
