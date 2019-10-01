@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.etsi.sol003.packagemanagement.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryDriver;
+import com.accantosystems.stratoss.vnfmdriver.test.TestConstants;
 import com.google.common.io.ByteStreams;
 
 @RunWith(SpringRunner.class)
@@ -157,7 +160,8 @@ public class PackageManagementServiceTest {
 
         Resource vnfdPackage = packageManagementService.getVnfdAsZip(VNF_PACKAGE_ID);
         assertThat(vnfdPackage).isNotNull();
-        // TODO check zip contents
+        List<String> zipContents = TestConstants.listZipContents(vnfdPackage.getInputStream());
+        assertThat(zipContents).containsExactlyInAnyOrder("Definitions/MRF.yaml", "TOSCA-Metadata/TOSCA.meta");
 
     }
 

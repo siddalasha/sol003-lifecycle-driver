@@ -6,8 +6,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.assertj.core.api.Condition;
 import org.springframework.http.HttpEntity;
@@ -122,6 +126,20 @@ public abstract class TestConstants {
             }
             return Base64.getEncoder().encodeToString(result.toByteArray());
         }
+    }
+
+    public static List<String> listZipContents(InputStream zipAsInputStream) throws IOException {
+        List<String> zipContents = new ArrayList<String>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(zipAsInputStream)) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (!zipEntry.isDirectory()) {
+                    zipContents.add(zipEntry.getName());
+                }
+            }
+        }
+        return zipContents;
     }
 
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
@@ -103,7 +104,14 @@ public class ETSIExceptionHandlingControllerAdvice {
     @ResponseStatus(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
     @ResponseBody
     protected ProblemDetails handleContentRangeNotSatisfiableException(HttpServletRequest req, ContentRangeNotSatisfiableException cause) {
-        return defaultHandle("The byte range passed in the \"Range\" header did not match any available byte range in the VNF package file.", cause, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        return defaultHandle("The byte range passed in the \"Range\" header did not match any available byte range in the VNF Package file.", cause, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+    }
+
+    @ExceptionHandler(VNFPackageNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    protected ProblemDetails handleVNFPackageNotFoundException(HttpServletRequest req, VNFPackageNotFoundException cause) {
+        return defaultHandle("The VNF Package could not be found.", cause, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
     }
 
     @ExceptionHandler(Exception.class)

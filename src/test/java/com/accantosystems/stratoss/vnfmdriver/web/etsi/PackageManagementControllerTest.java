@@ -24,7 +24,10 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
+import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
+import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
 import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 import com.accantosystems.stratoss.vnfmdriver.test.TestConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,6 +56,19 @@ public class PackageManagementControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    public void testQueryPackageInfoNotImplemented() throws Exception {
+
+        // TODO remove this test method when implementing GET /vnfpkgm/v1/vnf_packages
+
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password").getForEntity(PACKAGE_MANAGEMENT_BASE_ENDPOINT, ProblemDetails.class);
+
+        // This method is not yet implemented so ensure all callers will receive status 501
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_IMPLEMENTED);
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Query VNF Packages Info API not yet implemented.");
+
+    }
+
+    @Test
     public void testRequestPackageInfo() throws Exception {
 
         String vnfd = loadFileIntoString("examples/VnfPkgInfo.json");
@@ -70,16 +86,17 @@ public class PackageManagementControllerTest {
     }
 
     @Test
-    public void testQueryPackageInfoNotImplemented() throws Exception {
+    public void testRequestPackageInfoPackageNotFound() throws Exception {
 
-        // TODO remove this test method when implementing GET /vnfpkgm/v1/vnf_packages
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfPackageInfo(eq(vnfPkgId))).thenThrow(new VNFPackageNotFoundException("Unable to find VNF Package"));
 
-        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password").getForEntity(PACKAGE_MANAGEMENT_BASE_ENDPOINT, ProblemDetails.class);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password").getForEntity(PACKAGE_MANAGEMENT_VNF_PKG_INFO_ENDPOINT, ProblemDetails.class, vnfPkgId);
 
-        // This method is not yet implemented so ensure all callers will receive status 501
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_IMPLEMENTED);
-        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Query VNF Packages Info API not yet implemented.");
-
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Unable to find VNF Package");
     }
 
     @Test
@@ -99,9 +116,28 @@ public class PackageManagementControllerTest {
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfdAsByteArray);
+    }
+
+    @Test
+    public void testRequestVNFDPackageNotFound() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfdAsZip(eq(vnfPkgId))).thenThrow(new VNFPackageNotFoundException("Unable to find VNF Package"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Unable to find VNF Package");
     }
 
     @Test
@@ -120,6 +156,7 @@ public class PackageManagementControllerTest {
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/yaml"));
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody()).isEqualTo(vnfd);
@@ -161,14 +198,14 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
 
         // Check with only invalid Accept types specified
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
 
         // Check with additional invalid Accept types specified
-        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON));
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.TEXT_PLAIN, MediaType.APPLICATION_OCTET_STREAM));
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
@@ -194,6 +231,7 @@ public class PackageManagementControllerTest {
         when(packageManagementService.getVnfPackageContent(eq(vnfPkgId), nullable(String.class))).thenReturn(vnfPackageAsResource);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip")));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
                 .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
@@ -203,6 +241,85 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackageAsByteArray);
+    }
+
+    @Test
+    public void testRequestVNFPackagePartialContent() throws Exception {
+
+        byte[] vnfPackageAsByteArray = loadFileIntoByteArray(VNF_PACKAGE_FILENAME);
+        ByteArrayResource vnfPackageAsResource = new ByteArrayResource(vnfPackageAsByteArray);
+
+        String vnfPkgId = UUID.randomUUID().toString();
+        String contentRange = "1000-2000";
+
+        when(packageManagementService.getVnfPackageContent(eq(vnfPkgId), eq(contentRange))).thenReturn(vnfPackageAsResource);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip")));
+        headers.set(HttpHeaders.CONTENT_RANGE, contentRange);
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackageAsByteArray);
+    }
+
+    @Test
+    public void testRequestVNFPackageContentPackageNotFound() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfPackageContent(eq(vnfPkgId), nullable(String.class))).thenThrow(new VNFPackageNotFoundException("Unable to find VNF Package"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Unable to find VNF Package");
+    }
+
+    @Test
+    public void testRequestVNFPackageContentPackageConflict() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfPackageContent(eq(vnfPkgId), nullable(String.class))).thenThrow(new PackageStateConflictException("Invalid state"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Invalid state");
+    }
+
+    @Test
+    public void testRequestVNFPackageContentRangeNotSatisfiable() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfPackageContent(eq(vnfPkgId), nullable(String.class))).thenThrow(new ContentRangeNotSatisfiableException("Invalid state"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Invalid state");
     }
 
     @Test
@@ -217,6 +334,7 @@ public class PackageManagementControllerTest {
         when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), nullable(String.class))).thenReturn(vnfPackageArtifactAsResource);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
@@ -227,6 +345,93 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackageArtifact.getBytes());
+    }
+
+    @Test
+    public void testRequestVNFPackageArtifactPartialContent() throws Exception {
+
+        String vnfPackageArtifact = loadFileIntoString("examples/Vnfd.yaml");
+        ByteArrayResource vnfPackageArtifactAsResource = new ByteArrayResource(vnfPackageArtifact.getBytes());
+
+        String vnfPkgId = UUID.randomUUID().toString();
+        String artifactPath = "Definitions/Vnfd.yaml";
+        String contentRange = "1000-2000";
+
+        when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), eq(contentRange))).thenReturn(vnfPackageArtifactAsResource);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
+        headers.set(HttpHeaders.CONTENT_RANGE, contentRange);
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
+        final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(ByteStreams.toByteArray(responseEntity.getBody().getInputStream())).isEqualTo(vnfPackageArtifact.getBytes());
+    }
+
+    @Test
+    public void testRequestVNFPackageArtifactPackageNotFound() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        String artifactPath = "Definitions/Vnfd.yaml";
+        when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), nullable(String.class))).thenThrow(new VNFPackageNotFoundException("Unable to find VNF Package"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Unable to find VNF Package");
+    }
+
+    @Test
+    public void testRequestVNFPackageArtifactPackageConflict() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        String artifactPath = "Definitions/Vnfd.yaml";
+        when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), nullable(String.class))).thenThrow(new PackageStateConflictException("Invalid state"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Invalid state");
+    }
+
+    @Test
+    public void testRequestVNFPackageArtifactRangeNotSatisfiable() throws Exception {
+
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        String artifactPath = "Definitions/Vnfd.yaml";
+        when(packageManagementService.getVnfPackageArtifact(eq(vnfPkgId), eq(artifactPath), nullable(String.class))).thenThrow(new ContentRangeNotSatisfiableException("Invalid state"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Invalid state");
     }
 
     // TODO - further testing

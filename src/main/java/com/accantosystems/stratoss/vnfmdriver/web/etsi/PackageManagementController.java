@@ -55,8 +55,8 @@ public class PackageManagementController {
     }
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Reads the information of an individual VNF package", notes = "Queries the information of the VNF packages matching the filter.")
-    public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws NotImplementedException, VNFPackageNotFoundException {
+    @ApiOperation(value = "Reads the information of an individual VNF package", notes = "This resource represents an individual VNF package. The client can use this resource to read information of the VNF package.")
+    public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws VNFPackageNotFoundException {
 
         logger.info("Received Individual VNF package Info Get request.");
 
@@ -76,15 +76,18 @@ public class PackageManagementController {
             throw new ResponseTypeNotAcceptableException("No response type specified in Accept HTTP header. ");
         } else {
             List<String> acceptTypes = new ArrayList<String>(acceptHeader);
+            // remove all acceptable types from the list
             acceptsZip = acceptTypes.remove(CONTENT_TYPE_APPLICATION_ZIP);
-            acceptTypes.remove(MediaType.TEXT_PLAIN_VALUE);
+            acceptTypes.remove(MediaType.TEXT_PLAIN_VALUE); // text/plain is an allowed content type
+            acceptTypes.remove(MediaType.APPLICATION_JSON_VALUE); // need to accept application/json in case a ProblemDetails response is returned
+            // anything left is unacceptable
             if (!acceptTypes.isEmpty()) {
                 throw new ResponseTypeNotAcceptableException(String.format("Response type(s) not acceptable in Accept HTTP header: [%s]", String.join(",", acceptTypes)));
             }
         }
 
         if (acceptsZip) {
-            // application/zip is accepted (even if text/plain is also accepted) then return all as zip
+            // application/zip is accepted (even if text/plain is also accepted) so return all as zip
             Resource zipResource = packageManagementService.getVnfdAsZip(vnfPkgId);
             HttpHeaders headers = new HttpHeaders();
             // TODO set content length: headers.setContentLength(?);
@@ -123,7 +126,7 @@ public class PackageManagementController {
 
     // The actual mapping we want is "/{vnfPkgId}/artifacts/{artifactPath}" but it's not possible to match on this when the artifact path contains "/" characters (even when encoded)
     // This path filter seems to be the only way to match on these URLs - https://stackoverflow.com/questions/51108291
-    @GetMapping(path = { "/{vnfPkgId}/artifacts/**" }, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(path = { "/{vnfPkgId}/artifacts/**" })
     @ApiOperation(value = "Reads the content content of an artifact within a VNF package.", notes = "This resource represents an individual artifact contained in a VNF package. The client can use this resource to fetch the content of the artifact.")
     public ResponseEntity<Resource> getVnfPackageArtifact(@RequestHeader(value = "Content-Range", required = false) String contentRange, @PathVariable String vnfPkgId,
                                                           HttpServletRequest request) throws PackageStateConflictException, ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
