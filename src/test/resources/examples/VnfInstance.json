@@ -12,8 +12,8 @@
   "vimConnectionInfo": {},
   "instantiationState": "NOT_INSTANTIATED",
   "instantiatedVnfInfo": {},
-  "metadata": "",
-  "extensions": "",
+  "metadata": {},
+  "extensions": {},
   "_links": {
     "self": {
       "href": "{apiRoot}/vnflcm/v1/vnf_instances/{vnfInstanceId}"

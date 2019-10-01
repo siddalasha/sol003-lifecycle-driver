@@ -32,22 +32,16 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
     @Override public String generateMessageFromRequest(final String messageType, final ExecutionRequest executionRequest) throws MessageConversionException {
         final String script = getScriptFromExecutionRequest(executionRequest, messageType);
-        logger.debug("Found script, contents are\n{}", script);
+        final ScriptEngine scriptEngine = getScriptEngine();
 
         try {
-            // Retrieve a Javascript engine (should be Nashorn in JRE 8+)
-            final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByMimeType("application/javascript");
-            logger.debug("Retrieved an instance of a [{}] script engine", scriptEngine);
-
             // Create a new bindings object and attach objects to be used by the scripts
             final Bindings bindings = scriptEngine.createBindings();
             bindings.put("executionRequest", executionRequest);
             bindings.put("logger", logger);
 
-            logger.debug("Preparing to run script");
             final Object returnVal = scriptEngine.eval(script, bindings);
-            logger.info("Script successfully run, returnVal is [{}]", returnVal);
-
+            logger.info("Message conversion script successfully run, returnVal is\n{}", returnVal);
             if (returnVal instanceof String) {
                 return (String) returnVal;
             } else if (returnVal == null) {
@@ -62,13 +56,9 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
     @Override public Map<String, String> extractPropertiesFromMessage(String messageType, ExecutionRequest executionRequest, String message) throws MessageConversionException {
         final String script = getScriptFromExecutionRequest(executionRequest, messageType);
-        logger.debug("Found script, contents are\n{}", script);
+        final ScriptEngine scriptEngine = getScriptEngine();
 
         try {
-            // Retrieve a Javascript engine (should be Nashorn in JRE 8+)
-            final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByMimeType("application/javascript");
-            logger.debug("Retrieved an instance of a [{}] script engine", scriptEngine);
-
             // Create a new bindings object and attach objects to be used by the scripts
             final Bindings bindings = scriptEngine.createBindings();
             bindings.put("message", message);
@@ -76,13 +66,19 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
             final Map<String, String> outputs = new HashMap<>();
             bindings.put("outputs", outputs);
 
-            logger.debug("Preparing to run script");
             scriptEngine.eval(script, bindings);
-            logger.info("Script successfully run, outputs are [{}]", outputs);
+            logger.info("Message conversion script successfully run, outputs are\n{}", outputs);
             return outputs;
         } catch (ScriptException e) {
             throw new MessageConversionException("Exception caught executing a script", e);
         }
+    }
+
+    private ScriptEngine getScriptEngine() {
+        // Retrieve a Javascript engine (should be Nashorn in JRE 8+)
+        final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByMimeType("application/javascript");
+        logger.debug("Retrieved an instance of a [{}] script engine", scriptEngine);
+        return scriptEngine;
     }
 
     private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptName) {
@@ -96,10 +92,12 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
             try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedByteArray))) {
                 ZipEntry entry = zis.getNextEntry();
                 while (entry != null) {
-                    logger.debug("Found zip entry: {}", entry);
+                    logger.trace("Found zip entry: {}", entry);
                     if (fullScriptName.equalsIgnoreCase(entry.getName())) {
-                        logger.debug("Found script [{}], extracting contents...", entry.getName());
-                        return IOUtils.toString(zis, Charset.defaultCharset());
+                        logger.debug("Found script called [{}], extracting...", entry.getName());
+                        final String script = IOUtils.toString(zis, Charset.defaultCharset());
+                        logger.debug("Script content is\n{}", script);
+                        return script;
                     }
                     // Get the next entry for the loop
                     entry = zis.getNextEntry();
