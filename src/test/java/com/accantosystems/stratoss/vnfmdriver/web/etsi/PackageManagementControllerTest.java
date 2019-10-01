@@ -434,8 +434,4 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getBody().getDetail()).isEqualTo("Invalid state");
     }
 
-    // TODO - further testing
-    // - partial context requests
-    // - conflicted requests
-    // - unsuitable range requests
 }

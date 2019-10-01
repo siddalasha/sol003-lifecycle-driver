@@ -13,6 +13,8 @@
 vnfmdriver:
   kafka:
     enabled: false
+  packageManagement:
+    packageRepositoryUrl: file:./src/test/resources/examples/VnfPackage-{vnfPackageId}.zip      
 
 spring:
   jackson:
