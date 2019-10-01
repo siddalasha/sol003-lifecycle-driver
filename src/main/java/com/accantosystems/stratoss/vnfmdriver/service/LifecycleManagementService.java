@@ -41,34 +41,35 @@ public class LifecycleManagementService {
                 final String vnfInstanceResponse = vnfLifecycleManagementDriver.createVnfInstance(executionRequest.getDeploymentLocation(), createVnfRequest);
                 // Convert response into properties to be returned to ALM
                 final Map<String, String> outputs = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceResponse);
-                // Send response back to ALM
+
                 final String requestId = UUID.randomUUID().toString();
                 // TODO Need to put a delay into sending this (from a different thread) as this method needs to complete first (to send the response back to Brent)
-                ExecutionAsyncResponse asyncResponse = new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs);
-                externalMessagingService.sendExecutionAsyncResponse(asyncResponse);
+                externalMessagingService.sendExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs));
+
+                // Send response back to ALM
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Configure".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Instantiate
-                final String vnfInstanceId = null;
-                final String instantiateVnfRequest = null;
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String instantiateVnfRequest = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.instantiateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, instantiateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Start".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Operate (Start)
-                final String vnfInstanceId = null;
-                final String operateVnfRequest = null;
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String operateVnfRequest = messageConversionService.generateMessageFromRequest("OperateVnfRequest-Start", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.operateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, operateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Stop".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Operate (Stop)
-                final String vnfInstanceId = null;
-                final String operateVnfRequest = null;
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String operateVnfRequest = messageConversionService.generateMessageFromRequest("OperateVnfRequest-Stop", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.operateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, operateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Uninstall".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Terminate
-                final String vnfInstanceId = null;
-                final String terminateVnfRequest = null;
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String terminateVnfRequest = messageConversionService.generateMessageFromRequest("TerminateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.terminateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, terminateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Reconfigure".equalsIgnoreCase(executionRequest.getLifecycleName())) {
