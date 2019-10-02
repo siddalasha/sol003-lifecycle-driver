@@ -53,12 +53,14 @@ public class JavascriptMessageConversionServiceImplTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getProperties().put("description", "testing testing 123");
+        executionRequest.getProperties().put("vnfdId", "xyz-xyz-xyz-xyz");
+        executionRequest.getProperties().put("vnfInstanceName", "Install");
+        executionRequest.getProperties().put("vnfInstanceDescription", "testing testing 123");
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final String message = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
 
-        assertThat(message).isEqualTo("{\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+        assertThat(message).isEqualTo("{\"additionalParams\":{},\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
     }
 
 }
