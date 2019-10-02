@@ -1,17 +1,17 @@
 /*
- This is the generic message creation logic for OperateVnfRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
+ This is the generic message creation logic for ScaleVnfToLevelRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
  */
-logger.debug('Generating OperateVnfRequest message for ETSI SOL003 v2.4.1');
+logger.debug('Generating ScaleVnfToLevelRequest message for ETSI SOL003 v2.4.1');
 load('classpath:scripts/lib.js');
 
 // Create the message object to be returned
-var message = {additionalParams: {}};
+var message = {scaleInfo: [], additionalParams: {}};
 
 // Set the standard message properties
-message.changeStateTo = 'STARTED';
+setPropertyIfNotNull(executionRequest.properties, message, 'instantiationLevelId');
 
 for (var key in executionRequest.getProperties()) {
-    if (key.startsWith('additionalParams.')) {
+    if (key.startsWith('additionalParams.') || key.startsWith('scaleInfo.')) {
         // print('Got property [' + key + '], value = [' + executionRequest.properties[key] + ']');
         addProperty(message, key, executionRequest.properties[key]);
     }

@@ -1,5 +1,5 @@
 /*
- This is the generic message creation logic for CreateVnfRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
+ This is the generic message creation logic for OperateVnfRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
  */
 logger.debug('Generating OperateVnfRequest message for ETSI SOL003 v2.4.1');
 load('classpath:scripts/lib.js');

@@ -1,15 +1,15 @@
 /*
- This is the generic message creation logic for InstantiateVnfRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
+ This is the generic message creation logic for ChangeVnfFlavourRequest messages based on the 2.4.1 version of the ETSI SOL003 specification
  */
-logger.debug('Generating InstantiateVnfRequest message for ETSI SOL003 v2.4.1');
+logger.debug('Generating ChangeVnfFlavourRequest message for ETSI SOL003 v2.4.1');
 load('classpath:scripts/lib.js');
 
 // Create the message object to be returned
-var message = {extVirtualLinks: [], extManagedVirtualLinks: [], vimConnectionInfo: [], additionalParams: {}};
+var message = {extVirtualLinks: {}, extManagedVirtualLinks: {}, vimConnectionInfo: {}, additionalParams: {}};
 
 // Set the standard message properties
 // The flavourId is required, the other fields are optional
-setPropertyIfNotNull(executionRequest.properties, message, 'flavourId');
+message.newFlavourId = executionRequest.properties.flavourId;
 setPropertyIfNotNull(executionRequest.properties, message, 'instantiationLevelId');
 setPropertyIfNotNull(executionRequest.properties, message, 'localizationLanguage');
 

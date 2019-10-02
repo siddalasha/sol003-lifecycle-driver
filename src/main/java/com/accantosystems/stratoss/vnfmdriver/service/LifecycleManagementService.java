@@ -72,8 +72,30 @@ public class LifecycleManagementService {
                 final String terminateVnfRequest = messageConversionService.generateMessageFromRequest("TerminateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.terminateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, terminateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
-            } else if ("Reconfigure".equalsIgnoreCase(executionRequest.getLifecycleName())) {
-                // Look at properties to see if there's anything changed to drive healing?
+            } else if ("Scale".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // Scale
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
+                final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
+                return new ExecutionAcceptedResponse(requestId);
+            } else if ("ScaleOut".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // Scale Out
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
+                final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
+                return new ExecutionAcceptedResponse(requestId);
+            } else if ("ScaleIn".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // Scale In
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
+                final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
+                return new ExecutionAcceptedResponse(requestId);
+            } else if ("Heal".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // Heal
+                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String healVnfRequest = messageConversionService.generateMessageFromRequest("HealVnfRequest", executionRequest);
+                final String requestId = vnfLifecycleManagementDriver.healVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, healVnfRequest);
+                return new ExecutionAcceptedResponse(requestId);
             } else {
                 // Unsupported transition
             }

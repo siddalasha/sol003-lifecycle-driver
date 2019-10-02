@@ -12,6 +12,7 @@ import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDrive
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.service.impl.JavascriptMessageConversionServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LifecycleManagementServiceTest {
 
@@ -19,7 +20,9 @@ public class LifecycleManagementServiceTest {
     public void testExecuteLifecycle() throws Exception {
         final VNFLifecycleManagementDriver mockDriver = mock(VNFLifecycleManagementDriver.class);
         final ExternalMessagingService mockExternalMessagingService = mock(ExternalMessagingService.class);
-        final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(mockDriver, messageConversionService, mockExternalMessagingService);
 
         when(mockDriver.createVnfInstance(any(), any())).thenReturn(loadFileIntoString("examples/VnfInstance.json"));
