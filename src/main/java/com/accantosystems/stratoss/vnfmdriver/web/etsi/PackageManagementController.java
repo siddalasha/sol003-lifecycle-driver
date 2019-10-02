@@ -98,7 +98,7 @@ public class PackageManagementController {
             try {
                 String vnfd = packageManagementService.getVnfdAsYaml(vnfPkgId);
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_YAML));
+                headers.setContentType(MediaType.TEXT_PLAIN);
                 return new ResponseEntity<String>(vnfd, headers, HttpStatus.OK);
             } catch (UnexpectedPackageContentsException e) {
                 throw new ResponseTypeNotAcceptableException(String.format("The contents of the VNF Package were unexpected for the given Accept HTTP header: [%s]", String.join(",", acceptHeader)),
