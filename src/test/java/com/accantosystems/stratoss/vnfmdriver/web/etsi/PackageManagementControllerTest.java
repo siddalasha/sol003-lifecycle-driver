@@ -156,7 +156,7 @@ public class PackageManagementControllerTest {
                 .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/yaml"));
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody()).isEqualTo(vnfd);
