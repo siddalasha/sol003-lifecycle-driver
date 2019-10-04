@@ -1,5 +1,6 @@
 package org.etsi.sol003.lifecyclemanagement;
 
+import java.util.List;
 import java.util.Map;
 
 import org.etsi.sol003.common.VimConnectionInfo;
@@ -12,8 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * Represents attribute modifications for an "Individual VNF instance" resource, i.e. modifications to a resource
- * representation based on the "VnfInstance" data type.
+ * Represents attribute modifications for an "Individual VNF instance" resource, i.e. modifications to a resource representation based on the "VnfInstance" data type.
  */
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
@@ -34,6 +34,6 @@ public class VnfInfoModificationRequest {
     @ApiModelProperty(name = "Extensions", notes = "Modifications of the \"extensions\" attribute in \"VnfInstance\". If present, these modifications shall be applied according to the rules of JSON Merge PATCH (see IETF RFC 7396).")
     private Map<String, String> extensions;
     @ApiModelProperty(name = "VIM Connection Information", notes = "New content of certain entries in the \"vimConnectionInfo\" attribute array in \"VnfInstance\", as defined below this table.")
-    private VimConnectionInfo vimConnectionInfo;
+    private List<VimConnectionInfo> vimConnectionInfo;
 
 }

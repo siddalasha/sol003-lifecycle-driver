@@ -111,7 +111,7 @@ public class ETSIExceptionHandlingControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     protected ProblemDetails handleVNFPackageNotFoundException(HttpServletRequest req, VNFPackageNotFoundException cause) {
-        return defaultHandle("The VNF Package could not be found.", cause, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+        return defaultHandle("The VNF Package could not be found.", cause, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
