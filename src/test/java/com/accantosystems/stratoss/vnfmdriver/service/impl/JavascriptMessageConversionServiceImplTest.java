@@ -3,6 +3,7 @@ package com.accantosystems.stratoss.vnfmdriver.service.impl;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_DL_NO_AUTH;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadZipIntoBase64String;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,6 +62,15 @@ public class JavascriptMessageConversionServiceImplTest {
         final String message = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
 
         assertThat(message).isEqualTo("{\"additionalParams\":{},\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+    }
+
+    @Test
+    public void testNoScriptFound() {
+        final ExecutionRequest executionRequest = new ExecutionRequest();
+        final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
+        assertThatThrownBy(() -> messageConversionService.generateMessageFromRequest("UnknownMessageType", executionRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Unable to find a script called [UnknownMessageType.js]");
     }
 
 }

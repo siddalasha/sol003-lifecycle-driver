@@ -102,7 +102,9 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
             // If we can't find it in the zip file, try searching in out default locations
             final String interfaceVersion = executionRequest.getProperties().getOrDefault("interfaceVersion", DEFAULT_ETSI_SOL003_VERSION);
             try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/scripts/" + interfaceVersion + "/" + fullScriptName)) {
-                scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());
+                if (inputStream != null) {
+                    scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());
+                }
             } catch (IOException e) {
                 logger.error("Exception raised looking up default lifecycle script", e);
             }
