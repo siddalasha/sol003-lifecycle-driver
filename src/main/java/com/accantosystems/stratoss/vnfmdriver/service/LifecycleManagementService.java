@@ -1,5 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
@@ -22,12 +24,14 @@ public class LifecycleManagementService {
     private final VNFLifecycleManagementDriver vnfLifecycleManagementDriver;
     private final MessageConversionService messageConversionService;
     private final ExternalMessagingService externalMessagingService;
+    private final VNFMDriverProperties properties;
 
     @Autowired
-    public LifecycleManagementService(VNFLifecycleManagementDriver vnfLifecycleManagementDriver, MessageConversionService messageConversionService, ExternalMessagingService externalMessagingService) {
+    public LifecycleManagementService(VNFLifecycleManagementDriver vnfLifecycleManagementDriver, MessageConversionService messageConversionService, ExternalMessagingService externalMessagingService, VNFMDriverProperties properties) {
         this.vnfLifecycleManagementDriver = vnfLifecycleManagementDriver;
         this.messageConversionService = messageConversionService;
         this.externalMessagingService = externalMessagingService;
+        this.properties = properties;
     }
 
     public ExecutionAcceptedResponse executeLifecycle(ExecutionRequest executionRequest) throws MessageConversionException {
@@ -43,8 +47,8 @@ public class LifecycleManagementService {
                 final Map<String, String> outputs = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceResponse);
 
                 final String requestId = UUID.randomUUID().toString();
-                // TODO Need to put a delay into sending this (from a different thread) as this method needs to complete first (to send the response back to Brent)
-                externalMessagingService.sendExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs));
+                // Delay sending the asynchronous response (from a different thread) as this method needs to complete first (to send the response back to Brent)
+                externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs), properties.getExecutionResponseDelay());
 
                 // Send response back to ALM
                 return new ExecutionAcceptedResponse(requestId);

@@ -1,10 +1,13 @@
 package com.accantosystems.stratoss.vnfmdriver.service.impl;
 
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
@@ -38,5 +41,18 @@ public class KafkaExternalMessagingServiceImpl implements ExternalMessagingServi
         } catch (JsonProcessingException e) {
             logger.warn("Exception generating message text from ExecutionAsyncResponse", e);
         }
+    }
+
+    @Override
+    @Async
+    public void sendDelayedExecutionAsyncResponse(ExecutionAsyncResponse request, Duration delay) {
+        if (delay != null) {
+            try {
+                Thread.sleep(delay.toMillis());
+            } catch (InterruptedException e) {
+                logger.error("Thread interrupted during sleep", e);
+            }
+        }
+        sendExecutionAsyncResponse(request);
     }
 }

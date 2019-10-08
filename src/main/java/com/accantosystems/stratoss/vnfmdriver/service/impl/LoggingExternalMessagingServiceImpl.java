@@ -1,5 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.service.impl;
 
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,10 @@ public class LoggingExternalMessagingServiceImpl implements ExternalMessagingSer
 
     @Override public void sendExecutionAsyncResponse(ExecutionAsyncResponse request) {
         logger.info("Would send: {}", request);
+    }
+
+    @Override public void sendDelayedExecutionAsyncResponse(ExecutionAsyncResponse request, Duration delay) {
+        logger.info("Would send delayed message after {} seconds: {}", delay.getSeconds(), request);
     }
 
 }

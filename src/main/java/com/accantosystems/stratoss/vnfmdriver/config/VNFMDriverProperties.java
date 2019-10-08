@@ -1,5 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.config;
 
+import java.time.Duration;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -12,9 +14,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "vnfmdriver")
 public class VNFMDriverProperties {
 
+    private final Async async = new Async();
     private final Topics topics = new Topics();
     private final Logging logging = new Logging();
     private final PackageManagement packageManagement = new PackageManagement();
+    private Duration executionResponseDelay = Duration.ofSeconds(5);
+    private Duration lccnPollingDelay = Duration.ofSeconds(10);
+
+    public Async getAsync() {
+        return async;
+    }
 
     public Topics getTopics() {
         return topics;
@@ -26,6 +35,52 @@ public class VNFMDriverProperties {
 
     public PackageManagement getPackageManagement() {
         return packageManagement;
+    }
+
+    public Duration getExecutionResponseDelay() {
+        return executionResponseDelay;
+    }
+
+    public void setExecutionResponseDelay(Duration executionResponseDelay) {
+        this.executionResponseDelay = executionResponseDelay;
+    }
+
+    public Duration getLccnPollingDelay() {
+        return lccnPollingDelay;
+    }
+
+    public void setLccnPollingDelay(Duration lccnPollingDelay) {
+        this.lccnPollingDelay = lccnPollingDelay;
+    }
+
+    public static class Async {
+        private int corePoolSize = 4;
+        private int maxPoolSize = 32;
+        private int queueCapacity = 10000;
+
+        public int getCorePoolSize() {
+            return corePoolSize;
+        }
+
+        public void setCorePoolSize(int corePoolSize) {
+            this.corePoolSize = corePoolSize;
+        }
+
+        public int getMaxPoolSize() {
+            return maxPoolSize;
+        }
+
+        public void setMaxPoolSize(int maxPoolSize) {
+            this.maxPoolSize = maxPoolSize;
+        }
+
+        public int getQueueCapacity() {
+            return queueCapacity;
+        }
+
+        public void setQueueCapacity(int queueCapacity) {
+            this.queueCapacity = queueCapacity;
+        }
     }
 
     public static class Topics {
@@ -53,7 +108,6 @@ public class VNFMDriverProperties {
     }
 
     public static class PackageManagement {
-
         private String packageRepositoryUrl;
 
         public String getPackageRepositoryUrl() {

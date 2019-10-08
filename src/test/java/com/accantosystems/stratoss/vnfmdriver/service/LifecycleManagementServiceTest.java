@@ -3,11 +3,11 @@ package com.accantosystems.stratoss.vnfmdriver.service;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
@@ -23,7 +23,7 @@ public class LifecycleManagementServiceTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
-        final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(mockDriver, messageConversionService, mockExternalMessagingService);
+        final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(mockDriver, messageConversionService, mockExternalMessagingService, new VNFMDriverProperties());
 
         when(mockDriver.createVnfInstance(any(), any())).thenReturn(loadFileIntoString("examples/VnfInstance.json"));
 
@@ -42,6 +42,8 @@ public class LifecycleManagementServiceTest {
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
 
         assertThat(executionAcceptedResponse).isNotNull();
+
+        verify(mockExternalMessagingService).sendDelayedExecutionAsyncResponse(any(), any());
     }
 
 }
