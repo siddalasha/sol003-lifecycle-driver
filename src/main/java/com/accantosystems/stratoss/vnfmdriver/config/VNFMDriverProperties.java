@@ -19,7 +19,7 @@ public class VNFMDriverProperties {
     private final Logging logging = new Logging();
     private final PackageManagement packageManagement = new PackageManagement();
     private Duration executionResponseDelay = Duration.ofSeconds(5);
-    private Duration lccnPollingDelay = Duration.ofSeconds(10);
+    private Duration lcmOpOccPollingDelay = Duration.ofSeconds(10);
 
     public Async getAsync() {
         return async;
@@ -45,12 +45,12 @@ public class VNFMDriverProperties {
         this.executionResponseDelay = executionResponseDelay;
     }
 
-    public Duration getLccnPollingDelay() {
-        return lccnPollingDelay;
+    public Duration getLcmOpOccPollingDelay() {
+        return lcmOpOccPollingDelay;
     }
 
-    public void setLccnPollingDelay(Duration lccnPollingDelay) {
-        this.lccnPollingDelay = lccnPollingDelay;
+    public void setLcmOpOccPollingDelay(Duration lcmOpOccPollingDelay) {
+        this.lcmOpOccPollingDelay = lcmOpOccPollingDelay;
     }
 
     public static class Async {
@@ -85,6 +85,7 @@ public class VNFMDriverProperties {
 
     public static class Topics {
         private String lifecycleResponsesTopic = "lm_vnfc_lifecycle_execution_events";
+        private String lcmOpOccPollingTopic = "lcm_op_occ_polling_requests";
 
         public String getLifecycleResponsesTopic() {
             return lifecycleResponsesTopic;
@@ -92,6 +93,14 @@ public class VNFMDriverProperties {
 
         public void setLifecycleResponsesTopic(String lifecycleResponsesTopic) {
             this.lifecycleResponsesTopic = lifecycleResponsesTopic;
+        }
+
+        public String getLcmOpOccPollingTopic() {
+            return lcmOpOccPollingTopic;
+        }
+
+        public void setLcmOpOccPollingTopic(String lcmOpOccPollingTopic) {
+            this.lcmOpOccPollingTopic = lcmOpOccPollingTopic;
         }
     }
 

@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
+import com.accantosystems.stratoss.vnfmdriver.service.LcmOpOccPollingService;
 import com.accantosystems.stratoss.vnfmdriver.service.impl.KafkaExternalMessagingServiceImpl;
 import com.accantosystems.stratoss.vnfmdriver.service.impl.LoggingExternalMessagingServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +24,16 @@ public class KafkaConfiguration {
     @Configuration("KafkaConfigurationEnabled")
     @ConditionalOnProperty(value = "vnfmdriver.kafka.enabled", matchIfMissing = true)
     @EnableKafka
-    public class KafkaConfigurationEnabled {
+    public static class KafkaConfigurationEnabled {
         @Bean
         public ExternalMessagingService getKafkaEMS(VNFMDriverProperties properties, KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
             logger.info("Creating Kafka EMS Bus Connector");
             return new KafkaExternalMessagingServiceImpl(properties, kafkaTemplate, objectMapper);
+        }
+
+        @Bean
+        public LcmOpOccPollingService lcmOpOccPollingService(VNFLifecycleManagementDriver driver, ExternalMessagingService externalMessagingService, ObjectMapper objectMapper) {
+            return new LcmOpOccPollingService(driver, externalMessagingService, objectMapper);
         }
     }
 

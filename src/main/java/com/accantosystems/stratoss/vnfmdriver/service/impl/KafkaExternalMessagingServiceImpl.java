@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
+import com.accantosystems.stratoss.vnfmdriver.model.LcmOpOccPollingRequest;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,4 +56,22 @@ public class KafkaExternalMessagingServiceImpl implements ExternalMessagingServi
         }
         sendExecutionAsyncResponse(request);
     }
+
+    @Override public void sendLcmOpOccPollingRequest(LcmOpOccPollingRequest request) {
+        try {
+            try {
+                Thread.sleep(properties.getLcmOpOccPollingDelay().toMillis());
+            } catch (InterruptedException e) {
+                logger.error("Thread interrupted during sleep", e);
+            }
+            final String message = objectMapper.writeValueAsString(request);
+            ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(properties.getTopics().getLcmOpOccPollingTopic(), message);
+
+            future.addCallback(sendResult -> logger.debug("Submitted request to poll for LcmOpOcc [{}]", request.getVnfLcmOpOccId()),
+                               exception -> logger.warn("Exception sending LcmOpOccPollingRequest", exception));
+        } catch (JsonProcessingException e) {
+            logger.warn("Exception generating message text from LcmOpOccPollingRequest", e);
+        }
+    }
+
 }
