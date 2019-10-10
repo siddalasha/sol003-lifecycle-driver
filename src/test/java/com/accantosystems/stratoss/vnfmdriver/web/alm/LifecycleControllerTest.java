@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.model.web.ErrorInfo;
@@ -59,7 +60,7 @@ public class LifecycleControllerTest {
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
 
-        when(lifecycleManagementService.executeLifecycle(any())).thenThrow(new RuntimeException(TEST_EXCEPTION_MESSAGE));
+        when(lifecycleManagementService.executeLifecycle(any())).thenThrow(new SOL003ResponseException(TEST_EXCEPTION_MESSAGE));
 
         final ResponseEntity<ErrorInfo> responseEntity = testRestTemplate.postForEntity("/api/lifecycle/execute", executionRequest, ErrorInfo.class);
         assertThat(responseEntity).isNotNull();
