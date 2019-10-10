@@ -5,16 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.etsi.sol003.packagemanagement.VnfPackageArtifactInfo;
 import org.etsi.sol003.packagemanagement.VnfPackageSoftwareImageInfo;
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractionException;
 import com.accantosystems.stratoss.vnfmdriver.service.VNFPackageExtractor;
@@ -56,6 +57,11 @@ public class SOL004ToscaVNFPackageExtractorImpl extends VNFPackageExtractor {
     public static final String KEY_VNF_PACKAGE_VERSION = "vnf_package_version";
     public static final String KEY_VNF_RELEASE_DATA_TIME = "vnf_release_date_time";
 
+    @Autowired
+    public SOL004ToscaVNFPackageExtractorImpl(VNFMDriverProperties vnfmDriverProperties) {
+        super(vnfmDriverProperties);
+    }
+
     @Override
     public VnfPkgInfo populateVnfPackageInfo(String vnfPkgId, Resource vnfPackageZip) {
 
@@ -80,24 +86,11 @@ public class SOL004ToscaVNFPackageExtractorImpl extends VNFPackageExtractor {
             vnfPkgInfo.setVnfProductName(entryManifest.get(KEY_VNF_PRODUCT_NAME));
             vnfPkgInfo.setVnfProvider(entryManifest.get(KEY_VNF_PROVIDER_ID));
 
-            List<String> packageArtifacts = listPackageArtifacts(vnfPackageZip, "Files");
-
-            // TODO This isn't the right list of 'additional artifacts'. Not sure exactly how to extract the specific list from the package
-            List<VnfPackageArtifactInfo> additionalArtifacts = packageArtifacts.stream().map(artifactPath -> {
-                VnfPackageArtifactInfo info = new VnfPackageArtifactInfo();
-                info.setArtifactPath(artifactPath);
-                return info;
-            }).collect(Collectors.toList());
-            vnfPkgInfo.setAdditionalArtifacts(additionalArtifacts);
-
-            // TODO This isn't the right list of 'software images'. Not sure exactly how to extract the specific list from the package. Also need to populate more info on the
-            // VnfPackageSoftwareImageInfo
-            List<VnfPackageSoftwareImageInfo> softwareImages = packageArtifacts.stream().map(artifactPath -> {
-                VnfPackageSoftwareImageInfo info = new VnfPackageSoftwareImageInfo();
-                info.setImagePath(artifactPath);
-                return info;
-            }).collect(Collectors.toList());
+            List<VnfPackageSoftwareImageInfo> softwareImages = listPackageImageArtifacts(vnfPackageZip);
             vnfPkgInfo.setSoftwareImages(softwareImages);
+
+            List<VnfPackageArtifactInfo> additionalArtifacts = listPackageNonImageArtifacts(vnfPackageZip);
+            vnfPkgInfo.setAdditionalArtifacts(additionalArtifacts);
 
         } catch (IOException e) {
             handleGenericExtractionException(e, vnfPkgId);

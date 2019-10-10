@@ -2,30 +2,38 @@ package com.accantosystems.stratoss.vnfmdriver.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.etsi.sol003.packagemanagement.VnfPackageArtifactInfo;
+import org.etsi.sol003.packagemanagement.VnfPackageSoftwareImageInfo;
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
+
 public abstract class VNFPackageExtractor {
 
     private final static Logger logger = LoggerFactory.getLogger(VNFPackageExtractor.class);
+
+    private final VNFMDriverProperties vnfmDriverProperties;
 
     public abstract VnfPkgInfo populateVnfPackageInfo(String vnfPkgId, Resource vnfPackageZip);
 
     public abstract String extractVnfdAsYaml(String vnfPkgId, Resource vnfPackageZip) throws UnexpectedPackageContentsException;
 
     public abstract Resource extractVnfdAsZip(String vnfPkgId, Resource vnfPackageZip);
+
+    public VNFPackageExtractor(VNFMDriverProperties vnfmDriverProperties) {
+        this.vnfmDriverProperties = vnfmDriverProperties;
+    }
 
     public Resource extractVnfPackageArtifact(String vnfPkgId, String artifactPath, Resource vnfPackageZip) throws PackageStateConflictException, ContentRangeNotSatisfiableException {
 
@@ -77,13 +85,40 @@ public abstract class VNFPackageExtractor {
         return artifactResources;
     }
 
-    protected List<String> listPackageArtifacts(Resource zipPackage, String artifactPathStartsWith) throws IOException {
+    protected List<VnfPackageSoftwareImageInfo> listPackageImageArtifacts(Resource zipPackage) throws IOException {
+        String imagePathFilter = vnfmDriverProperties.getPackageManagement().getImageArtifactFilter();
+        List<String> packageImageArtifactPaths = imagePathFilter == null ? Collections.emptyList() : listPackageArtifacts(zipPackage, imagePathFilter, null);
+
+        List<VnfPackageSoftwareImageInfo> softwareImages = packageImageArtifactPaths.stream().map(artifactPath -> {
+            VnfPackageSoftwareImageInfo info = new VnfPackageSoftwareImageInfo();
+            info.setImagePath(artifactPath);
+            return info;
+        }).collect(Collectors.toList());
+
+        return softwareImages;
+    }
+
+    protected List<VnfPackageArtifactInfo> listPackageNonImageArtifacts(Resource zipPackage) throws IOException {
+        String imagePathFilter = vnfmDriverProperties.getPackageManagement().getImageArtifactFilter();
+        List<String> packageNonImageArtifactPaths = listPackageArtifacts(zipPackage, null, imagePathFilter);
+
+        List<VnfPackageArtifactInfo> additionalArtifacts = packageNonImageArtifactPaths.stream().map(artifactPath -> {
+            VnfPackageArtifactInfo info = new VnfPackageArtifactInfo();
+            info.setArtifactPath(artifactPath);
+            return info;
+        }).collect(Collectors.toList());
+
+        return additionalArtifacts;
+    }
+
+    private List<String> listPackageArtifacts(Resource zipPackage, String artifactPathContains, String artifactPathNotContains) throws IOException {
         List<String> zipContents = new ArrayList<String>();
 
         try (ZipInputStream zipInputStream = new ZipInputStream(zipPackage.getInputStream())) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (!zipEntry.isDirectory() && zipEntry.getName().startsWith(artifactPathStartsWith)) {
+                if (!zipEntry.isDirectory() && (artifactPathContains == null || zipEntry.getName().contains(artifactPathContains))
+                    && (artifactPathNotContains == null || !zipEntry.getName().contains(artifactPathNotContains))) {
                     zipContents.add(zipEntry.getName());
                 }
             }

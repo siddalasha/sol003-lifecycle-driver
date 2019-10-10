@@ -55,6 +55,7 @@ public class VNFMDriverProperties {
     public static class PackageManagement {
 
         private String packageRepositoryUrl;
+        private String imageArtifactFilter;
 
         public String getPackageRepositoryUrl() {
             return packageRepositoryUrl;
@@ -63,6 +64,15 @@ public class VNFMDriverProperties {
         public void setPackageRepositoryUrl(String packageRepositoryUrl) {
             this.packageRepositoryUrl = packageRepositoryUrl;
         }
+
+        public String getImageArtifactFilter() {
+            return imageArtifactFilter;
+        }
+
+        public void setImageArtifactFilter(String imageArtifactFilter) {
+            this.imageArtifactFilter = imageArtifactFilter;
+        }
+
     }
 
 }

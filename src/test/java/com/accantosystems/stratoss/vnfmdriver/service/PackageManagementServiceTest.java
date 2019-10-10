@@ -55,10 +55,20 @@ public class PackageManagementServiceTest {
         assertThat(vnfPackageInfo.getVnfProvider()).isEqualTo("Acme");
         assertThat(vnfPackageInfo.getOnboardingState()).isEqualTo(PackageOnboardingStateType.ONBOARDED);
         assertThat(vnfPackageInfo.getOperationalState()).isEqualTo(PackageOperationalStateType.ENABLED);
-        assertThat(vnfPackageInfo.getAdditionalArtifacts()).isNotEmpty(); // TODO verify these contents better once for format of the VNF package is better understood
-        assertThat(vnfPackageInfo.getSoftwareImages()).isNotEmpty(); // TODO verify these contents better once for format of the VNF package is better understood
 
-        // TODO further verifications against the info contents
+        assertThat(vnfPackageInfo.getAdditionalArtifacts()).isNotEmpty();
+        assertThat(vnfPackageInfo.getAdditionalArtifacts()).extracting(VnfPackageArtifactInfo::getArtifactPath).containsExactlyInAnyOrder(
+                                                                                                                                          "MRF.mf",
+                                                                                                                                          "Definitions/MRF.yaml",
+                                                                                                                                          "Files/ChangeLog.txt",
+                                                                                                                                          "Files/Licenses/README",
+                                                                                                                                          "Files/Tests/README",
+                                                                                                                                          "Scripts/install.sh",
+                                                                                                                                          "TOSCA-Metadata/TOSCA.meta");
+
+        assertThat(vnfPackageInfo.getSoftwareImages()).isNotEmpty();
+        assertThat(vnfPackageInfo.getSoftwareImages()).extracting(VnfPackageSoftwareImageInfo::getImagePath).containsExactlyInAnyOrder("Files/Images/01-VPC-CF-IMAGE");
+
     }
 
     @Test
