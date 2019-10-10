@@ -32,11 +32,11 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        if (logger.isTraceEnabled()) {
+        if (logger.isInfoEnabled()) {
             traceRequest(request, body);
         }
         ClientHttpResponse response = execution.execute(request, body);
-        if (logger.isTraceEnabled()) {
+        if (logger.isInfoEnabled()) {
             traceResponse(response);
         }
         return response;
@@ -47,9 +47,7 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
         requestDetails.append("Performing a " + request.getMethod() + " request to " + request.getURI() + LINE_SEPARATOR);
         requestDetails.append("Headers     : " + request.getHeaders() + LINE_SEPARATOR);
         requestDetails.append("Request body:" + LINE_SEPARATOR + new String(body, StandardCharsets.UTF_8));
-        if (logger.isTraceEnabled()) {
-            logger.trace(requestDetails.toString());
-        }
+        logger.info(requestDetails.toString());
     }
 
     private void traceResponse(ClientHttpResponse response) throws IOException {
@@ -68,8 +66,6 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
             inputStringBuilder.append(LINE_SEPARATOR);
             line = bufferedReader.readLine();
         }
-        if (logger.isTraceEnabled()) {
-            logger.trace(inputStringBuilder.toString());
-        }
+        logger.info(inputStringBuilder.toString());
     }
 }

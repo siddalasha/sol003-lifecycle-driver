@@ -1,5 +1,11 @@
 package com.accantosystems.stratoss.vnfmdriver.web.alm;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +37,13 @@ public class LifecycleController {
 
     @PostMapping("/execute")
     @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
-    public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest) throws MessageConversionException {
+    public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest, HttpServletRequest servletRequest) throws MessageConversionException {
+        try (BufferedReader messageReader = servletRequest.getReader()) {
+            String rawMessage = messageReader.lines().collect(Collectors.joining("\n"));
+            logger.info("Received ExecutionRequest:\n{}", rawMessage);
+        } catch (IOException e) {
+            logger.warn(String.format("Exception caught logging ExecutionRequest message: %s", e.getMessage()), e);
+        }
         logger.info("Received request to execute a lifecycle [{}] at deployment location [{}]", executionRequest.getLifecycleName(), executionRequest.getDeploymentLocation().getName());
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
         return ResponseEntity.accepted().body(executionAcceptedResponse);
