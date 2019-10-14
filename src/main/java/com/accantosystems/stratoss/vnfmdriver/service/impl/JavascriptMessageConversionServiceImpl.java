@@ -26,8 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service("JavascriptMessageConversionServiceImpl")
 public class JavascriptMessageConversionServiceImpl implements MessageConversionService {
 
-    private final static Logger logger = LoggerFactory.getLogger(JavascriptMessageConversionServiceImpl.class);
-    private final static String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
+    private static final Logger logger = LoggerFactory.getLogger(JavascriptMessageConversionServiceImpl.class);
+    private static final String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
+    private static final String SCRIPTS_PATH = "scripts/";
 
     private final ObjectMapper objectMapper;
 
@@ -96,12 +97,12 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
     private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptName) {
         final String fullScriptName = scriptName + ".js";
 
-        String scriptContents = FileUtils.getFileFromLifecycleScripts(executionRequest.getLifecycleScripts(), fullScriptName);
+        String scriptContents = FileUtils.getFileFromLifecycleScripts(executionRequest.getLifecycleScripts(), SCRIPTS_PATH + fullScriptName);
 
         if (scriptContents == null) {
             // If we can't find it in the zip file, try searching in out default locations
             final String interfaceVersion = executionRequest.getProperties().getOrDefault("interfaceVersion", DEFAULT_ETSI_SOL003_VERSION);
-            try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/scripts/" + interfaceVersion + "/" + fullScriptName)) {
+            try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/" + SCRIPTS_PATH + interfaceVersion + "/" + fullScriptName)) {
                 if (inputStream != null) {
                     scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());
                 }
