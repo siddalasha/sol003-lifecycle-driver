@@ -23,6 +23,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 import com.accantosystems.stratoss.vnfmdriver.security.CookieAuthenticatedRestTemplate;
 import com.accantosystems.stratoss.vnfmdriver.security.CookieCredentials;
+import com.accantosystems.stratoss.vnfmdriver.utils.DynamicSslCertificateHttpRequestFactory;
 
 @Service("AuthenticatedRestTemplateService")
 public class AuthenticatedRestTemplateService {
@@ -36,6 +37,7 @@ public class AuthenticatedRestTemplateService {
     public AuthenticatedRestTemplateService(RestTemplateBuilder restTemplateBuilder, SOL003ResponseErrorHandler sol003ResponseErrorHandler) {
         logger.info("Initialising RestTemplate configuration");
         this.restTemplateBuilder = restTemplateBuilder.errorHandler(sol003ResponseErrorHandler)
+                                                      .requestFactory(DynamicSslCertificateHttpRequestFactory.class)
                                                       .setConnectTimeout(Duration.ofSeconds(10))
                                                       .setReadTimeout(Duration.ofSeconds(30));
     }
