@@ -7,6 +7,7 @@ data:
 {{ toYaml .Values.app.config.env | indent 2 }}
 {{- end }}
   "alm_vnfmdriver_config_name": {{ .Values.app.config.rmName }}
+  "spring_profiles_include": "prod,kubernetes"
   "LOG_FOLDER": "/var/lm/logs"
 {{- if .Values.app.jvmOptions }}
   "JVM_OPTIONS": {{ .Values.app.jvmOptions }}
