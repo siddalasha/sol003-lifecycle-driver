@@ -84,8 +84,8 @@ public class VNFMDriverProperties {
     }
 
     public static class Topics {
-        private String lifecycleResponsesTopic = "lm_vnfc_lifecycle_execution_events";
-        private String lcmOpOccPollingTopic = "lcm_op_occ_polling_requests";
+        private String lifecycleResponsesTopic;
+        private String lcmOpOccPollingTopic;
 
         public String getLifecycleResponsesTopic() {
             return lifecycleResponsesTopic;
