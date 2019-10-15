@@ -1,7 +1,9 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
-import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_DL_NO_AUTH;
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoString;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,6 +46,19 @@ public class LifecycleManagementServiceTest {
         assertThat(executionAcceptedResponse).isNotNull();
 
         verify(mockExternalMessagingService).sendDelayedExecutionAsyncResponse(any(), any());
+    }
+
+    @Test
+    public void testExecuteLifecycleInvalidLifecycleName() {
+        final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(null, null, null, null);
+
+        final ExecutionRequest executionRequest = new ExecutionRequest();
+        executionRequest.setLifecycleName("Integrity");
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
+
+        assertThatThrownBy(() -> lifecycleManagementService.executeLifecycle(executionRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Requested transition [Integrity] is not supported by this lifecycle driver");
     }
 
 }

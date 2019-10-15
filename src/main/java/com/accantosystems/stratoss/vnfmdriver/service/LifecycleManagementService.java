@@ -1,6 +1,5 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,7 +26,8 @@ public class LifecycleManagementService {
     private final VNFMDriverProperties properties;
 
     @Autowired
-    public LifecycleManagementService(VNFLifecycleManagementDriver vnfLifecycleManagementDriver, MessageConversionService messageConversionService, ExternalMessagingService externalMessagingService, VNFMDriverProperties properties) {
+    public LifecycleManagementService(VNFLifecycleManagementDriver vnfLifecycleManagementDriver, MessageConversionService messageConversionService, ExternalMessagingService externalMessagingService,
+                                      VNFMDriverProperties properties) {
         this.vnfLifecycleManagementDriver = vnfLifecycleManagementDriver;
         this.messageConversionService = messageConversionService;
         this.externalMessagingService = externalMessagingService;
@@ -101,14 +101,12 @@ public class LifecycleManagementService {
                 final String requestId = vnfLifecycleManagementDriver.healVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, healVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else {
-                // Unsupported transition
+                throw new IllegalArgumentException(String.format("Requested transition [%s] is not supported by this lifecycle driver", executionRequest.getLifecycleName()));
             }
         } catch (MessageConversionException e) {
             logger.error("Error converting message", e);
             throw e;
         }
-
-        return null;
     }
 
 }
