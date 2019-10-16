@@ -1,8 +1,0 @@
-{
-  "vnfdId": "fa2343af-2a81-4e84-a667-e40662e5ed93",
-  "vnfInstanceName": "CSCF-1",
-  "vnfInstanceDescription": "CSCF",
-  "additionalParams": {
-    "vnfPkgId": "316aa140-c99a-4a08-b8f5-8e2cb73c83e8"
-  }
-}
