@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
+import org.etsi.sol003.common.ProblemDetails;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,8 @@ public class LifecycleControllerTest {
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
 
-        when(lifecycleManagementService.executeLifecycle(any())).thenThrow(new SOL003ResponseException(TEST_EXCEPTION_MESSAGE));
+        when(lifecycleManagementService.executeLifecycle(any()))
+                .thenThrow(new SOL003ResponseException("Received SOL003-compliant error when communicating with VNFM: " + TEST_EXCEPTION_MESSAGE, new ProblemDetails(404, TEST_EXCEPTION_MESSAGE)));
 
         final ResponseEntity<ErrorInfo> responseEntity = testRestTemplate.postForEntity("/api/lifecycle/execute", executionRequest, ErrorInfo.class);
         assertThat(responseEntity).isNotNull();
@@ -68,7 +70,9 @@ public class LifecycleControllerTest {
         assertThat(responseEntity.getHeaders().getContentType()).isNotNull();
         assertThat(responseEntity.getHeaders().getContentType().includes(MediaType.APPLICATION_JSON)).isTrue();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(responseEntity.getBody().getLocalizedMessage()).isEqualTo(TEST_EXCEPTION_MESSAGE);
+        assertThat(responseEntity.getBody().getLocalizedMessage()).isEqualTo("Received SOL003-compliant error when communicating with VNFM: TestExceptionMessage");
+        assertThat(responseEntity.getBody().getDetails().get("vnfmStatus")).isEqualTo(404);
+        assertThat(responseEntity.getBody().getDetails().get("vnfmDetail")).isEqualTo(TEST_EXCEPTION_MESSAGE);
     }
 
 }

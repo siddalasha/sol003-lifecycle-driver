@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
 import com.accantosystems.stratoss.vnfmdriver.model.web.ErrorInfo;
 
 /**
@@ -67,6 +68,29 @@ public class ALMExceptionHandlingControllerAdvice {
     @ResponseBody
     protected ErrorInfo handleHttpRequestMethodNotSupportedException(HttpServletRequest req, HttpRequestMethodNotSupportedException cause) {
         return defaultHandle("Invalid method used in request", req, cause);
+    }
+
+    @ExceptionHandler(SOL003ResponseException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    protected ErrorInfo handleSOL003ResponseException(HttpServletRequest req, SOL003ResponseException cause) {
+        ErrorInfo errorInfo = defaultHandle(cause.getLocalizedMessage(), req, cause);
+        if (cause.getProblemDetails().getDetail() != null) {
+            errorInfo.getDetails().put("vnfmDetail", cause.getProblemDetails().getDetail());
+        }
+        if (cause.getProblemDetails().getStatus() != null) {
+            errorInfo.getDetails().put("vnfmStatus", cause.getProblemDetails().getStatus());
+        }
+        if (cause.getProblemDetails().getInstance() != null) {
+            errorInfo.getDetails().put("vnfmInstance", cause.getProblemDetails().getInstance());
+        }
+        if (cause.getProblemDetails().getTitle() != null) {
+            errorInfo.getDetails().put("vnfmTitle", cause.getProblemDetails().getTitle());
+        }
+        if (cause.getProblemDetails().getType() != null) {
+            errorInfo.getDetails().put("vnfmType", cause.getProblemDetails().getType());
+        }
+        return errorInfo;
     }
 
     @ExceptionHandler(Exception.class)
