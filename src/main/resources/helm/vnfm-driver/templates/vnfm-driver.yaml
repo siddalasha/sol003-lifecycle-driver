@@ -8,6 +8,7 @@ data:
 {{- end }}
   "alm_vnfmdriver_config_name": {{ .Values.app.config.rmName }}
   "spring_profiles_include": "prod,kubernetes"
+  "spring_profiles_active": {{ .Values.app.config.profiles }}
   "LOG_FOLDER": "/var/lm/logs"
 {{- if .Values.app.config.packageRepositoryUrl }}
   "vnfmdriver_packageManagement_packageRepositoryUrl": {{ .Values.app.config.packageRepositoryUrl }}
@@ -50,7 +51,16 @@ spec:
     metadata:
       labels:
         app: vnfm-driver
+        part-of: lm
     spec:
+{{- if .Values.app.affinity }}
+      affinity:
+{{ toYaml .Values.app.affinity | indent 8 }}
+{{- end }}
+{{- if .Values.app.tolerations }}
+      tolerations:
+{{ toYaml .Values.app.tolerations | indent 8 }}
+{{- end }}
       containers:
         - name: vnfm-driver
 {{- if .Values.global.docker.registryEnabled }}
@@ -82,3 +92,5 @@ spec:
           envFrom:
           - configMapRef:
               name: vnfm-driver
+          resources:
+{{ toYaml .Values.app.resources | indent 12 }}

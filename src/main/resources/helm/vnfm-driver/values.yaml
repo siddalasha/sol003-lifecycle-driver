@@ -19,13 +19,11 @@ global:
   ## Enable the use of LM security features
   security:
     enabled: false
-    ## Reference to a secret containing the certificate for https enabled services
-    lmCertsSecretName: 
 
 ## Docker
 docker:
   ## Name of the Docker Image
-  image: vnfm-driver
+  image: accanto/vnfm-driver
   ## Tagged version of the Docker Image
   version: #project.version#
   ## Pull policy on the Docker Image (when global.docker.registryEnabled is false)
@@ -38,10 +36,10 @@ app:
   
   config:
     ## Runtime Profiles
-    ## Included runtime profiles of the application (spring_profiles_include)
+    ## Included runtime profiles of the application (spring_profiles_active)
     ## Options:
     ##    - swagger: add this option to enabled swagger documentation endpoint on the application
-    profiles: "prod,kubernetes"
+    profiles:
     
     ## RM Name referenced by LM as the "type" of this RM when onboarded 
     rmName: Not_configured
@@ -64,9 +62,54 @@ app:
     initialDelaySeconds: 20
     periodSeconds: 10
   
+  ## Affinity for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity:
+    podAntiAffinity:
+      ## Default anti-affinity rule is to try and schedule multiple pods of this app on different nodes
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - vnfm-driver
+    ## Example of node affinity rule to require this pod is only scheduled on a Node with a label (key=value) of "Stateless=True"
+    #nodeAffinity:
+    #  requiredDuringSchedulingIgnoredDuringExecution:
+    #    nodeSelectorTerms:
+    #    - matchExpressions:
+    #      - key: Stateless
+    #        operator: In
+    #        values:
+    #        - "True"
+    
+  ## Node tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+  ## Example of allowing this pod to be deployed onto a Node that has been tainted with "ReservedForLm"
+  #- key: ReservedForLm
+  #  operator: Exists
+  #  effect: NoSchedule
+
   ## JVM Options
   ## Options to pass to the JVM when running the application
   # jvmOptions: -Xmx384m
+
+  ## Configure resource requests and limits for each container of the application
+  ## Default is to have no limit
+  ## NOTE: when setting the limit you should consider the -Xmx value passed in app.jvmOptions. If this is higher than the limit below then the application is likely to fail
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  resources: {}
+    # limits:
+    #  cpu: 250m
+    #  memory: 384Mi
+    # requests:
+    #  cpu: 250m
+    #  memory: 384Mi
 
 ## Service Configuration 
 ## Define how this application is accessed internally (and potentially externally)

@@ -2,6 +2,8 @@
 
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    
+    <property name="SERVER_ID" value="${SERVER_ID:-${HOSTNAME}}" />
 
     <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -22,13 +24,25 @@
     <!-- Stdout will be redirected to journald, so we want to remove DEBUG messages (if enabled) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <pattern>#project.name# | ${SERVER_ID} | ${CONSOLE_LOG_PATTERN}</pattern>
             <charset>utf8</charset>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
             <level>INFO</level>
         </filter>
+    </appender>
+
+    <appender name="K8SCONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <springProfile name="flatlog">
+            <encoder>
+                <pattern>#project.name# | ${SERVER_ID} | ${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </springProfile>
+        <springProfile name="!flatlog">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"></encoder>
+        </springProfile>
     </appender>
 
     <logger name="com.accantosystems" level="#logback.loglevel#"/>
@@ -66,9 +80,18 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <root level="#logback.loglevel#">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </root>
+    <!-- for Kubernetes, output using the LogstashEncoder encoder so that log messages can be consumed by Filebeat -->
+    <springProfile name="kubernetes">
+        <root level="#logback.loglevel#">
+            <appender-ref ref="K8SCONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!kubernetes">
+        <root level="#logback.loglevel#">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
 
 </configuration>

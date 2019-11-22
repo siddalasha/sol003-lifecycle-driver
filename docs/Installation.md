@@ -18,7 +18,7 @@ Use lmctl for onboard the driver into LM. For full details on how to install or 
 The following command will onboard the VNFM Driver into an LM environment called 'dev01':
 
 ```bash
-lmctl --type sol003 --url http://vnfm-driver:8296 dev01
+lmctl lifecycledriver add --type sol003 --url http://vnfm-driver:8296 dev01
 ```
 
 **NOTES**:
