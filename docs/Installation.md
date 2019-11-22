@@ -2,6 +2,9 @@
 
 ## Helm Install of Driver
 
+Prior to installing the driver, it may be necessary to configure the source for VNF Packages. See [Configuring VNF Package Location](ConfiguringVNFPackageLocation.md)
+
+
 Download the Helm chart for the required version of the VNFM Driver. Run the following command to install the Helm chart with the default values:
 
 ```bash

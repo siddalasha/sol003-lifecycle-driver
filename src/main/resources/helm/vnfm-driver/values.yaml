@@ -46,6 +46,10 @@ app:
     ## RM Name referenced by LM as the "type" of this RM when onboarded 
     rmName: Not_configured
     
+    ## The URL where the VNF packages are stored, such as an HTTP target or an FTP target
+    ## e.g. 'http://hostname/path/{vnfPackageId}'
+    # packageRepositoryUrl:
+    
     ## Environment Options
     ## Add environment variables to the pods
     # env: 
