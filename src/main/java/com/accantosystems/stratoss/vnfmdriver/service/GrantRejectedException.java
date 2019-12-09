@@ -1,6 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
-public class GrantRejectedException extends Exception {
+public class GrantRejectedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -11,7 +11,7 @@ public class GrantRejectedException extends Exception {
         this.reason = reason;
     }
 
-    public GrantRejectedException(Throwable cause, String reason) {
+    public GrantRejectedException(String reason, Throwable cause) {
         super(cause);
         this.reason = reason;
     }
