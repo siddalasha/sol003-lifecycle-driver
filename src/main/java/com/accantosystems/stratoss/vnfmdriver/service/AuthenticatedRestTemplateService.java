@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseErrorHandler;
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFMResponseErrorHandler;
 import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 import com.accantosystems.stratoss.vnfmdriver.security.CookieAuthenticatedRestTemplate;
@@ -34,9 +35,9 @@ public class AuthenticatedRestTemplateService {
     private final Map<ResourceManagerDeploymentLocation, RestTemplate> cachedRestTemplates = new ConcurrentHashMap<>();
 
     @Autowired
-    public AuthenticatedRestTemplateService(RestTemplateBuilder restTemplateBuilder, SOL003ResponseErrorHandler sol003ResponseErrorHandler) {
+    public AuthenticatedRestTemplateService(RestTemplateBuilder restTemplateBuilder, VNFMResponseErrorHandler vnfmResponseErrorHandler) {
         logger.info("Initialising RestTemplate configuration");
-        this.restTemplateBuilder = restTemplateBuilder.errorHandler(sol003ResponseErrorHandler)
+        this.restTemplateBuilder = restTemplateBuilder.errorHandler(vnfmResponseErrorHandler)
                                                       .requestFactory(DynamicSslCertificateHttpRequestFactory.class)
                                                       .setConnectTimeout(Duration.ofSeconds(10))
                                                       .setReadTimeout(Duration.ofSeconds(30));

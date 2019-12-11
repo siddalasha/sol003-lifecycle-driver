@@ -6,15 +6,13 @@ import org.etsi.sol003.common.ProblemDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Component("SOL003ResponseErrorHandler")
-public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
+public abstract class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -55,8 +53,6 @@ public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
         }
     }
 
-    protected String endpointDescription() {
-        return "VNFM";
-    }
+    protected abstract String endpointDescription();
 
 }

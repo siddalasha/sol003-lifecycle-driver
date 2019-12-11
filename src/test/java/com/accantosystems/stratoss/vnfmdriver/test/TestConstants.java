@@ -38,6 +38,7 @@ public abstract class TestConstants {
     public static final String TEST_VNF_LCM_OP_OCC_ID = "8dbe6621-f6b9-49ba-878b-26803f107f27";
     public static final String TEST_LCCN_SUBSCRIPTION_ID = "2fdffb76-5c74-44ab-a38f-40b302ba5ec9";
     public static final String TEST_VNF_PKG_ID = "1472c841-c4ac-418c-bd45-e2e7f7638336";
+    public static final String TEST_GRANT_ID = "73b0931d-5883-4c91-a788-11777c212007";
 
     public static final ResourceManagerDeploymentLocation TEST_DL_NO_AUTH = new ResourceManagerDeploymentLocation("test-location", "etsi-sol003");
     public static final ResourceManagerDeploymentLocation TEST_DL_BASIC_AUTH = new ResourceManagerDeploymentLocation("test-basic-location", "etsi-sol003");

@@ -2,6 +2,7 @@ package com.accantosystems.stratoss.vnfmdriver.driver;
 
 import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.*;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -9,6 +10,7 @@ import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -20,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties.Authentication;
 import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
+import com.accantosystems.stratoss.vnfmdriver.model.GrantCreationResponse;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 import com.accantosystems.stratoss.vnfmdriver.utils.DynamicSslCertificateHttpRequestFactory;
 
@@ -27,12 +30,14 @@ import com.accantosystems.stratoss.vnfmdriver.utils.DynamicSslCertificateHttpReq
  * Driver implementing the ETSI SOL003 Grant interface
  */
 @Service("GrantDriver")
+@ConditionalOnProperty(name = "vnfmdriver.grant.automatic", havingValue = "false")
 public class GrantDriver {
 
     private final static Logger logger = LoggerFactory.getLogger(GrantDriver.class);
 
     private final static String API_CONTEXT_ROOT = "/grant/v1";
     private final static String API_PATH_GRANTS = "/grants";
+    private final static String LOCATION_HEADER_PATH = API_CONTEXT_ROOT + API_PATH_GRANTS + "/";
 
     private final VNFMDriverProperties vnfmDriverProperties;
     private final RestTemplate authenticatedRestTemplate;
@@ -53,17 +58,18 @@ public class GrantDriver {
      * 
      * @param grantRequest
      *            the request for permission from the NFVO to perform a particular VNF lifecycle operation.
-     * @return
+     * @return the creation response, wrapping the grant resource if it exists and the grant location
      * @throws GrantRejectedException
      *             if the grant request was rejected
-     * @throws SOL003ResponseException
-     *             if there are any errors creating the Grant request
+     * @throws GrantProviderException
+     *             if there was an error communicating with the Grant Provider or it gave an unexpected response.
      */
-    public Grant requestGrant(GrantRequest grantRequest) throws GrantRejectedException, SOL003ResponseException {
+    public GrantCreationResponse requestGrant(GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
 
         final String url = vnfmDriverProperties.getGrant().getProvider().getUrl() + API_CONTEXT_ROOT + API_PATH_GRANTS;
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<GrantRequest> requestEntity = new HttpEntity<>(grantRequest, headers);
 
         final ResponseEntity<Grant> responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
@@ -71,22 +77,23 @@ public class GrantDriver {
         if (HttpStatus.CREATED.equals(responseEntity.getStatusCode())) {
             // synchronous response - should find grant resource in body
             if (responseEntity.getBody() == null) {
-                throw new SOL003ResponseException("No response body");
+                throw new GrantProviderException("No response body");
             }
-            return responseEntity.getBody();
+            return new GrantCreationResponse(responseEntity.getBody());
         } else if (HttpStatus.ACCEPTED.equals(responseEntity.getStatusCode())) {
             // asynchronous response - need to poll for grant resource, no body expected
             if (responseEntity.getBody() != null) {
-                throw new SOL003ResponseException("No response body expected");
+                throw new GrantProviderException("No response body expected");
             }
-            return null;
+            String grantId = getGrantIdFromLocationHeader(responseEntity);
+            return new GrantCreationResponse(grantId);
         } else {
-            throw new SOL003ResponseException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
+            throw new GrantProviderException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
         }
     }
 
     /**
-     * Reads a grant.
+     * Reads a grant for a particular VNF lifecycle operation.
      *
      * <ul>
      * <li>Sends HTTP GET request to /grants/grantId</li>
@@ -94,35 +101,42 @@ public class GrantDriver {
      * <li>If grant decision is still pending, should receive 202 Accepted response with no response body</li>
      * </ul>
      * 
-     * @param grantRequest
-     *            the request for permission from the NFVO to perform a particular VNF lifecycle operation.
-     * @return
+     * @param grantId
+     *            id of the grant resource on which a decision is pending
+     * @return the grant resource if a grant decision has been made, null if still pending
      * @throws GrantRejectedException
      *             if the grant request was rejected
-     * @throws SOL003ResponseException
-     *             if there are any errors returning the Grant resource
+     * @throws GrantProviderException
+     *             if there was an error communicating with the Grant Provider or it gave an unexpected response.
      */
-    public Grant getGrant(String grantId) throws GrantRejectedException, SOL003ResponseException {
+    public Grant getGrant(String grantId) throws GrantRejectedException, GrantProviderException {
         final String url = vnfmDriverProperties.getGrant().getProvider().getUrl() + API_CONTEXT_ROOT + API_PATH_GRANTS + "/{grantId}";
 
-        final ResponseEntity<Grant> responseEntity = authenticatedRestTemplate.getForEntity(url, Grant.class, grantId);
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        final ResponseEntity<Grant> responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.GET, requestEntity, Grant.class, grantId);
 
         if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
             // grant was accepted and grant resource is available and should be found in body
             if (responseEntity.getBody() == null) {
-                throw new SOL003ResponseException("No response body");
+                throw new GrantProviderException("No response body");
             }
             return responseEntity.getBody();
         } else if (HttpStatus.ACCEPTED.equals(responseEntity.getStatusCode())) {
             // grant not yet accepted nor rejected - should continue to poll until grant resource available
             if (responseEntity.getBody() != null) {
-                throw new SOL003ResponseException("No response body expected");
+                throw new GrantProviderException("No response body expected");
             }
             return null;
         } else {
-            throw new SOL003ResponseException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
+            throw new GrantProviderException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
         }
 
+    }
+
+    protected RestTemplate getAuthenticatedRestTemplate() {
+        return authenticatedRestTemplate;
     }
 
     private RestTemplate getAuthenticatedRestTemplate(VNFMDriverProperties vnfmDriverProperties, RestTemplateBuilder restTemplateBuilder, GrantResponseErrorHandler grantResponseErrorHandler) {
@@ -132,7 +146,7 @@ public class GrantDriver {
         final String authenticationTypeString = authenticationProperties.getAuthenticationType();
         final AuthenticationType authenticationType = AuthenticationType.valueOfIgnoreCase(authenticationTypeString);
         if (authenticationType == null) {
-            throw new IllegalArgumentException(String.format("Invalid authentication type specified [%s]", authenticationTypeString));
+            throw new IllegalArgumentException(String.format("Invalid authentication type specified for Grant Provider [%s]", authenticationTypeString));
         }
 
         RestTemplate authenticatedRestTemplate;
@@ -191,6 +205,20 @@ public class GrantDriver {
                 .setReadTimeout(Duration.ofSeconds(30));
         logger.info("Initialising RestTemplate configuration");
         return customRestTemplateBuilder;
+    }
+
+    private String getGrantIdFromLocationHeader(ResponseEntity<Grant> responseEntity) throws GrantProviderException {
+        URI location = responseEntity.getHeaders().getLocation();
+        if (location == null) {
+            throw new GrantProviderException("Expected to find Location header in Grant Provider response");
+        }
+        String locationStr = location.toString();
+        // would expect the location to look like this '/grant/v1/grants/{grantId}'
+        int grantIdIndex = locationStr.lastIndexOf(LOCATION_HEADER_PATH) + LOCATION_HEADER_PATH.length();
+        if (grantIdIndex < LOCATION_HEADER_PATH.length() || grantIdIndex >= locationStr.length()) {
+            throw new GrantProviderException(String.format("Unable to extract grantId from Location header [%s]", locationStr));
+        }
+        return locationStr.substring(grantIdIndex);
     }
 
     private String checkProperty(String property, String propertyName) {

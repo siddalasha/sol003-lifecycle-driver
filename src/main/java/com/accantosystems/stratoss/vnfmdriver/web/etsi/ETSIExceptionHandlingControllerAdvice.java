@@ -93,6 +93,12 @@ public class ETSIExceptionHandlingControllerAdvice {
         return defaultHandle("The requested response type was not acceptable", cause, HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ProblemDetails handleBadRequestException(HttpServletRequest req, BadRequestException cause) {
+        return defaultHandle("The request was invalid", cause, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(PackageStateConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
