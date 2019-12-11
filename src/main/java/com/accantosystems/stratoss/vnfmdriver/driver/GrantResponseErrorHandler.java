@@ -24,7 +24,7 @@ public class GrantResponseErrorHandler extends SOL003ResponseErrorHandler {
             if (e.getProblemDetails() != null && HttpStatus.FORBIDDEN.value() == e.getProblemDetails().getStatus()) {
                 throw new GrantRejectedException(e.getProblemDetails().getDetail(), e.getCause());
             }
-            throw new GrantProviderException("Unable to communicate with Grant Provider", e);
+            throw e;
         }
     }
 

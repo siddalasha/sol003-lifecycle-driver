@@ -70,9 +70,16 @@ public class GrantDriver {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        final HttpEntity<GrantRequest> requestEntity = new HttpEntity<>(grantRequest, headers);
 
-        final ResponseEntity<Grant> responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
+        final HttpEntity<GrantRequest> requestEntity = new HttpEntity<>(grantRequest, headers);
+        final ResponseEntity<Grant> responseEntity;
+        try {
+            responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.POST, requestEntity, Grant.class);
+        } catch (SOL003ResponseException e) {
+            throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s] which gave status %s", url, e.getProblemDetails().getStatus()), e);
+        } catch (Exception e) {
+            throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
+        }
 
         if (HttpStatus.CREATED.equals(responseEntity.getStatusCode())) {
             // synchronous response - should find grant resource in body
@@ -90,6 +97,7 @@ public class GrantDriver {
         } else {
             throw new GrantProviderException(String.format("Invalid status code [%s] received", responseEntity.getStatusCode()));
         }
+
     }
 
     /**
@@ -115,8 +123,14 @@ public class GrantDriver {
         final HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-        final ResponseEntity<Grant> responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.GET, requestEntity, Grant.class, grantId);
-
+        final ResponseEntity<Grant> responseEntity;
+        try {
+            responseEntity = authenticatedRestTemplate.exchange(url, HttpMethod.GET, requestEntity, Grant.class, grantId);
+        } catch (SOL003ResponseException e) {
+            throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s] which gave status %s", url, e.getProblemDetails().getStatus()), e);
+        } catch (Exception e) {
+            throw new GrantProviderException(String.format("Unable to communicate with Grant Provider on [%s]", url), e);
+        }
         if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
             // grant was accepted and grant resource is available and should be found in body
             if (responseEntity.getBody() == null) {
@@ -143,7 +157,7 @@ public class GrantDriver {
         RestTemplateBuilder customRestTemplateBuilder = configureRestTemplateBuilder(restTemplateBuilder, grantResponseErrorHandler);
 
         Authentication authenticationProperties = vnfmDriverProperties.getGrant().getProvider().getAuthentication();
-        final String authenticationTypeString = authenticationProperties.getAuthenticationType();
+        final String authenticationTypeString = authenticationProperties.getType();
         final AuthenticationType authenticationType = AuthenticationType.valueOfIgnoreCase(authenticationTypeString);
         if (authenticationType == null) {
             throw new IllegalArgumentException(String.format("Invalid authentication type specified for Grant Provider [%s]", authenticationTypeString));
@@ -225,6 +239,6 @@ public class GrantDriver {
         if (StringUtils.isEmpty(property)) {
             throw new IllegalArgumentException(String.format("Must specify a property value for [%s]", propertyName));
         }
-        return propertyName;
+        return property;
     }
 }

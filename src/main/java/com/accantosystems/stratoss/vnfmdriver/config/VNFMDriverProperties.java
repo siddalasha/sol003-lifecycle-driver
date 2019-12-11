@@ -182,7 +182,7 @@ public class VNFMDriverProperties {
 
     public static class Authentication {
 
-        private String authenticationType;
+        private String type;
         private String username;
         private String password;
         private String authenticationUrl;
@@ -191,12 +191,12 @@ public class VNFMDriverProperties {
         private String clientSecret;
         private String scope;
 
-        public String getAuthenticationType() {
-            return authenticationType;
+        public String getType() {
+            return type;
         }
 
-        public void setAuthenticationType(String authenticationType) {
-            this.authenticationType = authenticationType;
+        public void setType(String type) {
+            this.type = type;
         }
 
         public String getUsername() {

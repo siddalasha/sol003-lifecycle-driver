@@ -93,7 +93,7 @@ public class GrantDriverTest {
         GrantProviderException exception = catchThrowableOfType(() -> grantDriver.requestGrant(grantRequest), GrantProviderException.class);
         SOL003ResponseException cause = (SOL003ResponseException) exception.getCause();
 
-        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider");
+        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider on [http://localhost:8080/grant/v1/grants] which gave status 500");
         assertThat(cause.getProblemDetails()).isNotNull();
         assertThat(cause.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(cause.getProblemDetails().getDetail()).isEqualTo("Internal Server Error");
@@ -112,7 +112,7 @@ public class GrantDriverTest {
         GrantProviderException exception = catchThrowableOfType(() -> grantDriver.requestGrant(grantRequest), GrantProviderException.class);
         SOL003ResponseException cause = (SOL003ResponseException) exception.getCause();
 
-        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider");
+        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider on [http://localhost:8080/grant/v1/grants] which gave status 500");
         assertThat(cause.getProblemDetails()).isNotNull();
         assertThat(cause.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(cause.getProblemDetails().getDetail()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + TEST_EXCEPTION_MESSAGE);
@@ -280,7 +280,7 @@ public class GrantDriverTest {
         GrantProviderException exception = catchThrowableOfType(() -> grantDriver.getGrant(TEST_GRANT_ID), GrantProviderException.class);
         SOL003ResponseException cause = (SOL003ResponseException) exception.getCause();
 
-        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider");
+        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider on [http://localhost:8080/grant/v1/grants/{grantId}] which gave status 500");
         assertThat(cause.getProblemDetails()).isNotNull();
         assertThat(cause.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(cause.getProblemDetails().getDetail()).isEqualTo("Internal Server Error");
@@ -297,7 +297,7 @@ public class GrantDriverTest {
         GrantProviderException exception = catchThrowableOfType(() -> grantDriver.getGrant(TEST_GRANT_ID), GrantProviderException.class);
         SOL003ResponseException cause = (SOL003ResponseException) exception.getCause();
 
-        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider");
+        assertThat(exception.getMessage()).isEqualTo("Unable to communicate with Grant Provider on [http://localhost:8080/grant/v1/grants/{grantId}] which gave status 500");
         assertThat(cause.getProblemDetails()).isNotNull();
         assertThat(cause.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(cause.getProblemDetails().getDetail()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + TEST_EXCEPTION_MESSAGE);
