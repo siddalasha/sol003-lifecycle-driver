@@ -1,5 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.EMPTY_JSON;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -157,6 +158,54 @@ public class GrantControllerTest {
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().getDetail()).isEqualTo(rejectionReason);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void testRequestGrantInvalidMessage() {
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                .postForEntity(GRANTS_ENDPOINT, "NOT_VALID_JSON", ProblemDetails.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().getStatus()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+    }
+
+    @Test
+    public void testRequestGrantNoAuthentication() {
+        final ResponseEntity<String> responseEntity = testRestTemplate.postForEntity(GRANTS_ENDPOINT, EMPTY_JSON, String.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+    @Test
+    public void testRequestGrantBadCredentials() {
+        final ResponseEntity<String> responseEntity = testRestTemplate.withBasicAuth("invalid_user", "invalid_password")
+                .postForEntity(GRANTS_ENDPOINT, EMPTY_JSON, String.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void testRequestGrantNoAuthorization() {
+        final ResponseEntity<String> responseEntity = testRestTemplate.withBasicAuth("user_with_no_roles", "password")
+                .postForEntity(GRANTS_ENDPOINT, EMPTY_JSON, String.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+    @Test
+    public void testRequestGrantLockedUser() {
+        final ResponseEntity<String> responseEntity = testRestTemplate.withBasicAuth("locked_user", "password")
+                .postForEntity(GRANTS_ENDPOINT, EMPTY_JSON, String.class);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
 }

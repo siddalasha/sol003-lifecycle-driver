@@ -40,7 +40,7 @@ public class GrantService {
     public GrantCreationResponse requestGrant(GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
 
         if (grantRequest == null) {
-            throw new IllegalArgumentException("Grant Request cannot be null");
+            throw new BadRequestException("Grant Request cannot be null");
         } else if (grantRequest.getVnfInstanceId() == null) {
             throw new BadRequestException("Grant request missing vnfInstanceId");
         } else if (grantRequest.getOperation() == null) {
@@ -73,7 +73,7 @@ public class GrantService {
     public Grant getGrant(String grantId) throws GrantRejectedException, GrantProviderException {
 
         if (grantId == null) {
-            throw new IllegalArgumentException("grantId cannot be null");
+            throw new BadRequestException("grantId cannot be null");
         }
 
         Grant grant;

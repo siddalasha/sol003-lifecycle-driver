@@ -43,7 +43,7 @@ public class GrantServiceTest {
     public void testRequestGrantBadRequest() {
 
         assertThatThrownBy(() -> grantService.requestGrant(null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("Grant Request cannot be null");
 
         GrantRequest request = new GrantRequest();
@@ -106,7 +106,7 @@ public class GrantServiceTest {
     public void testGetGrantBadRequest() {
 
         assertThatThrownBy(() -> grantService.getGrant(null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("grantId cannot be null");
     }
 
