@@ -18,8 +18,11 @@ public class VNFMDriverProperties {
     private final Topics topics = new Topics();
     private final Logging logging = new Logging();
     private final PackageManagement packageManagement = new PackageManagement();
+    private final Grant grant = new Grant();
     private Duration executionResponseDelay = Duration.ofSeconds(5);
     private Duration lcmOpOccPollingDelay = Duration.ofSeconds(10);
+    private Duration restConnectTimeout = Duration.ofSeconds(10);
+    private Duration restReadTimeout = Duration.ofSeconds(60);
 
     public Async getAsync() {
         return async;
@@ -37,6 +40,10 @@ public class VNFMDriverProperties {
         return packageManagement;
     }
 
+    public Grant getGrant() {
+        return grant;
+    }
+
     public Duration getExecutionResponseDelay() {
         return executionResponseDelay;
     }
@@ -51,6 +58,22 @@ public class VNFMDriverProperties {
 
     public void setLcmOpOccPollingDelay(Duration lcmOpOccPollingDelay) {
         this.lcmOpOccPollingDelay = lcmOpOccPollingDelay;
+    }
+
+    public Duration getRestConnectTimeout() {
+        return restConnectTimeout;
+    }
+
+    public void setRestConnectTimeout(Duration restConnectTimeout) {
+        this.restConnectTimeout = restConnectTimeout;
+    }
+
+    public Duration getRestReadTimeout() {
+        return restReadTimeout;
+    }
+
+    public void setRestReadTimeout(Duration restReadTimeout) {
+        this.restReadTimeout = restReadTimeout;
     }
 
     public static class Async {
@@ -134,6 +157,120 @@ public class VNFMDriverProperties {
 
         public void setImageArtifactFilter(String imageArtifactFilter) {
             this.imageArtifactFilter = imageArtifactFilter;
+        }
+
+    }
+
+    public static class Grant {
+
+        private boolean automatic;
+
+        private final Provider provider = new Provider();
+
+        public boolean isAutomatic() {
+            return automatic;
+        }
+
+        public void setAutomatic(boolean automatic) {
+            this.automatic = automatic;
+        }
+
+        public Provider getProvider() {
+            return provider;
+        }
+
+        public static class Provider {
+            private String url;
+            private final Authentication authentication = new Authentication();
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            public Authentication getAuthentication() {
+                return authentication;
+            }
+
+        }
+    }
+
+    public static class Authentication {
+
+        private String type;
+        private String username;
+        private String password;
+        private String authenticationUrl;
+        private String accessTokenUri;
+        private String clientId;
+        private String clientSecret;
+        private String scope;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getAuthenticationUrl() {
+            return authenticationUrl;
+        }
+
+        public void setAuthenticationUrl(String authenticationUrl) {
+            this.authenticationUrl = authenticationUrl;
+        }
+
+        public String getAccessTokenUri() {
+            return accessTokenUri;
+        }
+
+        public void setAccessTokenUri(String accessTokenUri) {
+            this.accessTokenUri = accessTokenUri;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
+        }
+
+        public String getClientSecret() {
+            return clientSecret;
+        }
+
+        public void setClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
         }
 
     }

@@ -15,6 +15,12 @@ vnfmdriver:
     enabled: false
   packageManagement:
     packageRepositoryUrl: file:./src/test/resources/examples/VnfPackage-{vnfPackageId}.zip      
+  grant:
+    automatic: false
+    provider:
+      url: http://localhost:8080
+      authentication:
+        authenticationType: NONE 
 
 spring:
   jackson:

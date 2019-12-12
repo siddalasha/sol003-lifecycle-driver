@@ -35,3 +35,7 @@ vnfmdriver:
     imageArtifactFilter: Files/Images
     # url should be in the form 'http://hostname/path/{vnfPackageId}'
     packageRepositoryUrl:  
+  grant:
+    automatic: true
+    provider:
+      url:

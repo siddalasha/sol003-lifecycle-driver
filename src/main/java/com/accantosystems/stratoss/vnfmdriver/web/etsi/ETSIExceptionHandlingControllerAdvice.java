@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.accantosystems.stratoss.vnfmdriver.driver.GrantProviderException;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
@@ -93,6 +94,12 @@ public class ETSIExceptionHandlingControllerAdvice {
         return defaultHandle("The requested response type was not acceptable", cause, HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ProblemDetails handleBadRequestException(HttpServletRequest req, BadRequestException cause) {
+        return defaultHandle("The request was invalid", cause, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(PackageStateConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
@@ -112,6 +119,13 @@ public class ETSIExceptionHandlingControllerAdvice {
     @ResponseBody
     protected ProblemDetails handleVNFPackageNotFoundException(HttpServletRequest req, VNFPackageNotFoundException cause) {
         return defaultHandle("The VNF Package could not be found.", cause, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(GrantProviderException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    protected ProblemDetails handleGrantProviderException(HttpServletRequest req, GrantProviderException cause) {
+        return defaultHandle("Grant request could not be handled.", cause, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

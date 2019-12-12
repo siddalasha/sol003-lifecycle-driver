@@ -6,15 +6,13 @@ import org.etsi.sol003.common.ProblemDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Component("SOL003ResponseErrorHandler")
-public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
+public abstract class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -37,7 +35,8 @@ public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
                     ProblemDetails problemDetails = objectMapper.readValue(responseBody, ProblemDetails.class);
                     // Check mandatory fields to see if this is indeed a valid ETSI SOL003-compliant error response
                     if (problemDetails.getStatus() != null && problemDetails.getDetail() != null) {
-                        throw new SOL003ResponseException(String.format("Received SOL003-compliant error when communicating with VNFM: %s", problemDetails.getDetail()), e, problemDetails);
+                        throw new SOL003ResponseException(String.format("Received SOL003-compliant error when communicating with %s: %s", endpointDescription(), problemDetails.getDetail()), e,
+                                                          problemDetails);
                     }
                 }
             }
@@ -47,10 +46,13 @@ public class SOL003ResponseErrorHandler extends DefaultResponseErrorHandler {
             if (!StringUtils.isEmpty(responseBody)) {
                 detailsMessage += ": " + responseBody;
             }
-            throw new SOL003ResponseException("Caught REST client exception when communicating with VNFM", new ProblemDetails(e.getRawStatusCode(), detailsMessage));
+            throw new SOL003ResponseException(String.format("Caught REST client exception when communicating with %s", endpointDescription()),
+                                              new ProblemDetails(e.getRawStatusCode(), detailsMessage));
         } catch (Exception e) {
-            throw new SOL003ResponseException("Caught general exception when communicating with VNFM", e);
+            throw new SOL003ResponseException(String.format("Caught general exception when communicating with %s", endpointDescription()), e);
         }
     }
+
+    protected abstract String endpointDescription();
 
 }
