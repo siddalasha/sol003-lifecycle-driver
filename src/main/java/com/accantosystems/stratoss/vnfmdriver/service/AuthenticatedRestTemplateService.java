@@ -2,7 +2,6 @@ package com.accantosystems.stratoss.vnfmdriver.service;
 
 import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.*;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseErrorHandler;
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFMResponseErrorHandler;
 import com.accantosystems.stratoss.vnfmdriver.model.AuthenticationType;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
@@ -35,12 +34,12 @@ public class AuthenticatedRestTemplateService {
     private final Map<ResourceManagerDeploymentLocation, RestTemplate> cachedRestTemplates = new ConcurrentHashMap<>();
 
     @Autowired
-    public AuthenticatedRestTemplateService(RestTemplateBuilder restTemplateBuilder, VNFMResponseErrorHandler vnfmResponseErrorHandler) {
+    public AuthenticatedRestTemplateService(RestTemplateBuilder restTemplateBuilder, VNFMResponseErrorHandler vnfmResponseErrorHandler, VNFMDriverProperties vnfmDriverProperties) {
         logger.info("Initialising RestTemplate configuration");
         this.restTemplateBuilder = restTemplateBuilder.errorHandler(vnfmResponseErrorHandler)
-                                                      .requestFactory(DynamicSslCertificateHttpRequestFactory.class)
-                                                      .setConnectTimeout(Duration.ofSeconds(10))
-                                                      .setReadTimeout(Duration.ofSeconds(30));
+                .requestFactory(DynamicSslCertificateHttpRequestFactory.class)
+                .setConnectTimeout(vnfmDriverProperties.getRestConnectTimeout())
+                .setReadTimeout(vnfmDriverProperties.getRestReadTimeout());
     }
 
     public RestTemplate getRestTemplate(ResourceManagerDeploymentLocation deploymentLocation) {
@@ -50,10 +49,10 @@ public class AuthenticatedRestTemplateService {
 
         // Double-check we haven't got a cached entry of the same "name", but different properties. If so, remove it.
         cachedRestTemplates.keySet()
-                           .stream()
-                           .filter(dl -> Objects.equals(dl.getName(), deploymentLocation.getName()))
-                           .findFirst()
-                           .ifPresent(cachedRestTemplates::remove);
+                .stream()
+                .filter(dl -> Objects.equals(dl.getName(), deploymentLocation.getName()))
+                .findFirst()
+                .ifPresent(cachedRestTemplates::remove);
 
         checkProperty(deploymentLocation, VNFM_SERVER_URL);
 
@@ -65,25 +64,25 @@ public class AuthenticatedRestTemplateService {
 
         final RestTemplate restTemplate;
         switch (authenticationType) {
-            case BASIC:
-                checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
-                checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
-                restTemplate = getBasicAuthenticatedRestTemplate(deploymentLocation);
-                break;
-            case OAUTH2:
-                checkProperty(deploymentLocation, AUTHENTICATION_ACCESS_TOKEN_URI);
-                checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_ID);
-                checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_SECRET);
-                restTemplate = getOAuth2RestTemplate(deploymentLocation);
-                break;
-            case COOKIE:
-                checkProperty(deploymentLocation, AUTHENTICATION_URL);
-                checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
-                checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
-                restTemplate = getCookieAuthenticatedRestTemplate(deploymentLocation);
-                break;
-            default:
-                restTemplate = getUnauthenticatedRestTemplate();
+        case BASIC:
+            checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
+            checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
+            restTemplate = getBasicAuthenticatedRestTemplate(deploymentLocation);
+            break;
+        case OAUTH2:
+            checkProperty(deploymentLocation, AUTHENTICATION_ACCESS_TOKEN_URI);
+            checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_ID);
+            checkProperty(deploymentLocation, AUTHENTICATION_CLIENT_SECRET);
+            restTemplate = getOAuth2RestTemplate(deploymentLocation);
+            break;
+        case COOKIE:
+            checkProperty(deploymentLocation, AUTHENTICATION_URL);
+            checkProperty(deploymentLocation, AUTHENTICATION_USERNAME);
+            checkProperty(deploymentLocation, AUTHENTICATION_PASSWORD);
+            restTemplate = getCookieAuthenticatedRestTemplate(deploymentLocation);
+            break;
+        default:
+            restTemplate = getUnauthenticatedRestTemplate();
         }
 
         cachedRestTemplates.put(deploymentLocation, restTemplate);
@@ -105,7 +104,7 @@ public class AuthenticatedRestTemplateService {
         logger.info("Configuring Basic Authentication RestTemplate.");
         return restTemplateBuilder.basicAuthentication(deploymentLocation.getProperties().get(AUTHENTICATION_USERNAME),
                                                        deploymentLocation.getProperties().get(AUTHENTICATION_PASSWORD))
-                                  .build();
+                .build();
     }
 
     private RestTemplate getOAuth2RestTemplate(final ResourceManagerDeploymentLocation deploymentLocation) {

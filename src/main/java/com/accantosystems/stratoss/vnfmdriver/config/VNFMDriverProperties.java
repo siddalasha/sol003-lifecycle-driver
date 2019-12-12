@@ -21,6 +21,8 @@ public class VNFMDriverProperties {
     private final Grant grant = new Grant();
     private Duration executionResponseDelay = Duration.ofSeconds(5);
     private Duration lcmOpOccPollingDelay = Duration.ofSeconds(10);
+    private Duration restConnectTimeout = Duration.ofSeconds(10);
+    private Duration restReadTimeout = Duration.ofSeconds(60);
 
     public Async getAsync() {
         return async;
@@ -56,6 +58,22 @@ public class VNFMDriverProperties {
 
     public void setLcmOpOccPollingDelay(Duration lcmOpOccPollingDelay) {
         this.lcmOpOccPollingDelay = lcmOpOccPollingDelay;
+    }
+
+    public Duration getRestConnectTimeout() {
+        return restConnectTimeout;
+    }
+
+    public void setRestConnectTimeout(Duration restConnectTimeout) {
+        this.restConnectTimeout = restConnectTimeout;
+    }
+
+    public Duration getRestReadTimeout() {
+        return restReadTimeout;
+    }
+
+    public void setRestReadTimeout(Duration restReadTimeout) {
+        this.restReadTimeout = restReadTimeout;
     }
 
     public static class Async {

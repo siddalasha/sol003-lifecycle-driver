@@ -3,7 +3,6 @@ package com.accantosystems.stratoss.vnfmdriver.driver;
 import static com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants.*;
 
 import java.net.URI;
-import java.time.Duration;
 import java.util.Arrays;
 
 import org.etsi.sol003.granting.Grant;
@@ -215,8 +214,8 @@ public class GrantDriver {
     private RestTemplateBuilder configureRestTemplateBuilder(RestTemplateBuilder restTemplateBuilder, GrantResponseErrorHandler grantResponseErrorHandler) {
         RestTemplateBuilder customRestTemplateBuilder = restTemplateBuilder.errorHandler(grantResponseErrorHandler)
                 .requestFactory(DynamicSslCertificateHttpRequestFactory.class)
-                .setConnectTimeout(Duration.ofSeconds(10))
-                .setReadTimeout(Duration.ofSeconds(30));
+                .setConnectTimeout(vnfmDriverProperties.getRestConnectTimeout())
+                .setReadTimeout(vnfmDriverProperties.getRestReadTimeout());
         logger.info("Initialising RestTemplate configuration");
         return customRestTemplateBuilder;
     }
