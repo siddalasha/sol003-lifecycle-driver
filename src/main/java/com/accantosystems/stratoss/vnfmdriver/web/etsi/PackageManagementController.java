@@ -2,7 +2,6 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
@@ -28,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/vnfpkgm/v1/vnf_packages")
 public class PackageManagementController {
 
-    private final static Logger logger = LoggerFactory.getLogger(GrantController.class);
+    private final static Logger logger = LoggerFactory.getLogger(PackageManagementController.class);
 
     private static final String CONTENT_TYPE_APPLICATION_YAML = "application/yaml";
     private static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
@@ -75,7 +74,7 @@ public class PackageManagementController {
         if (acceptHeader.isEmpty()) {
             throw new ResponseTypeNotAcceptableException("No response type specified in Accept HTTP header. ");
         } else {
-            List<String> acceptTypes = new ArrayList<String>(acceptHeader);
+            List<String> acceptTypes = new ArrayList<>(acceptHeader);
             // remove all acceptable types from the list
             acceptsZip = acceptTypes.remove(CONTENT_TYPE_APPLICATION_ZIP);
             acceptTypes.remove(MediaType.TEXT_PLAIN_VALUE); // text/plain is an allowed content type
@@ -92,14 +91,14 @@ public class PackageManagementController {
             HttpHeaders headers = new HttpHeaders();
             // TODO set content length: headers.setContentLength(?);
             headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_ZIP));
-            return new ResponseEntity<Resource>(zipResource, headers, HttpStatus.OK);
+            return new ResponseEntity<>(zipResource, headers, HttpStatus.OK);
         } else {
             // text/plain is the only accepted type. Return as YAML only
             try {
                 String vnfd = packageManagementService.getVnfdAsYaml(vnfPkgId);
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.TEXT_PLAIN);
-                return new ResponseEntity<String>(vnfd, headers, HttpStatus.OK);
+                return new ResponseEntity<>(vnfd, headers, HttpStatus.OK);
             } catch (UnexpectedPackageContentsException e) {
                 throw new ResponseTypeNotAcceptableException(String.format("The contents of the VNF Package were unexpected for the given Accept HTTP header: [%s]", String.join(",", acceptHeader)),
                                                              e);
@@ -112,15 +111,15 @@ public class PackageManagementController {
     @ApiOperation(value = "Reads the content of a VNF package identified by the VNF package identifier allocated by the NFVO.", notes = "This resource represents a VNF package identified by the VNF package identifier allocated by the NFVO. The client can use this resource to fetch the content of the VNF package.")
     public ResponseEntity<Resource> getVnfPackageContent(@RequestHeader(value = "Content-Range", required = false) String contentRange,
                                                          @PathVariable String vnfPkgId) throws PackageStateConflictException,
-                                                                                        ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
+                                                                                               ContentRangeNotSatisfiableException, VNFPackageNotFoundException {
 
-        logger.info("Received VNF Package Content Get request for package id [{}] and content range []", vnfPkgId, contentRange);
+        logger.info("Received VNF Package Content Get request for package id [{}] and content range [{}]", vnfPkgId, contentRange);
 
         Resource vnfPackage = packageManagementService.getVnfPackageContent(vnfPkgId, contentRange);
         HttpStatus responseStatus = contentRange != null ? HttpStatus.PARTIAL_CONTENT : HttpStatus.OK;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(CONTENT_TYPE_APPLICATION_ZIP));
-        return new ResponseEntity<Resource>(vnfPackage, headers, responseStatus);
+        return new ResponseEntity<>(vnfPackage, headers, responseStatus);
 
     }
 
@@ -136,13 +135,13 @@ public class PackageManagementController {
         int index = requestPath.indexOf("/artifacts/") + "/artifacts/".length();
         String artifactPath = request.getRequestURI().substring(index);
 
-        logger.info("Received VNF Package Artifact Get request for package id [{}], artifact path [] and content range []", vnfPkgId, artifactPath, contentRange);
+        logger.info("Received VNF Package Artifact Get request for package id [{}], artifact path [{}] and content range [{}]", vnfPkgId, artifactPath, contentRange);
 
         Resource vnfPackageArtifact = packageManagementService.getVnfPackageArtifact(vnfPkgId, artifactPath, contentRange);
         HttpStatus responseStatus = contentRange != null ? HttpStatus.PARTIAL_CONTENT : HttpStatus.OK;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM); // TODO - can we determine the actual type from the content
-        return new ResponseEntity<Resource>(vnfPackageArtifact, headers, responseStatus);
+        return new ResponseEntity<>(vnfPackageArtifact, headers, responseStatus);
 
     }
 
