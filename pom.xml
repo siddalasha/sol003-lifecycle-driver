@@ -5,18 +5,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.8.RELEASE</version>
+        <version>2.1.12.RELEASE</version>
         <relativePath />
         <!-- lookup parent from repository -->
     </parent>
 
     <!-- Must be duplicated for versions:set plugin to work in builds -->
     <groupId>com.accantosystems.stratoss</groupId>
-    <artifactId>vnfm-driver</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <artifactId>sol003-vnfm-driver</artifactId>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>VNFM Driver</name>
+    <name>SOL003 VNFM Driver</name>
     <description>ETSI SOL003-compatible VNFM Driver for Stratoss LM</description>
     <inceptionYear>2019</inceptionYear>
     <organization>

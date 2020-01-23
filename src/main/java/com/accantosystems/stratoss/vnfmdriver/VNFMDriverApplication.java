@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 
@@ -25,8 +26,10 @@ public class VNFMDriverApplication {
      * @throws UnknownHostException if the local host name could not be resolved into an address
      */
     public static void main(String[] args) throws UnknownHostException {
-        SpringApplication app = new SpringApplication(VNFMDriverApplication.class);
-        Environment env = app.run(args).getEnvironment();
+        Environment env = new SpringApplicationBuilder().sources(VNFMDriverApplication.class)
+                                                        .run(args)
+                                                        .getEnvironment();
+
         log.info("\n----------------------------------------------------------\n\t"
                          + "Application '{}' is running! Access URLs:\n\t"
                          + "Local: \t\thttp://localhost:{}\n\t"
