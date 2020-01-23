@@ -3,8 +3,6 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,23 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.etsi.sol003.packagemanagement.PkgmSubscription;
 import org.etsi.sol003.packagemanagement.PkgmSubscriptionRequest;
-import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
-import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
-import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
-import com.accantosystems.stratoss.vnfmdriver.service.PackageStateConflictException;
-import com.accantosystems.stratoss.vnfmdriver.service.UnexpectedPackageContentsException;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -58,6 +45,7 @@ public class PackageManagementSubscriptionController {
         newSubscription.setFilter(subscriptionRequest.getFilter());
         newSubscription.setCallbackUri(subscriptionRequest.getCallbackUri());
         localSubscriptionCache.put(newSubscription.getId(), newSubscription);
+        logger.info("New Subscription [{}] created for callback URI [{}]", newSubscription.getId(), newSubscription.getCallbackUri());
 
         final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
         URI location = uriBuilder.pathSegment("{id}").buildAndExpand(newSubscription.getId()).toUri();
@@ -67,7 +55,7 @@ public class PackageManagementSubscriptionController {
     @GetMapping(path = "/{subscriptionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Reads the information of an individual Subscription", notes = "This resource represents an individual Subscription. The client can use this resource to read information of the Subscription.")
     public ResponseEntity<PkgmSubscription> getSubscription(@PathVariable String subscriptionId) {
-        logger.info("Received request for Package Management Subscription [{}]", subscriptionId);
+        logger.info("Received request to retrieve Package Management Subscription [{}]", subscriptionId);
         return localSubscriptionCache.containsKey(subscriptionId) ? ResponseEntity.ok(localSubscriptionCache.get(subscriptionId)) : ResponseEntity.notFound().build();
     }
 
