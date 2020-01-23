@@ -49,7 +49,7 @@ public class PackageManagementController {
                                                              @RequestParam(value = "exclude_fields", required = false) String excludeFields,
                                                              @RequestParam(value = "exclude_default", required = false) String excludeDefault,
                                                              @RequestParam(value = "nextpage_opaque_marker", required = false) String nextPageOpaqueMarker,
-                                                             @RequestParam(value = "vnfdId", required = false) String vnfdId) throws NotImplementedException, VNFPackageNotFoundException {
+                                                             @RequestParam(value = "vnfdId", required = false) String vnfdId) throws VNFPackageNotFoundException {
         logger.info("Received VNF Package Query.");
 
         // NFV-3251 - Special case to support Mavenir integration. We assume the VNFD Id will be the same as the VNF Pkg Id
@@ -57,6 +57,7 @@ public class PackageManagementController {
             return ResponseEntity.ok(Collections.singletonList(packageManagementService.getVnfPackageInfo(vnfdId)));
         }
 
+        // NFV-3251 - For now, return an empty list (we expect the VNFM to query directly when they see a request for a package they don't have)
         return ResponseEntity.ok(Collections.emptyList());
 
     }
