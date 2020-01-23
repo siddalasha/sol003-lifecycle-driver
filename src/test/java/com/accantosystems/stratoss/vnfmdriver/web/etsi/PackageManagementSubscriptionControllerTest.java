@@ -56,6 +56,7 @@ public class PackageManagementSubscriptionControllerTest {
         responseEntity = controller.getSubscription(subscriptionId);
 
         assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().getId()).isEqualTo(subscriptionId);
 

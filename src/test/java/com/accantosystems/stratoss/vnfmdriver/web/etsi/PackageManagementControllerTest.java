@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.etsi.sol003.common.ProblemDetails;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -56,15 +58,14 @@ public class PackageManagementControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testQueryPackageInfoNotImplemented() throws Exception {
+    public void testQueryPackageInfoEmptyList() {
+        final ResponseEntity<List<VnfPkgInfo>> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                                                                                .exchange(PACKAGE_MANAGEMENT_BASE_ENDPOINT, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),
+                                                                                          new ParameterizedTypeReference<List<VnfPkgInfo>>() {});
 
-        // TODO remove this test method when implementing GET /vnfpkgm/v1/vnf_packages
-
-        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password").getForEntity(PACKAGE_MANAGEMENT_BASE_ENDPOINT, ProblemDetails.class);
-
-        // This method is not yet implemented so ensure all callers will receive status 501
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_IMPLEMENTED);
-        assertThat(responseEntity.getBody().getDetail()).isEqualTo("Query VNF Packages Info API not yet implemented.");
+        // This method is not yet implemented, but will return an empty list
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isNotNull().isEmpty();
 
     }
 
@@ -83,6 +84,25 @@ public class PackageManagementControllerTest {
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().getId()).isNotNull();
         assertThat(responseEntity.getBody().getId()).isEqualTo(vnfPkgId);
+    }
+
+    @Test
+    public void testRequestPackageInfoByVnfdId() throws Exception {
+
+        String vnfd = loadFileIntoString("examples/VnfPkgInfo.json");
+        VnfPkgInfo vnfPkgInfo = objectMapper.readValue(vnfd, VnfPkgInfo.class);
+        String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;
+        when(packageManagementService.getVnfPackageInfo(eq(vnfPkgId))).thenReturn(vnfPkgInfo);
+
+        final ResponseEntity<List<VnfPkgInfo>> responseEntity = testRestTemplate.withBasicAuth("user", "password")
+                                                                                .exchange(PACKAGE_MANAGEMENT_BASE_ENDPOINT + "?vnfdId={vnfPkgId}", HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),
+                                                                                          new ParameterizedTypeReference<List<VnfPkgInfo>>() {}, vnfPkgId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody()).hasSize(1);
+        assertThat(responseEntity.getBody().get(0).getId()).isEqualTo(vnfPkgId);
     }
 
     @Test
@@ -113,7 +133,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip")));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -132,7 +152,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity).isNotNull();
@@ -153,7 +173,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<String> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
+                                                                      .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -176,7 +196,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.TEXT_PLAIN));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity).isNotNull();
@@ -193,7 +213,7 @@ public class PackageManagementControllerTest {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<?> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                           .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
 
@@ -201,14 +221,14 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                         .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
 
         // Check with additional invalid Accept types specified
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.TEXT_PLAIN, MediaType.APPLICATION_OCTET_STREAM));
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                         .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
 
         // Check when Accept type of text/plain but multiple vnfds found within the package
@@ -216,7 +236,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
+                                         .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -234,7 +254,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip")));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -259,7 +279,7 @@ public class PackageManagementControllerTest {
         headers.set(HttpHeaders.CONTENT_RANGE, contentRange);
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -278,7 +298,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity).isNotNull();
@@ -296,7 +316,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(responseEntity).isNotNull();
@@ -314,7 +334,7 @@ public class PackageManagementControllerTest {
         headers.setAccept(Arrays.asList(MediaType.parseMediaType("application/zip"), MediaType.APPLICATION_JSON));
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_CONTENT_ENDPOINT, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
         assertThat(responseEntity).isNotNull();
@@ -338,7 +358,7 @@ public class PackageManagementControllerTest {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
@@ -365,7 +385,7 @@ public class PackageManagementControllerTest {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<Resource> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
+                                                                        .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
@@ -386,7 +406,8 @@ public class PackageManagementControllerTest {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class,
+                                                                                        vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(responseEntity).isNotNull();
@@ -406,7 +427,8 @@ public class PackageManagementControllerTest {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class,
+                                                                                        vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(responseEntity).isNotNull();
@@ -426,7 +448,8 @@ public class PackageManagementControllerTest {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         // don't allow rest template to expand the artifactPath variable into the uri or it will end up encoded and the uri rejected
         final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.withBasicAuth("user", "password")
-                .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class, vnfPkgId);
+                                                                              .exchange(PACKAGE_MANAGEMENT_PACKAGE_ARTIFACT_ENDPOINT + artifactPath, HttpMethod.GET, httpEntity, ProblemDetails.class,
+                                                                                        vnfPkgId);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
         assertThat(responseEntity).isNotNull();

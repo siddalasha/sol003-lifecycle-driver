@@ -1,6 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
@@ -46,17 +48,22 @@ public class PackageManagementController {
                                                              @RequestParam(value = "fields", required = false) String fields,
                                                              @RequestParam(value = "exclude_fields", required = false) String excludeFields,
                                                              @RequestParam(value = "exclude_default", required = false) String excludeDefault,
-                                                             @RequestParam(value = "nextpage_opaque_marker", required = false) String nextPageOpaqueMarker) throws NotImplementedException {
+                                                             @RequestParam(value = "nextpage_opaque_marker", required = false) String nextPageOpaqueMarker,
+                                                             @RequestParam(value = "vnfdId", required = false) String vnfdId) throws NotImplementedException, VNFPackageNotFoundException {
         logger.info("Received VNF Package Query.");
-        // This API is not yet implemented
-        throw new NotImplementedException("Query VNF Packages Info API not yet implemented.");
+
+        // NFV-3251 - Special case to support Mavenir integration. We assume the VNFD Id will be the same as the VNF Pkg Id
+        if (StringUtils.hasText(vnfdId)) {
+            return ResponseEntity.ok(Collections.singletonList(packageManagementService.getVnfPackageInfo(vnfdId)));
+        }
+
+        return ResponseEntity.ok(Collections.emptyList());
 
     }
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Reads the information of an individual VNF package", notes = "This resource represents an individual VNF package. The client can use this resource to read information of the VNF package.")
     public ResponseEntity<VnfPkgInfo> getVnfPackage(@PathVariable String vnfPkgId) throws VNFPackageNotFoundException {
-
         logger.info("Received Individual VNF package Info Get request.");
 
         VnfPkgInfo vnfInfo = packageManagementService.getVnfPackageInfo(vnfPkgId);
