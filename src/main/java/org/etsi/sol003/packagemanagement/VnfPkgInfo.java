@@ -20,7 +20,6 @@ import lombok.Data;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel(description = "Represents the information of a VNF package.")
-
 public class VnfPkgInfo {
 
     @ApiModelProperty(name = "Identifier", required = true, notes = "Identifier of the VNF package. This identifier is allocated by the NFVO. ")
