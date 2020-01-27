@@ -1,7 +1,7 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
-import org.etsi.sol003.packagemanagement.PackageOnboardingStateType;
-import org.etsi.sol003.packagemanagement.PackageOperationalStateType;
+import java.util.List;
+
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryDriver;
 @Service("PackageManagementService")
 public class PackageManagementService {
 
-    private final static Logger logger = LoggerFactory.getLogger(VNFPackageRepositoryDriver.class);
+    private final static Logger logger = LoggerFactory.getLogger(PackageManagementService.class);
 
     private final VNFPackageRepositoryDriver vnfPackageDriver;
     private final VNFPackageExtractor vnfPackageExtractor;
@@ -26,15 +26,12 @@ public class PackageManagementService {
         this.vnfPackageExtractor = vnfPackageExtractor;
     }
 
+    public List<VnfPkgInfo> getAllVnfPackageInfos(String groupName) {
+        return vnfPackageDriver.queryAllVnfPkgInfos(groupName);
+    }
+
     public VnfPkgInfo getVnfPackageInfo(String vnfPkgId) throws VNFPackageNotFoundException {
-
-        Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
-        VnfPkgInfo vnfPkgInfo = vnfPackageExtractor.populateVnfPackageInfo(vnfPkgId, vnfPackageZip);
-
-        vnfPkgInfo.setOnboardingState(PackageOnboardingStateType.ONBOARDED);
-        vnfPkgInfo.setOperationalState(PackageOperationalStateType.ENABLED);
-
-        return vnfPkgInfo;
+        return vnfPackageDriver.getVnfPkgInfo(vnfPkgId);
     }
 
     public String getVnfdAsYaml(String vnfPkgId) throws UnexpectedPackageContentsException, VNFPackageNotFoundException {
@@ -59,7 +56,7 @@ public class PackageManagementService {
     }
 
     public Resource getVnfPackageArtifact(String vnfPkgId, String artifactPath, String contentRange) throws PackageStateConflictException, ContentRangeNotSatisfiableException,
-                                                                                                     VNFPackageNotFoundException {
+                                                                                                            VNFPackageNotFoundException {
 
         Resource vnfPackageZip = vnfPackageDriver.getVnfPackage(vnfPkgId);
         Resource vnfArtifact = vnfPackageExtractor.extractVnfPackageArtifact(vnfPkgId, artifactPath, vnfPackageZip);

@@ -3,11 +3,11 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoByteArray;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoString;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,20 +58,20 @@ public class PackageManagementControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testQueryPackageInfoEmptyList() {
+    public void testQueryPackageInfoEmptyList() throws Exception {
+        VnfPkgInfo vnfPkgInfo = objectMapper.readValue(loadFileIntoString("examples/vnfPackageId.pkgInfo"), VnfPkgInfo.class);
+        when(packageManagementService.getAllVnfPackageInfos(isNull())).thenReturn(Collections.singletonList(vnfPkgInfo));
+
         final ResponseEntity<List<VnfPkgInfo>> responseEntity = testRestTemplate.withBasicAuth("user", "password")
                                                                                 .exchange(PACKAGE_MANAGEMENT_BASE_ENDPOINT, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),
                                                                                           new ParameterizedTypeReference<List<VnfPkgInfo>>() {});
 
-        // This method is not yet implemented, but will return an empty list
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isNotNull().isEmpty();
-
+        assertThat(responseEntity.getBody()).hasSize(1);
     }
 
     @Test
     public void testRequestPackageInfo() throws Exception {
-
         String vnfd = loadFileIntoString("examples/VnfPkgInfo.json");
         VnfPkgInfo vnfPkgInfo = objectMapper.readValue(vnfd, VnfPkgInfo.class);
         String vnfPkgId = TestConstants.TEST_VNF_PKG_ID;

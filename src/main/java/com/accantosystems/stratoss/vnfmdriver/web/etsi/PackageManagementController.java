@@ -57,9 +57,7 @@ public class PackageManagementController {
             return ResponseEntity.ok(Collections.singletonList(packageManagementService.getVnfPackageInfo(vnfdId)));
         }
 
-        // NFV-3251 - For now, return an empty list (we expect the VNFM to query directly when they see a request for a package they don't have)
-        return ResponseEntity.ok(Collections.emptyList());
-
+        return ResponseEntity.ok(packageManagementService.getAllVnfPackageInfos(null));
     }
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)

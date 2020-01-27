@@ -1,8 +1,12 @@
 package com.accantosystems.stratoss.vnfmdriver.config;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.accantosystems.stratoss.vnfmdriver.model.alm.ResourceManagerDeploymentLocation;
 
 /**
  * Properties specific to the VNFM Driver.
@@ -142,6 +146,9 @@ public class VNFMDriverProperties {
     public static class PackageManagement {
         private String packageRepositoryUrl;
         private String imageArtifactFilter;
+        private RepositoryType repositoryType = RepositoryType.NEXUS;
+        private String repositoryName;
+        private final Map<String, String> authenticationProperties = new HashMap<>();
 
         public String getPackageRepositoryUrl() {
             return packageRepositoryUrl;
@@ -159,6 +166,29 @@ public class VNFMDriverProperties {
             this.imageArtifactFilter = imageArtifactFilter;
         }
 
+        public RepositoryType getRepositoryType() {
+            return repositoryType;
+        }
+
+        public void setRepositoryType(RepositoryType repositoryType) {
+            this.repositoryType = repositoryType;
+        }
+
+        public String getRepositoryName() {
+            return repositoryName;
+        }
+
+        public void setRepositoryName(String repositoryName) {
+            this.repositoryName = repositoryName;
+        }
+
+        public Map<String, String> getAuthenticationProperties() {
+            return authenticationProperties;
+        }
+
+        public enum RepositoryType {
+            NEXUS
+        }
     }
 
     public static class Grant {
