@@ -1,18 +1,22 @@
 package com.accantosystems.stratoss.vnfmdriver.driver.impl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.util.Strings;
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,26 +26,29 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
-import com.accantosystems.stratoss.vnfmdriver.driver.AbstractVNFPackageRepositoryDriver;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryDriver;
+import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageRepositoryException;
 import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sonatype.nexus.AssetInformation;
 import com.sonatype.nexus.ComponentInformation;
 import com.sonatype.nexus.PaginatedResults;
 
-public class NexusVNFPackageRepositoryDriver extends AbstractVNFPackageRepositoryDriver {
+public class NexusVNFPackageRepositoryDriver implements VNFPackageRepositoryDriver {
 
     private static final String COMPONENT_SEARCH_URL = "/service/rest/v1/search";
-    private static final String VNF_PKG_INFO_SUFFIX = ".pkgInfo";
+    private static final String ASSET_SEARCH_URL = "/service/rest/v1/search/assets";
     private static final Logger logger = LoggerFactory.getLogger(NexusVNFPackageRepositoryDriver.class);
 
+    private final VNFMDriverProperties vnfmDriverProperties;
     private final AuthenticatedRestTemplateService authenticatedRestTemplateService;
     private final ObjectMapper objectMapper;
     private final Map<String, VnfPkgInfo> localVnfPkgInfoCache = new ConcurrentHashMap<>();
 
     @Autowired
     public NexusVNFPackageRepositoryDriver(VNFMDriverProperties vnfmDriverProperties, AuthenticatedRestTemplateService authenticatedRestTemplateService, ObjectMapper objectMapper) {
-        super(vnfmDriverProperties);
+        this.vnfmDriverProperties = vnfmDriverProperties;
         this.authenticatedRestTemplateService = authenticatedRestTemplateService;
         this.objectMapper = objectMapper;
     }
@@ -70,7 +77,7 @@ public class NexusVNFPackageRepositoryDriver extends AbstractVNFPackageRepositor
             queryParameters.set("group", groupName);
         }
         if (StringUtils.hasText(vnfPackageId)) {
-            queryParameters.set("keyword", "*" + vnfPackageId + "*");
+            queryParameters.set("keyword", "*" + vnfPackageId + vnfmDriverProperties.getPackageManagement().getVnfPkgInfoSuffix() + "*");
         }
 
         // Get a list of components from Nexus
@@ -79,7 +86,7 @@ public class NexusVNFPackageRepositoryDriver extends AbstractVNFPackageRepositor
         // Reduce list to only contain unique VnfPkgInfo assets (and populate local cache, keyed by MD5 sum)
         return componentList.stream()
                             .flatMap(c -> c.getAssets().stream())
-                            .filter(a -> a.getPath().endsWith(VNF_PKG_INFO_SUFFIX))
+                            .filter(a -> a.getPath().endsWith(vnfmDriverProperties.getPackageManagement().getVnfPkgInfoSuffix()))
                             .map(a -> {
                                 // TODO What about if there's no md5 checksum?
                                 if (!localVnfPkgInfoCache.containsKey(a.getChecksum().getMd5())) {
@@ -88,6 +95,47 @@ public class NexusVNFPackageRepositoryDriver extends AbstractVNFPackageRepositor
                                 return localVnfPkgInfoCache.get(a.getChecksum().getMd5());
                             })
                             .collect(Collectors.toList());
+    }
+
+    public Resource getVnfPackage(String vnfPackageId) throws VNFPackageNotFoundException {
+
+        // TODO some local caching would be nice
+
+        String vnfRepositoryUrl = vnfmDriverProperties.getPackageManagement().getPackageRepositoryUrl();
+        if (Strings.isEmpty(vnfRepositoryUrl)) {
+            throw new VNFPackageRepositoryException("A valid VNF Package Repository URL must be configured.");
+        }
+
+        final MultiValueMap<String, String> queryParameters = new LinkedMultiValueMap<>();
+        queryParameters.set("repository", vnfmDriverProperties.getPackageManagement().getRepositoryName());
+        queryParameters.set("keyword", "*" + vnfPackageId + vnfmDriverProperties.getPackageManagement().getVnfPkgSuffix() + "*");
+
+        // Get a list of components from Nexus
+        List<AssetInformation> assetList = getPaginatedResultsAsList(ASSET_SEARCH_URL, queryParameters, AssetInformation.class);
+
+        if (assetList.isEmpty()) {
+            throw new VNFPackageNotFoundException(String.format("VNF Package [%s] not found in repository [%s]", vnfPackageId, vnfRepositoryUrl));
+        } else if (assetList.size() > 1) {
+            throw new VNFPackageNotFoundException(String.format("Too many results [%s] when searching for VNF Package [%s] in repository [%s]", assetList.size(), vnfPackageId, vnfRepositoryUrl));
+        }
+
+        final String vnfDownloadPath = assetList.get(0).getDownloadUrl();
+        logger.info("Attempting to load VNF Package from location {}", vnfDownloadPath);
+
+        try {
+            UrlResource vnfPackage = new UrlResource(vnfDownloadPath);
+
+            if (!vnfPackage.exists()) {
+                throw new VNFPackageNotFoundException(String.format("VNF Package not found in repository at location [%s].", vnfDownloadPath));
+            }
+
+            logger.info(" VNF Package found at location {}", vnfDownloadPath);
+
+            return vnfPackage;
+        } catch (MalformedURLException e) {
+            throw new VNFPackageRepositoryException(String.format("The configured VNF Package Repository location was invalid [%s].", vnfDownloadPath), e);
+        }
+
     }
 
     private RestTemplate getRestTemplate() {
@@ -132,8 +180,7 @@ public class NexusVNFPackageRepositoryDriver extends AbstractVNFPackageRepositor
                 paginatedResults.addAll(responseEntity.getBody().getItems());
                 continuationToken = responseEntity.getBody().getContinuationToken();
             } else {
-                // FIXME Something wrong
-                throw new RuntimeException("Something bad happened");
+                throw new VNFPackageRepositoryException(String.format("Invalid status code [%s] while searching Nexus repository at [%s]", responseEntity.getStatusCode(), uriBuilder.toUriString()));
             }
         } while (continuationToken != null);
 

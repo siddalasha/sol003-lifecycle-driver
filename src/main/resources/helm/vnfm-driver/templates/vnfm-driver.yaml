@@ -13,6 +13,21 @@ data:
 {{- if .Values.app.config.packageRepositoryUrl }}
   "vnfmdriver_packageManagement_packageRepositoryUrl": {{ .Values.app.config.packageRepositoryUrl }}
 {{- end }}
+{{- if .Values.app.config.repositoryName }}
+  "vnfmdriver_packageManagement_repositoryName": {{ .Values.app.config.repositoryName }}
+{{- end }}
+{{- if .Values.app.config.nexusGroupName }}
+  "vnfmdriver_packageManagement_nexusGroupName": {{ .Values.app.config.nexusGroupName }}
+{{- end }}
+{{- if .Values.app.config.authenticationProperties.type }}
+  "vnfmdriver_packageManagement_authenticationProperties_type": {{ .Values.app.config.authenticationProperties.type }}
+{{- end }}
+{{- if .Values.app.config.authenticationProperties.username }}
+  "vnfmdriver_packageManagement_authenticationProperties_username": {{ .Values.app.config.authenticationProperties.username }}
+{{- end }}
+{{- if .Values.app.config.authenticationProperties.password }}
+  "vnfmdriver_packageManagement_authenticationProperties_password": {{ .Values.app.config.authenticationProperties.password }}
+{{- end }}
 {{- if .Values.app.jvmOptions }}
   "JVM_OPTIONS": {{ .Values.app.jvmOptions }}
 {{- end }}

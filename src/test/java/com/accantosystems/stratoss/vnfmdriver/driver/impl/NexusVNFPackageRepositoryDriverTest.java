@@ -3,6 +3,7 @@ package com.accantosystems.stratoss.vnfmdriver.driver.impl;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadFileIntoString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.ExpectedCount.between;
 import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -40,21 +41,38 @@ import com.google.common.io.ByteStreams;
 @ActiveProfiles({ "test" })
 public class NexusVNFPackageRepositoryDriverTest {
 
+    public static final String EMPTY_SEARCH_RESULTS = "{\"items\": [], \"continuationToken\": null}";
     @Autowired private VNFPackageRepositoryDriver vnfPackageDriver;
+    @Autowired private VNFMDriverProperties vnfmDriverProperties;
     @Autowired private AuthenticatedRestTemplateService authenticatedRestTemplateService;
     @Autowired private ObjectMapper objectMapper;
 
+    private MockRestServiceServer getMockRestServiceServer(VNFMDriverProperties vnfmDriverProperties) {
+        return MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(vnfmDriverProperties.getPackageManagement().getPackageRepositoryUrl(),
+                                                                                             vnfmDriverProperties.getPackageManagement().getAuthenticationProperties())).build();
+    }
+
     @Test
     public void testGetVnfPackage() throws Exception {
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
+
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search/assets?repository=test-repository&keyword=*vMRF.zip*")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(loadFileIntoString("examples/pkgMgmt-AssetSearch.json"), MediaType.APPLICATION_JSON));
+
         Resource vnfPackage = vnfPackageDriver.getVnfPackage("vMRF");
         assertThat(ByteStreams.toByteArray(vnfPackage.getInputStream())).isNotEmpty();
     }
 
     @Test
     public void testGetVnfPackageNotFound() {
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
+
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search/assets?repository=test-repository&keyword=*not-present-id.zip*")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(EMPTY_SEARCH_RESULTS, MediaType.APPLICATION_JSON));
+
         assertThatThrownBy(() -> vnfPackageDriver.getVnfPackage("not-present-id"))
                 .isInstanceOf(VNFPackageNotFoundException.class)
-                .hasMessageStartingWith("VNF Package not found in repository at location");
+                .hasMessage("VNF Package [not-present-id] not found in repository [http://does-not-exist:8081]");
     }
 
     @Test
@@ -70,25 +88,44 @@ public class NexusVNFPackageRepositoryDriverTest {
 
     @Test
     public void testQueryVnfPkgInfo() throws Exception {
-        final VNFMDriverProperties properties = new VNFMDriverProperties();
-        properties.getPackageManagement().setPackageRepositoryUrl("http://does-not-exist:8081");
-        properties.getPackageManagement().setRepositoryName("test-repository");
-        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(properties.getPackageManagement().getPackageRepositoryUrl(),
-                                                                                                                           properties.getPackageManagement().getAuthenticationProperties())).build();
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
 
-        server.expect(times(2), requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/mavenir/vnfdId")).andExpect(method(HttpMethod.GET))
-              .andRespond(withSuccess(loadFileIntoString("/examples/pkgMgmt-ComponentSearch.json"), MediaType.APPLICATION_JSON));
+        server.expect(times(2), requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/group/vnfdId")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(loadFileIntoString("examples/pkgMgmt-ComponentSearch.json"), MediaType.APPLICATION_JSON));
 
         server.expect(requestTo("http://does-not-exist:8081/repository/test-repository/group/vnfdId/vnfPackageId.pkgInfo")).andExpect(method(HttpMethod.GET))
-              .andRespond(withSuccess(loadFileIntoString("/examples/vnfPackageId.pkgInfo"), MediaType.TEXT_PLAIN));
+              .andRespond(withSuccess(loadFileIntoString("examples/vnfPackageId.pkgInfo"), MediaType.TEXT_PLAIN));
 
-        VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(properties, authenticatedRestTemplateService, objectMapper);
+        // Create new instance of the driver to ensure we don't get accidental cache hits)
+        final VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(vnfmDriverProperties, authenticatedRestTemplateService, objectMapper);
 
-        List<VnfPkgInfo> vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/mavenir/vnfdId");
+        List<VnfPkgInfo> vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/group/vnfdId");
         assertThat(vnfPkgInfoList).hasSize(1);
 
         // Query for a second time and check we don't re-fetch the VnfPkgInfo (should be cached)
-        vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/mavenir/vnfdId");
+        vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/group/vnfdId");
+        assertThat(vnfPkgInfoList).hasSize(1);
+
+        // Verify all expectations met
+        server.verify();
+    }
+
+    @Test
+    public void testQueryVnfPkgInfoNoGroupName() throws Exception {
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
+
+        server.expect(times(2), requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(loadFileIntoString("/examples/pkgMgmt-ComponentSearch.json"), MediaType.APPLICATION_JSON));
+
+        // This is optional due to the potential caching within the driver
+        server.expect(between(0, 1), requestTo("http://does-not-exist:8081/repository/test-repository/group/vnfdId/vnfPackageId.pkgInfo")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(loadFileIntoString("/examples/vnfPackageId.pkgInfo"), MediaType.TEXT_PLAIN));
+
+        List<VnfPkgInfo> vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("");
+        assertThat(vnfPkgInfoList).hasSize(1);
+
+        // Query for a second time and check we don't re-fetch the VnfPkgInfo (should be cached)
+        vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos(null);
         assertThat(vnfPkgInfoList).hasSize(1);
 
         // Verify all expectations met
@@ -103,10 +140,9 @@ public class NexusVNFPackageRepositoryDriverTest {
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_TYPE, AuthenticationType.BASIC.toString());
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_USERNAME, "admin");
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_PASSWORD, "admin123");
-        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(properties.getPackageManagement().getPackageRepositoryUrl(),
-                                                                                                                           properties.getPackageManagement().getAuthenticationProperties())).build();
+        final MockRestServiceServer server = getMockRestServiceServer(properties);
 
-        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/mavenir/vnfdId")).andExpect(method(HttpMethod.GET))
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/group/vnfdId")).andExpect(method(HttpMethod.GET))
               .andRespond(withSuccess(loadFileIntoString("/examples/pkgMgmt-ComponentSearch.json"), MediaType.APPLICATION_JSON));
 
         server.expect(requestTo("http://does-not-exist:8081/repository/test-repository/group/vnfdId/vnfPackageId.pkgInfo")).andExpect(method(HttpMethod.GET))
@@ -114,7 +150,7 @@ public class NexusVNFPackageRepositoryDriverTest {
 
         VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(properties, authenticatedRestTemplateService, objectMapper);
 
-        List<VnfPkgInfo> vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/mavenir/vnfdId");
+        List<VnfPkgInfo> vnfPkgInfoList = vnfPackageDriver.queryAllVnfPkgInfos("/group/vnfdId");
         assertThat(vnfPkgInfoList).hasSize(1);
     }
 
@@ -126,34 +162,28 @@ public class NexusVNFPackageRepositoryDriverTest {
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_TYPE, AuthenticationType.BASIC.toString());
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_USERNAME, "jack");
         properties.getPackageManagement().getAuthenticationProperties().put(VNFMDriverConstants.AUTHENTICATION_PASSWORD, "jack");
-        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(properties.getPackageManagement().getPackageRepositoryUrl(),
-                                                                                                                           properties.getPackageManagement().getAuthenticationProperties())).build();
+        final MockRestServiceServer server = getMockRestServiceServer(properties);
 
-        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/mavenir/vnfdId")).andExpect(method(HttpMethod.GET))
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&group=/group/vnfdId")).andExpect(method(HttpMethod.GET))
               .andRespond(withUnauthorizedRequest());
 
         VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(properties, authenticatedRestTemplateService, objectMapper);
 
-        assertThatThrownBy(() -> vnfPackageDriver.queryAllVnfPkgInfos("/mavenir/vnfdId"))
+        assertThatThrownBy(() -> vnfPackageDriver.queryAllVnfPkgInfos("/group/vnfdId"))
                 .isInstanceOf(SOL003ResponseException.class)
                 .hasFieldOrPropertyWithValue("problemDetails.status", HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
     public void testGetVnfPkgInfo() throws Exception {
-        final VNFMDriverProperties properties = new VNFMDriverProperties();
-        properties.getPackageManagement().setPackageRepositoryUrl("http://does-not-exist:8081");
-        properties.getPackageManagement().setRepositoryName("test-repository");
-        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(properties.getPackageManagement().getPackageRepositoryUrl(),
-                                                                                                                           properties.getPackageManagement().getAuthenticationProperties())).build();
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
 
-        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&keyword=*vnfPackageId*")).andExpect(method(HttpMethod.GET))
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&keyword=*vnfPackageId.pkgInfo*")).andExpect(method(HttpMethod.GET))
               .andRespond(withSuccess(loadFileIntoString("/examples/pkgMgmt-ComponentSearch.json"), MediaType.APPLICATION_JSON));
 
-        server.expect(requestTo("http://does-not-exist:8081/repository/test-repository/group/vnfdId/vnfPackageId.pkgInfo")).andExpect(method(HttpMethod.GET))
+        // This is optional due to the potential caching within the driver
+        server.expect(between(0, 1), requestTo("http://does-not-exist:8081/repository/test-repository/group/vnfdId/vnfPackageId.pkgInfo")).andExpect(method(HttpMethod.GET))
               .andRespond(withSuccess(loadFileIntoString("/examples/vnfPackageId.pkgInfo"), MediaType.TEXT_PLAIN));
-
-        final VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(properties, authenticatedRestTemplateService, objectMapper);
 
         VnfPkgInfo vnfPkgInfo = vnfPackageDriver.getVnfPkgInfo("vnfPackageId");
         assertThat(vnfPkgInfo).isNotNull();
@@ -161,16 +191,10 @@ public class NexusVNFPackageRepositoryDriverTest {
 
     @Test
     public void testGetVnfPkgInfoNotFound() {
-        final VNFMDriverProperties properties = new VNFMDriverProperties();
-        properties.getPackageManagement().setPackageRepositoryUrl("http://does-not-exist:8081");
-        properties.getPackageManagement().setRepositoryName("test-repository");
-        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(properties.getPackageManagement().getPackageRepositoryUrl(),
-                                                                                                                           properties.getPackageManagement().getAuthenticationProperties())).build();
+        final MockRestServiceServer server = getMockRestServiceServer(vnfmDriverProperties);
 
-        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&keyword=*not-present-id*")).andExpect(method(HttpMethod.GET))
-              .andRespond(withSuccess("{\"items\": [], \"continuationToken\": null}", MediaType.APPLICATION_JSON));
-
-        final VNFPackageRepositoryDriver vnfPackageDriver = new NexusVNFPackageRepositoryDriver(properties, authenticatedRestTemplateService, objectMapper);
+        server.expect(requestTo("http://does-not-exist:8081/service/rest/v1/search?repository=test-repository&keyword=*not-present-id.pkgInfo*")).andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(EMPTY_SEARCH_RESULTS, MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> vnfPackageDriver.getVnfPkgInfo("not-present-id"))
                 .isInstanceOf(VNFPackageNotFoundException.class)

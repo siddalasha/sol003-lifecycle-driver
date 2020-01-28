@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFPackageNotFoundException;
 import com.accantosystems.stratoss.vnfmdriver.service.ContentRangeNotSatisfiableException;
 import com.accantosystems.stratoss.vnfmdriver.service.PackageManagementService;
@@ -35,10 +36,12 @@ public class PackageManagementController {
     private static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
 
     private final PackageManagementService packageManagementService;
+    private final VNFMDriverProperties vnfmDriverProperties;
 
     @Autowired
-    public PackageManagementController(PackageManagementService packageManagementService) {
+    public PackageManagementController(PackageManagementService packageManagementService, VNFMDriverProperties vnfmDriverProperties) {
         this.packageManagementService = packageManagementService;
+        this.vnfmDriverProperties = vnfmDriverProperties;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,7 +60,7 @@ public class PackageManagementController {
             return ResponseEntity.ok(Collections.singletonList(packageManagementService.getVnfPackageInfo(vnfdId)));
         }
 
-        return ResponseEntity.ok(packageManagementService.getAllVnfPackageInfos(null));
+        return ResponseEntity.ok(packageManagementService.getAllVnfPackageInfos(vnfmDriverProperties.getPackageManagement().getNexusGroupName()));
     }
 
     @GetMapping(path = "/{vnfPkgId}", produces = MediaType.APPLICATION_JSON_VALUE)

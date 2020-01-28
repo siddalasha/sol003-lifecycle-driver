@@ -148,6 +148,9 @@ public class VNFMDriverProperties {
         private String imageArtifactFilter;
         private RepositoryType repositoryType = RepositoryType.NEXUS;
         private String repositoryName;
+        private String nexusGroupName;
+        private String vnfPkgInfoSuffix = ".pkgInfo";
+        private String vnfPkgSuffix = ".zip";
         private final Map<String, String> authenticationProperties = new HashMap<>();
 
         public String getPackageRepositoryUrl() {
@@ -180,6 +183,30 @@ public class VNFMDriverProperties {
 
         public void setRepositoryName(String repositoryName) {
             this.repositoryName = repositoryName;
+        }
+
+        public String getNexusGroupName() {
+            return nexusGroupName;
+        }
+
+        public void setNexusGroupName(String nexusGroupName) {
+            this.nexusGroupName = nexusGroupName;
+        }
+
+        public String getVnfPkgInfoSuffix() {
+            return vnfPkgInfoSuffix;
+        }
+
+        public void setVnfPkgInfoSuffix(String vnfPkgInfoSuffix) {
+            this.vnfPkgInfoSuffix = vnfPkgInfoSuffix;
+        }
+
+        public String getVnfPkgSuffix() {
+            return vnfPkgSuffix;
+        }
+
+        public void setVnfPkgSuffix(String vnfPkgSuffix) {
+            this.vnfPkgSuffix = vnfPkgSuffix;
         }
 
         public Map<String, String> getAuthenticationProperties() {
