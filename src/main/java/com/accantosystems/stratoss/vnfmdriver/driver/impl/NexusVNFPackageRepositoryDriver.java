@@ -153,7 +153,7 @@ public class NexusVNFPackageRepositoryDriver implements VNFPackageRepositoryDriv
             try {
                 vnfPkgInfo = objectMapper.readValue(vnfPkgInfoString, VnfPkgInfo.class);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new VNFPackageRepositoryException(String.format("Exception parsing VnfPkgInfo record from [%s]", downloadUrl), e);
             }
             return vnfPkgInfo;
         }
