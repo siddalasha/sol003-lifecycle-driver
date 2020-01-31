@@ -1,7 +1,7 @@
-name: vnfm-driver
+name: sol003-lifecycle-driver
 version: #project.version#
 apiVersion: v1
-description: A Helm chart for the VNFM Driver
+description: A Helm chart for the SOL003 VNFM Driver
 maintainers:
 - name: Accanto Systems
   email: containers@accantosystems.com

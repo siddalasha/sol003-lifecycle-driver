@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vnfm-driver
+  name: sol003-lifecycle-driver
 data:
 {{- if .Values.app.config.env }}
 {{ toYaml .Values.app.config.env | indent 2 }}
@@ -35,9 +35,9 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: vnfm-driver
+  name: sol003-lifecycle-driver
   labels:
-    app: vnfm-driver
+    app: sol003-lifecycle-driver
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -49,12 +49,12 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: vnfm-driver
+    app: sol003-lifecycle-driver
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: vnfm-driver
+  name: sol003-lifecycle-driver
 spec:
   replicas: {{ .Values.app.numReplicas }}
   strategy:
@@ -65,7 +65,7 @@ spec:
   template:
     metadata:
       labels:
-        app: vnfm-driver
+        app: sol003-lifecycle-driver
         part-of: lm
     spec:
 {{- if .Values.app.affinity }}
@@ -77,7 +77,7 @@ spec:
 {{ toYaml .Values.app.tolerations | indent 8 }}
 {{- end }}
       containers:
-        - name: vnfm-driver
+        - name: sol003-lifecycle-driver
 {{- if .Values.global.docker.registryEnabled }}
           image: {{ .Values.global.docker.registryIp }}:{{ .Values.global.docker.registryPort }}/{{ .Values.docker.image }}:{{ .Values.docker.version }}
           imagePullPolicy: {{ .Values.global.docker.imagePullPolicy }}
@@ -106,6 +106,6 @@ spec:
             periodSeconds: {{ .Values.app.readinessProbe.periodSeconds }}
           envFrom:
           - configMapRef:
-              name: vnfm-driver
+              name: sol003-lifecycle-driver
           resources:
 {{ toYaml .Values.app.resources | indent 12 }}

@@ -12,7 +12,7 @@
 
     <!-- Must be duplicated for versions:set plugin to work in builds -->
     <groupId>com.accantosystems.stratoss</groupId>
-    <artifactId>vnfm-driver</artifactId>
+    <artifactId>sol003-lifecycle-driver</artifactId>
     <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -24,7 +24,7 @@
     </organization>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/accanto-systems/vnfm-driver</developerConnection>
+        <developerConnection>scm:git:https://github.com/accanto-systems/sol003-lifecycle-driver</developerConnection>
     </scm>
 
     <properties>

@@ -64,7 +64,7 @@ curl -X POST \
   https://vnfm-address:port/vnflcm/v1/subscriptions \
   -H 'Content-Type: application/json' \
   -d '{
-    "callbackUri" : "http://vnfm-driver:8296/vnflcm/v1/notifications",
+    "callbackUri" : "http://sol003-lifecycle-driver:8296/vnflcm/v1/notifications",
     "filter" : {
       "notificationTypes" : [ "VnfLcmOperationOccurrenceNotification" ],
       "operationStates" : [ "COMPLETED", "FAILED", "FAILED_TEMP", "ROLLED_BACK" ]

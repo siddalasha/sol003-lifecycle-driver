@@ -23,7 +23,7 @@ global:
 ## Docker
 docker:
   ## Name of the Docker Image
-  image: accanto/vnfm-driver
+  image: accanto/sol003-lifecycle-driver
   ## Tagged version of the Docker Image
   version: #project.version#
   ## Pull policy on the Docker Image (when global.docker.registryEnabled is false)
@@ -76,7 +76,7 @@ app:
             - key: app
               operator: In
               values:
-              - vnfm-driver
+              - sol003-lifecycle-driver
     ## Example of node affinity rule to require this pod is only scheduled on a Node with a label (key=value) of "Stateless=True"
     #nodeAffinity:
     #  requiredDuringSchedulingIgnoredDuringExecution:

@@ -4,5 +4,5 @@ FROM ${JDK_IMAGE}:${JDK_VERSION}
 ENV JVM_OPTIONS=-Xmx256m
 COPY *.sh /data/
 RUN chmod +x /data/*.sh && mkdir /var/lm
-COPY vnfm-driver-@project.version@.jar /data/vnfm-driver-@project.version@.jar
+COPY sol003-lifecycle-driver-@project.version@.jar /data/sol003-lifecycle-driver-@project.version@.jar
 CMD sh /data/commands.sh

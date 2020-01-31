@@ -8,7 +8,7 @@ Prior to installing the driver, it may be necessary to configure the source for 
 Download the Helm chart for the required version of the VNFM Driver. Run the following command to install the Helm chart with the default values:
 
 ```bash
-helm install vnfm-driver-<version>.tgz --name vnfm-driver
+helm install sol003-lifecycle-driver-<version>.tgz --name sol003-lifecycle-driver
 ```
 
 ## Onboarding Driver into LM
@@ -18,7 +18,7 @@ Use lmctl for onboard the driver into LM. For full details on how to install or 
 The following command will onboard the VNFM Driver into an LM environment called 'dev01':
 
 ```bash
-lmctl lifecycledriver add --type sol003 --url http://vnfm-driver:8296 dev01
+lmctl lifecycledriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
 ```
 
 **NOTES**:
