@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -25,7 +26,9 @@ public class KafkaConfiguration {
     @ConditionalOnProperty(value = "vnfmdriver.kafka.enabled", matchIfMissing = true)
     @EnableKafka
     public static class KafkaConfigurationEnabled {
+
         @Bean
+        @Primary
         public ExternalMessagingService getKafkaEMS(VNFMDriverProperties properties, KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
             logger.info("Creating Kafka EMS Bus Connector");
             return new KafkaExternalMessagingServiceImpl(properties, kafkaTemplate, objectMapper);
