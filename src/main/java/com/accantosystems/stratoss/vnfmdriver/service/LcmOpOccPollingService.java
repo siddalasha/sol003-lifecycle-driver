@@ -52,13 +52,14 @@ public class LcmOpOccPollingService {
                 // Send back Async response to Brent
                 final ExecutionAsyncResponse executionResponse;
                 if (vnfLcmOpOcc.getOperationState() == LcmOperationStateType.COMPLETED) {
-                    executionResponse = new ExecutionAsyncResponse(lcmOpOccPollingRequest.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap());
+                    executionResponse = new ExecutionAsyncResponse(lcmOpOccPollingRequest.getVnfLcmOpOccId(), ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap());
                 } else {
                     executionResponse = new ExecutionAsyncResponse(lcmOpOccPollingRequest.getVnfLcmOpOccId(),
                                                                    ExecutionStatus.FAILED,
                                                                    new FailureDetails(FailureDetails.FailureCode.INFRASTRUCTURE_ERROR, vnfLcmOpOcc.getError().getDetail()),
-                                                                   Collections.emptyMap());
+                                                                   Collections.emptyMap(),Collections.emptyMap());
                 }
+                executionResponse.setTimestamp(System.currentTimeMillis());
                 externalMessagingService.sendExecutionAsyncResponse(executionResponse);
             } else {
                 // Keep waiting and re-enqueue polling request

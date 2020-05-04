@@ -12,12 +12,14 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel
 public class ResourceManagerDeploymentLocation {
 
+    @ApiModelProperty(example = "brent", value = "Name of the resource manager")
+    private String resourceManager;
     @ApiModelProperty(position = 1, example = "dev-cloud", value = "Name of the deployment location")
     private String name;
     @ApiModelProperty(position = 2, example = "default-rm::Cloud", value = "Type identifier for the deployment location")
     private String type;
     @ApiModelProperty(position = 3, example = "", value = "Properties required to gain access to the deployment location VIM", required = true)
-    private Map<String, String> properties = new HashMap<>();
+    private Map<String, Object> properties = new HashMap<>();
 
     public ResourceManagerDeploymentLocation() {
         super();
@@ -27,6 +29,21 @@ public class ResourceManagerDeploymentLocation {
         super();
         this.name = name;
         this.type = type;
+    }
+
+    public ResourceManagerDeploymentLocation(String name, String type, String resourceManager) {
+        super();
+        this.name = name;
+        this.type = type;
+        this.resourceManager = resourceManager;
+    }
+
+    public String getResourceManager() {
+        return resourceManager;
+    }
+
+    public void setResourceManager(String resourceManager) {
+        this.resourceManager = resourceManager;
     }
 
     public String getName() {
@@ -45,17 +62,18 @@ public class ResourceManagerDeploymentLocation {
         this.type = type;
     }
 
-    public Map<String, String> getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 
     @Override
     public String toString() {
-        return "ResourceManagerDeploymentLocation [name=" + name + ", type=" + type + ", infrastructureSpecificProperties=" + properties.toString() + "]";
+        return "ResourceManagerDeploymentLocation [resourceManager=" + resourceManager + ", name=" + name + ", type=" + type + ", infrastructureSpecificProperties=" + properties.toString()
+                + "]";
     }
 
 }

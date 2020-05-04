@@ -1,8 +1,10 @@
 package com.accantosystems.stratoss.vnfmdriver.service;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
-import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
-import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAsyncResponse;
-import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
-import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionStatus;
 
 @Service("LifecycleManagementService")
 public class LifecycleManagementService {
@@ -48,55 +46,55 @@ public class LifecycleManagementService {
 
                 final String requestId = UUID.randomUUID().toString();
                 // Delay sending the asynchronous response (from a different thread) as this method needs to complete first (to send the response back to Brent)
-                externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs), properties.getExecutionResponseDelay());
+                externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs, Collections.emptyMap()), properties.getExecutionResponseDelay());
 
                 // Send response back to ALM
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Configure".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Instantiate
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String instantiateVnfRequest = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.instantiateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, instantiateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Start".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Operate (Start)
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String operateVnfRequest = messageConversionService.generateMessageFromRequest("OperateVnfRequest-Start", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.operateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, operateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Stop".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Operate (Stop)
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String operateVnfRequest = messageConversionService.generateMessageFromRequest("OperateVnfRequest-Stop", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.operateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, operateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Uninstall".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Terminate
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String terminateVnfRequest = messageConversionService.generateMessageFromRequest("TerminateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.terminateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, terminateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Scale".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Scale
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("ScaleOut".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Scale Out
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("ScaleIn".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Scale In
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Heal".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Heal
-                final String vnfInstanceId = executionRequest.getProperties().get("vnfInstanceId");
+                final String vnfInstanceId = getStringRequestProperty(executionRequest, "vnfInstanceId");
                 final String healVnfRequest = messageConversionService.generateMessageFromRequest("HealVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.healVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, healVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
@@ -107,6 +105,16 @@ public class LifecycleManagementService {
             logger.error("Error converting message", e);
             throw e;
         }
+    }
+
+    private String getStringRequestProperty(ExecutionRequest executionRequest, String propertyName) throws MessageConversionException {
+        PropertyValue propertyValue = executionRequest.getRequestProperties().get(propertyName);
+        if(propertyValue != null && propertyValue instanceof StringPropertyValue) {
+            return ((StringPropertyValue) propertyValue).getValue();
+        } else {
+            throw new MessageConversionException(String.format("Unable to find StringPropertyValue for property %s", propertyName));
+        }
+
     }
 
 }

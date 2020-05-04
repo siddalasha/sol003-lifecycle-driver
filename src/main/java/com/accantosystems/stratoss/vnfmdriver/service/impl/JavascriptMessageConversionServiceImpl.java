@@ -10,6 +10,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import org.apache.commons.io.IOUtils;
 import org.etsi.ifa011.VnfDescriptor;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
     @Override public String generateMessageFromRequest(final String messageType, final ExecutionRequest executionRequest) throws MessageConversionException {
         final String script = getScriptFromExecutionRequest(executionRequest, messageType);
-        final String vnfdString = FileUtils.getFileFromLifecycleScripts(executionRequest.getLifecycleScripts(), "vnfd.yaml");
+        final String vnfdString = FileUtils.getFileFromLifecycleScripts(executionRequest.getDriverFiles(), "vnfd.yaml");
         final ScriptEngine scriptEngine = getScriptEngine();
 
         try {
@@ -97,11 +98,11 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
     private String getScriptFromExecutionRequest(final ExecutionRequest executionRequest, final String scriptName) {
         final String fullScriptName = scriptName + ".js";
 
-        String scriptContents = FileUtils.getFileFromLifecycleScripts(executionRequest.getLifecycleScripts(), SCRIPTS_PATH + fullScriptName);
+        String scriptContents = FileUtils.getFileFromLifecycleScripts(executionRequest.getDriverFiles(), SCRIPTS_PATH + fullScriptName);
 
         if (scriptContents == null) {
             // If we can't find it in the zip file, try searching in out default locations
-            final String interfaceVersion = executionRequest.getProperties().getOrDefault("interfaceVersion", DEFAULT_ETSI_SOL003_VERSION);
+            String interfaceVersion = ((StringPropertyValue)executionRequest.getRequestProperties().getOrDefault("interfaceVersion", new StringPropertyValue(DEFAULT_ETSI_SOL003_VERSION))).getValue();
             try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/" + SCRIPTS_PATH + interfaceVersion + "/" + fullScriptName)) {
                 if (inputStream != null) {
                     scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());

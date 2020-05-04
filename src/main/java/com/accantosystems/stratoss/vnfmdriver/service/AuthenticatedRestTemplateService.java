@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +57,11 @@ public class AuthenticatedRestTemplateService {
                                 .ifPresent(cachedRestTemplatesByDLs::remove);
 
         // Check there's a URL defined
-        checkProperty(deploymentLocation.getProperties(), VNFM_SERVER_URL);
+        Map<String,String> authenticationProperties = deploymentLocation.getProperties().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
+        checkProperty(authenticationProperties, VNFM_SERVER_URL);
 
-        final RestTemplate restTemplate = getRestTemplate(deploymentLocation.getProperties());
+        final RestTemplate restTemplate = getRestTemplate(authenticationProperties);
         cachedRestTemplatesByDLs.put(deploymentLocation, restTemplate);
         return restTemplate;
     }

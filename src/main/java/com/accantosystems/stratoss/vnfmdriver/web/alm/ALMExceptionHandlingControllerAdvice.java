@@ -3,6 +3,7 @@ package com.accantosystems.stratoss.vnfmdriver.web.alm;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 
+import org.etsi.sol003.common.ProblemDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,13 @@ public class ALMExceptionHandlingControllerAdvice {
     @ResponseBody
     protected ErrorInfo handleHttpRequestMethodNotSupportedException(HttpServletRequest req, HttpRequestMethodNotSupportedException cause) {
         return defaultHandle("Invalid method used in request", req, cause);
+    }
+
+    @ExceptionHandler(NotImplementedException.class)
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseBody
+    protected ErrorInfo handleNotImplementedException(HttpServletRequest req, NotImplementedException cause) {
+        return defaultHandle("Method not yet implemented", req, cause);
     }
 
     @ExceptionHandler(SOL003ResponseException.class)

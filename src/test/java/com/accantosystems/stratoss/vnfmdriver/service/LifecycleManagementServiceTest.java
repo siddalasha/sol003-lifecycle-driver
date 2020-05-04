@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import org.junit.Test;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
@@ -32,14 +33,14 @@ public class LifecycleManagementServiceTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getProperties().put("vnfdId", "fa2343af-2a81-4e84-a667-e40662e5ed93");
-        executionRequest.getProperties().put("vnfInstanceName", "CSCF-1");
-        executionRequest.getProperties().put("additionalParams.vnfPkgId", "316aa140-c99a-4a08-b8f5-8e2cb73c83e8");
-        executionRequest.getProperties().put("additionalParams.testProperty", "TestValue");
+        executionRequest.getRequestProperties().put("vnfdId", new StringPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
+        executionRequest.getRequestProperties().put("vnfInstanceName", new StringPropertyValue("CSCF-1"));
+        executionRequest.getRequestProperties().put("additionalParams.vnfPkgId", new StringPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
+        executionRequest.getRequestProperties().put("additionalParams.testProperty", new StringPropertyValue("TestValue"));
         // These properties should be ignored
-        executionRequest.getProperties().put("property1", "value1");
-        executionRequest.getProperties().put("property2", "value2");
-        executionRequest.getProperties().put("property3", "value3");
+        executionRequest.getRequestProperties().put("property1", new StringPropertyValue("value1"));
+        executionRequest.getRequestProperties().put("property2", new StringPropertyValue("value2"));
+        executionRequest.getRequestProperties().put("property3", new StringPropertyValue("value3"));
 
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
 
