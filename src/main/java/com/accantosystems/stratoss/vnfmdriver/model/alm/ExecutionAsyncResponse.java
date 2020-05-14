@@ -21,6 +21,8 @@ public class ExecutionAsyncResponse {
     private FailureDetails failureDetails;
     @ApiModelProperty(value = "Outputs")
     private Map<String, String> outputs;
+    @ApiModelProperty(value = "Timestamp")
+    private Long timestamp;
 
     public ExecutionAsyncResponse() {}
 
@@ -58,6 +60,10 @@ public class ExecutionAsyncResponse {
     public void setOutputs(Map<String, String> outputs) {
         this.outputs = outputs;
     }
+
+    public Long getTimestamp() { return timestamp; }
+
+    public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
 
     @Override
     public String toString() {

@@ -2,6 +2,7 @@ package com.accantosystems.stratoss.vnfmdriver.model.alm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,16 +20,16 @@ public class ExecutionRequest {
     @ApiModelProperty(value = "Lifecycle Scripts")
     private String lifecycleScripts;
     @ApiModelProperty(value = "System Properties")
-    private Map<String, String> systemProperties = new HashMap<>();
+    private Map<String, PropertyValue> systemProperties = new HashMap<>();
     @ApiModelProperty(value = "Properties")
-    private Map<String, String> properties = new HashMap<>();
+    private Map<String, PropertyValue> properties = new HashMap<>();
     @ApiModelProperty(value = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
 
     public ExecutionRequest() {}
 
-    public ExecutionRequest(String lifecycleName, String lifecycleScripts, Map<String, String> systemProperties,
-                            Map<String, String> properties, ResourceManagerDeploymentLocation deploymentLocation) {
+    public ExecutionRequest(String lifecycleName, String lifecycleScripts, Map<String, PropertyValue> systemProperties,
+                            Map<String, PropertyValue> properties, ResourceManagerDeploymentLocation deploymentLocation) {
         this.lifecycleName = lifecycleName;
         this.lifecycleScripts = lifecycleScripts;
         this.systemProperties = systemProperties;
@@ -52,12 +53,22 @@ public class ExecutionRequest {
         this.lifecycleScripts = lifecycleScripts;
     }
 
-    public Map<String, String> getSystemProperties() {
+    public Map<String, PropertyValue> getSystemProperties() {
         return systemProperties;
     }
 
-    public Map<String, String> getProperties() {
+    public Map<String, PropertyValue> getPropertiesAsPropertyValues() {
         return properties;
+    }
+
+    /**
+     * Legacy support for getProperties method which may be referenced in Javascript libraries. Will return a filtered version of properties with String values instead of PropertyValue values
+     *
+     * @return map containing property values as simple String types
+     */
+    public Map<String, String> getProperties() {
+        return properties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
+                                .collect(Collectors.toMap(Map.Entry::getKey, e -> ((StringPropertyValue) e.getValue()).getValue()));
     }
 
     public ResourceManagerDeploymentLocation getDeploymentLocation() {
