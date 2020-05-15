@@ -102,7 +102,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
         if (scriptContents == null) {
             // If we can't find it in the zip file, try searching in out default locations
-            String interfaceVersion = ((StringPropertyValue)executionRequest.getRequestProperties().getOrDefault("interfaceVersion", new StringPropertyValue(DEFAULT_ETSI_SOL003_VERSION))).getValue();
+            String interfaceVersion = ((StringPropertyValue)executionRequest.getResourceProperties().getOrDefault("interfaceVersion", new StringPropertyValue(DEFAULT_ETSI_SOL003_VERSION))).getValue();
             try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/" + SCRIPTS_PATH + interfaceVersion + "/" + fullScriptName)) {
                 if (inputStream != null) {
                     scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());

@@ -29,7 +29,7 @@ public class JavascriptMessageConversionServiceImplTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Configure");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getRequestProperties().put("description", new StringPropertyValue("testing testing 123"));
+        executionRequest.getResourceProperties().put("description", new StringPropertyValue("testing testing 123"));
         executionRequest.setDriverFiles(loadZipIntoBase64String("examples/lifecyclescripts.zip"));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
@@ -43,8 +43,8 @@ public class JavascriptMessageConversionServiceImplTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Configure");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getRequestProperties().put("description", new StringPropertyValue("testing testing 123"));
-        executionRequest.getRequestProperties().put("interfaceVersion", new StringPropertyValue("2.5.1"));
+        executionRequest.getResourceProperties().put("description", new StringPropertyValue("testing testing 123"));
+        executionRequest.getResourceProperties().put("interfaceVersion", new StringPropertyValue("2.5.1"));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final String message = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
@@ -57,9 +57,9 @@ public class JavascriptMessageConversionServiceImplTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getRequestProperties().put("vnfdId", new StringPropertyValue("xyz-xyz-xyz-xyz"));
-        executionRequest.getRequestProperties().put("vnfInstanceName", new StringPropertyValue("Install"));
-        executionRequest.getRequestProperties().put("vnfInstanceDescription", new StringPropertyValue("testing testing 123"));
+        executionRequest.getResourceProperties().put("vnfdId", new StringPropertyValue("xyz-xyz-xyz-xyz"));
+        executionRequest.getResourceProperties().put("vnfInstanceName", new StringPropertyValue("Install"));
+        executionRequest.getResourceProperties().put("vnfInstanceDescription", new StringPropertyValue("testing testing 123"));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final String message = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
@@ -81,47 +81,47 @@ public class JavascriptMessageConversionServiceImplTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Configure");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getRequestProperties().put("vnfdId", new StringPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
-        executionRequest.getRequestProperties().put("vnfInstanceId", new StringPropertyValue("0000-0002-0000-0001"));
-        executionRequest.getRequestProperties().put("vnfInstanceName", new StringPropertyValue("HelloWorld1"));
-        executionRequest.getRequestProperties().put("vnfPkgId", new StringPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
-        executionRequest.getRequestProperties().put("vnfProvider", new StringPropertyValue("ACME"));
-        executionRequest.getRequestProperties().put("vnfProductName", new StringPropertyValue("ACME-Product"));
-        executionRequest.getRequestProperties().put("vnfSoftwareVersion", new StringPropertyValue("1.0"));
-        executionRequest.getRequestProperties().put("vnfdVersion", new StringPropertyValue("1.0"));
+        executionRequest.getResourceProperties().put("vnfdId", new StringPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
+        executionRequest.getResourceProperties().put("vnfInstanceId", new StringPropertyValue("0000-0002-0000-0001"));
+        executionRequest.getResourceProperties().put("vnfInstanceName", new StringPropertyValue("HelloWorld1"));
+        executionRequest.getResourceProperties().put("vnfPkgId", new StringPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
+        executionRequest.getResourceProperties().put("vnfProvider", new StringPropertyValue("ACME"));
+        executionRequest.getResourceProperties().put("vnfProductName", new StringPropertyValue("ACME-Product"));
+        executionRequest.getResourceProperties().put("vnfSoftwareVersion", new StringPropertyValue("1.0"));
+        executionRequest.getResourceProperties().put("vnfdVersion", new StringPropertyValue("1.0"));
 
-        executionRequest.getRequestProperties().put("flavourId", new StringPropertyValue("Chocolate"));
-        executionRequest.getRequestProperties().put("instantiationLevelId", new StringPropertyValue("1"));
+        executionRequest.getResourceProperties().put("flavourId", new StringPropertyValue("Chocolate"));
+        executionRequest.getResourceProperties().put("instantiationLevelId", new StringPropertyValue("1"));
 
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.id", new StringPropertyValue("45672c22-7c12-49ed-8a4f-e4532b3026fb"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.vimConnectionId", new StringPropertyValue("f03a29d5-1fc6-11e9-83ea-fa163e045578"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.resourceId", new StringPropertyValue("45672c22-5r54-49ed-8a4f-e4532b3026fb"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.id", new StringPropertyValue("45672c22-7c12-49ed-8a4f-e4532b3026fb"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.vimConnectionId", new StringPropertyValue("f03a29d5-1fc6-11e9-83ea-fa163e045578"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.resourceId", new StringPropertyValue("45672c22-5r54-49ed-8a4f-e4532b3026fb"));
 
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpdId", new StringPropertyValue("SERVICES_ExtCp"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpInstanceId", new StringPropertyValue("cpInstanceId111"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.linkPortId", new StringPropertyValue("linkPortId222"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.layerProtocol", new StringPropertyValue("IP_OVER_ETHERNET"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.macAddress", new StringPropertyValue("fa:16:3e:23:fd:d7"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.type", new StringPropertyValue("IPV4"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.fixedAddresses.0", new StringPropertyValue("131.160.162.32"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.numDynamicAddresses", new StringPropertyValue("1"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.addressRange.minAddress", new StringPropertyValue("131.160.162.32"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.addressRange.maxAddress", new StringPropertyValue("131.160.162.36"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.subnetId", new StringPropertyValue(""));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpdId", new StringPropertyValue("SERVICES_ExtCp"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpInstanceId", new StringPropertyValue("cpInstanceId111"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.linkPortId", new StringPropertyValue("linkPortId222"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.layerProtocol", new StringPropertyValue("IP_OVER_ETHERNET"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.macAddress", new StringPropertyValue("fa:16:3e:23:fd:d7"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.type", new StringPropertyValue("IPV4"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.fixedAddresses.0", new StringPropertyValue("131.160.162.32"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.numDynamicAddresses", new StringPropertyValue("1"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.addressRange.minAddress", new StringPropertyValue("131.160.162.32"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.addressRange.maxAddress", new StringPropertyValue("131.160.162.36"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extCps.0.cpConfig.0.cpProtocolData.0.ipOverEthernet.ipAddresses.0.subnetId", new StringPropertyValue(""));
 
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extLinkPorts.0.id", new StringPropertyValue("id"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.vimConnectionId", new StringPropertyValue("47772c22-7c12-49ed-8a4f-e7625b3026fb"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.resourceProviderId", new StringPropertyValue(""));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.resourceId", new StringPropertyValue("45672c22-5r54-49ed-8a4f-e4532b3026fb"));
-        executionRequest.getRequestProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.vimLevelResourceType", new StringPropertyValue(""));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extLinkPorts.0.id", new StringPropertyValue("id"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.vimConnectionId", new StringPropertyValue("47772c22-7c12-49ed-8a4f-e7625b3026fb"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.resourceProviderId", new StringPropertyValue(""));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.resourceId", new StringPropertyValue("45672c22-5r54-49ed-8a4f-e4532b3026fb"));
+        executionRequest.getResourceProperties().put("extVirtualLinks.0.extLinkPorts.0.resourceHandle.vimLevelResourceType", new StringPropertyValue(""));
 
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.id", new StringPropertyValue("4408b119-eb54-11e7-bae0-fa163eb90b5c"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.vimId", new StringPropertyValue("vim1"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.vimType", new StringPropertyValue("Openstack"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.interfaceInfo.identityEndPoint", new StringPropertyValue("https://openstack:5000/v2.0"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.accessInfo.projectId", new StringPropertyValue("cab32f669c18404d8bed0fae6bf088aa"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.accessInfo.credentials.username", new StringPropertyValue("dummy"));
-        executionRequest.getRequestProperties().put("vimConnectionInfo.0.accessInfo.credentials.password", new StringPropertyValue("RXJpY3Nzb24uLjYyNA=="));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.id", new StringPropertyValue("4408b119-eb54-11e7-bae0-fa163eb90b5c"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.vimId", new StringPropertyValue("vim1"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.vimType", new StringPropertyValue("Openstack"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.interfaceInfo.identityEndPoint", new StringPropertyValue("https://openstack:5000/v2.0"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.accessInfo.projectId", new StringPropertyValue("cab32f669c18404d8bed0fae6bf088aa"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.accessInfo.credentials.username", new StringPropertyValue("dummy"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.accessInfo.credentials.password", new StringPropertyValue("RXJpY3Nzb24uLjYyNA=="));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final String message = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);

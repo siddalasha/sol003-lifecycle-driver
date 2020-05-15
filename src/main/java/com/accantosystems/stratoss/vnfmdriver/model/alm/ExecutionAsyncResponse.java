@@ -42,14 +42,6 @@ public class ExecutionAsyncResponse {
         }
     }
 
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getRequestId() {
         return requestId;
     }

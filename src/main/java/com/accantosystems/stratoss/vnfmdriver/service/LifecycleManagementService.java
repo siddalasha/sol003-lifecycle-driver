@@ -108,7 +108,7 @@ public class LifecycleManagementService {
     }
 
     private String getStringRequestProperty(ExecutionRequest executionRequest, String propertyName) throws MessageConversionException {
-        PropertyValue propertyValue = executionRequest.getRequestProperties().get(propertyName);
+        PropertyValue propertyValue = executionRequest.getResourceProperties().get(propertyName);
         if(propertyValue != null && propertyValue instanceof StringPropertyValue) {
             return ((StringPropertyValue) propertyValue).getValue();
         } else {
