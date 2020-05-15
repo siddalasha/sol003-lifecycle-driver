@@ -14,6 +14,7 @@ import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import com.accantosystems.stratoss.vnfmdriver.service.impl.JavascriptMessageConversionServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

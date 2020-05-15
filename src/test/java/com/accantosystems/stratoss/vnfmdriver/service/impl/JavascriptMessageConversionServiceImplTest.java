@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.springframework.boot.test.json.JsonContent;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

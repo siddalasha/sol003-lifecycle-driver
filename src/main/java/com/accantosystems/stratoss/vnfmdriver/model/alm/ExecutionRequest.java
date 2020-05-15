@@ -100,6 +100,18 @@ public class ExecutionRequest {
 
     public void setAssociatedTopology(Map<String, InternalResourceInstance> associatedTopology) {
         this.associatedTopology.putAll(associatedTopology);
+    public Map<String, PropertyValue> getPropertiesAsPropertyValues() {
+        return properties;
+    }
+
+    /**
+     * Legacy support for getProperties method which may be referenced in Javascript libraries. Will return a filtered version of properties with String values instead of PropertyValue values
+     *
+     * @return map containing property values as simple String types
+     */
+    public Map<String, String> getProperties() {
+        return properties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
+                                .collect(Collectors.toMap(Map.Entry::getKey, e -> ((StringPropertyValue) e.getValue()).getValue()));
     }
 
     public ResourceManagerDeploymentLocation getDeploymentLocation() {
