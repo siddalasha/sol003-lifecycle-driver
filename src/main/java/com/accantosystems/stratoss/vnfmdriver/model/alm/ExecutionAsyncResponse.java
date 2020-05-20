@@ -21,7 +21,7 @@ public class ExecutionAsyncResponse {
     @ApiModelProperty(value = "Failure Details")
     private FailureDetails failureDetails;
     @ApiModelProperty(value = "Outputs")
-    private Map<String, String> outputs = new HashMap<>();
+    private final Map<String, String> outputs = new HashMap<>();
     @ApiModelProperty(value = "Associated Resource Instance Topology")
     private final Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
     @ApiModelProperty(value = "Timestamp")
