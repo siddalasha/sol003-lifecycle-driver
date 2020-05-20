@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -17,24 +18,31 @@ public class ExecutionRequest {
 
     @ApiModelProperty(value = "Lifecycle Name")
     private String lifecycleName;
-    @ApiModelProperty(value = "Lifecycle Scripts")
-    private String lifecycleScripts;
+    @ApiModelProperty(value = "Driver files")
+    private String driverFiles;
     @ApiModelProperty(value = "System Properties")
     private Map<String, PropertyValue> systemProperties = new HashMap<>();
-    @ApiModelProperty(value = "Properties")
-    private Map<String, PropertyValue> properties = new HashMap<>();
+    @ApiModelProperty(value = "Resource Properties")
+    private Map<String, PropertyValue> resourceProperties = new HashMap<>();
+    @ApiModelProperty(value = "Request Properties")
+    private Map<String, PropertyValue> requestProperties = new HashMap<>();
     @ApiModelProperty(value = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
+    @ApiModelProperty(value = "Associated Topology")
+    private Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
 
     public ExecutionRequest() {}
 
-    public ExecutionRequest(String lifecycleName, String lifecycleScripts, Map<String, PropertyValue> systemProperties,
-                            Map<String, PropertyValue> properties, ResourceManagerDeploymentLocation deploymentLocation) {
+    public ExecutionRequest(String lifecycleName, String driverFiles, Map<String, PropertyValue> systemProperties,
+                            Map<String, PropertyValue> resourceProperties, Map<String, PropertyValue> requestProperties, ResourceManagerDeploymentLocation deploymentLocation,
+                            Map<String, InternalResourceInstance> associatedTopology) {
         this.lifecycleName = lifecycleName;
-        this.lifecycleScripts = lifecycleScripts;
+        this.driverFiles = driverFiles;
         this.systemProperties = systemProperties;
-        this.properties = properties;
+        this.requestProperties = requestProperties;
+        this.resourceProperties = resourceProperties;
         this.deploymentLocation = deploymentLocation;
+        this.associatedTopology = associatedTopology;
     }
 
     public String getLifecycleName() {
@@ -45,30 +53,74 @@ public class ExecutionRequest {
         this.lifecycleName = lifecycleName;
     }
 
-    public String getLifecycleScripts() {
-        return lifecycleScripts;
+    public String getDriverFiles() {
+        return driverFiles;
     }
 
-    public void setLifecycleScripts(String lifecycleScripts) {
-        this.lifecycleScripts = lifecycleScripts;
+    public void setDriverFiles(String driverFiles) {
+        this.driverFiles = driverFiles;
     }
 
     public Map<String, PropertyValue> getSystemProperties() {
         return systemProperties;
     }
 
-    public Map<String, PropertyValue> getPropertiesAsPropertyValues() {
-        return properties;
+    public void setSystemProperties(Map<String, PropertyValue> systemProperties) {
+        this.systemProperties.putAll(systemProperties);
+    }
+
+    public Map<String, PropertyValue> getResourceProperties() {
+        return resourceProperties;
+    }
+
+    public void setResourceProperties(Map<String, PropertyValue> resourceProperties) {
+        this.resourceProperties.putAll(resourceProperties);
+    }
+
+    public Map<String, PropertyValue> getRequestProperties() {
+        return requestProperties;
+    }
+
+    public void setRequestProperties(Map<String, PropertyValue> requestProperties) {
+        this.requestProperties.putAll(requestProperties);
     }
 
     /**
-     * Legacy support for getProperties method which may be referenced in Javascript libraries. Will return a filtered version of properties with String values instead of PropertyValue values
+     * Legacy support for getProperties method which may be referenced in Javascript libraries. Will return a filtered version of the resource properties with String values instead of PropertyValue values
      *
-     * @return map containing property values as simple String types
+     * @return map containing resourceProperties values as simple String types
      */
     public Map<String, String> getProperties() {
-        return properties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
+        return resourceProperties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
                                 .collect(Collectors.toMap(Map.Entry::getKey, e -> ((StringPropertyValue) e.getValue()).getValue()));
+    }
+
+    /**
+     * Get a resource property as a simple String type if it exists
+     * @param propertyName name of property
+     * @return inner property value of the resource property
+     * @throws MessageConversionException if the property exists and is of type other than StringPropertyValue
+     */
+    public String getStringResourceProperty(String propertyName) throws MessageConversionException {
+        PropertyValue propertyValue = resourceProperties.get(propertyName);
+        if(propertyValue != null) {
+            if( propertyValue instanceof StringPropertyValue) {
+                return ((StringPropertyValue) propertyValue).getValue();
+            } else {
+                throw new MessageConversionException(String.format("Expecting requestProperty of type StringPropertyValue but found %s", propertyValue.getClass().getSimpleName()));
+            }
+        } else {
+            return null;
+        }
+
+    }
+
+    public Map<String, InternalResourceInstance> getAssociatedTopology() {
+        return associatedTopology;
+    }
+
+    public void setAssociatedTopology(Map<String, InternalResourceInstance> associatedTopology) {
+        this.associatedTopology.putAll(associatedTopology);
     }
 
     public ResourceManagerDeploymentLocation getDeploymentLocation() {
@@ -83,9 +135,11 @@ public class ExecutionRequest {
     public String toString() {
         return "ExecutionRequest{" +
                 "lifecycleName='" + lifecycleName + '\'' +
-                ", lifecycleScripts='" + lifecycleScripts + '\'' +
-                ", systemProperties=" + systemProperties +
-                ", properties=" + properties +
+                ", driverFiles='" + driverFiles + '\'' +
+                ", systemProperties=" + LogSafeProperties.getLogSafeProperties(systemProperties) +
+                ", resourceProperties=" + LogSafeProperties.getLogSafeProperties(resourceProperties) +
+                ", requestProperties=" + LogSafeProperties.getLogSafeProperties(requestProperties) +
+                ", associatedTopology=" + associatedTopology +
                 ", deploymentLocation=" + deploymentLocation +
                 '}';
     }

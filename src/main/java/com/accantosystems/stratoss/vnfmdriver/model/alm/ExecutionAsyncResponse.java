@@ -1,5 +1,6 @@
 package com.accantosystems.stratoss.vnfmdriver.model.alm;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,17 +21,25 @@ public class ExecutionAsyncResponse {
     @ApiModelProperty(value = "Failure Details")
     private FailureDetails failureDetails;
     @ApiModelProperty(value = "Outputs")
-    private Map<String, String> outputs;
+    private final Map<String, String> outputs = new HashMap<>();
+    @ApiModelProperty(value = "Associated Resource Instance Topology")
+    private final Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
     @ApiModelProperty(value = "Timestamp")
     private Long timestamp;
 
     public ExecutionAsyncResponse() {}
 
-    public ExecutionAsyncResponse(String requestId, ExecutionStatus status, FailureDetails failureDetails, Map<String, String> outputs) {
+    public ExecutionAsyncResponse(String requestId, ExecutionStatus status, FailureDetails failureDetails,
+                                  Map<String, String> outputs, Map<String, InternalResourceInstance> associatedTopology) {
         this.requestId = requestId;
         this.status = status;
         this.failureDetails = failureDetails;
-        this.outputs = outputs;
+        if (outputs != null) {
+            this.outputs.putAll(outputs);
+        }
+        if (associatedTopology != null) {
+            this.associatedTopology.putAll(associatedTopology);
+        }
     }
 
     public String getRequestId() {
@@ -58,7 +67,15 @@ public class ExecutionAsyncResponse {
     }
 
     public void setOutputs(Map<String, String> outputs) {
-        this.outputs = outputs;
+        this.outputs.putAll(outputs);
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public Map<String, InternalResourceInstance> getAssociatedTopology() {
+        return associatedTopology;
     }
 
     public Long getTimestamp() { return timestamp; }
@@ -71,7 +88,9 @@ public class ExecutionAsyncResponse {
                 "requestId='" + requestId + '\'' +
                 ", status=" + status +
                 ", failureDetails=" + failureDetails +
-                ", outputs=" + outputs +
+                ", associatedTopology=" + associatedTopology +
+                // don't print outputs (because they may contain private keys)
+                ", timestamp=" + timestamp +
                 '}';
     }
 }

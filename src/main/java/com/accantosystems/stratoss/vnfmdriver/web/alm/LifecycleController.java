@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.FindReferenceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException
 import io.swagger.annotations.ApiOperation;
 
 @RestController("LifecycleController")
-@RequestMapping("/api/lifecycle")
+@RequestMapping("/api/driver")
 public class LifecycleController {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleController.class);
@@ -35,7 +36,7 @@ public class LifecycleController {
         this.lifecycleManagementService = lifecycleManagementService;
     }
 
-    @PostMapping("/execute")
+    @PostMapping("/lifecycle/execute")
     @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest, HttpServletRequest servletRequest) throws MessageConversionException {
         try (BufferedReader messageReader = servletRequest.getReader()) {
@@ -47,6 +48,12 @@ public class LifecycleController {
         logger.info("Received request to execute a lifecycle [{}] at deployment location [{}]", executionRequest.getLifecycleName(), executionRequest.getDeploymentLocation().getName());
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
         return ResponseEntity.accepted().body(executionAcceptedResponse);
+    }
+
+    @PostMapping("/references/find")
+    @ApiOperation(value = "Execute a lifecycle against a VNFM", notes = "Initiates a lifecycle against a VNF, managed by a VNFM")
+    public ResponseEntity<ExecutionAcceptedResponse> findReference(@RequestBody FindReferenceRequest findReferenceRequest, HttpServletRequest servletRequest) throws MessageConversionException, NotImplementedException {
+        throw new NotImplementedException("Find References API is not implemented");
     }
 
 }

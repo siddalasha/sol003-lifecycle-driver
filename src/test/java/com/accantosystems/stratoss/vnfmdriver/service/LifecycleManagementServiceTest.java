@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import org.junit.Test;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
@@ -33,14 +34,14 @@ public class LifecycleManagementServiceTest {
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Install");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
-        executionRequest.getPropertiesAsPropertyValues().put("vnfdId", new StringPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
-        executionRequest.getPropertiesAsPropertyValues().put("vnfInstanceName", new StringPropertyValue("CSCF-1"));
-        executionRequest.getPropertiesAsPropertyValues().put("additionalParams.vnfPkgId", new StringPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
-        executionRequest.getPropertiesAsPropertyValues().put("additionalParams.testProperty", new StringPropertyValue("TestValue"));
+        executionRequest.getResourceProperties().put("vnfdId", new StringPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
+        executionRequest.getResourceProperties().put("vnfInstanceName", new StringPropertyValue("CSCF-1"));
+        executionRequest.getResourceProperties().put("additionalParams.vnfPkgId", new StringPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
+        executionRequest.getResourceProperties().put("additionalParams.testProperty", new StringPropertyValue("TestValue"));
         // These properties should be ignored
-        executionRequest.getPropertiesAsPropertyValues().put("property1", new StringPropertyValue("value1"));
-        executionRequest.getPropertiesAsPropertyValues().put("property2", new StringPropertyValue("value2"));
-        executionRequest.getPropertiesAsPropertyValues().put("property3", new StringPropertyValue("value3"));
+        executionRequest.getResourceProperties().put("property1", new StringPropertyValue("value1"));
+        executionRequest.getResourceProperties().put("property2", new StringPropertyValue("value2"));
+        executionRequest.getResourceProperties().put("property3", new StringPropertyValue("value3"));
 
         final ExecutionAcceptedResponse executionAcceptedResponse = lifecycleManagementService.executeLifecycle(executionRequest);
 

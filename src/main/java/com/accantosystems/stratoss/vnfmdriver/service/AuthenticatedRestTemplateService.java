@@ -58,7 +58,7 @@ public class AuthenticatedRestTemplateService {
 
         // Check there's a URL defined
         Map<String,String> authenticationProperties = deploymentLocation.getProperties().entrySet().stream()
-                                                                        .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
         checkProperty(authenticationProperties, VNFM_SERVER_URL);
 
         final RestTemplate restTemplate = getRestTemplate(authenticationProperties);
