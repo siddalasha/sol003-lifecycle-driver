@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -92,6 +93,26 @@ public class ExecutionRequest {
     public Map<String, String> getProperties() {
         return resourceProperties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
                                 .collect(Collectors.toMap(Map.Entry::getKey, e -> ((StringPropertyValue) e.getValue()).getValue()));
+    }
+
+    /**
+     * Get a resource property as a simple String type if it exists
+     * @param propertyName name of property
+     * @return inner property value of the resource property
+     * @throws MessageConversionException if the property exists and is of type other than StringPropertyValue
+     */
+    public String getStringResourceProperty(String propertyName) throws MessageConversionException {
+        PropertyValue propertyValue = resourceProperties.get(propertyName);
+        if(propertyValue != null) {
+            if( propertyValue instanceof StringPropertyValue) {
+                return ((StringPropertyValue) propertyValue).getValue();
+            } else {
+                throw new MessageConversionException(String.format("Expecting requestProperty of type StringPropertyValue but found %s", propertyValue.getClass().getSimpleName()));
+            }
+        } else {
+            return null;
+        }
+
     }
 
     public Map<String, InternalResourceInstance> getAssociatedTopology() {
