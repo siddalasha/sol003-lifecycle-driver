@@ -11,4 +11,6 @@ RUN groupadd -g 1000 -r sld \
  && chown -R sld:0 /var/lm /data
 USER sld
 COPY sol003-lifecycle-driver-@project.version@.jar /data/sol003-lifecycle-driver-@project.version@.jar
+# Set HOME variable (for OCP arbitrary user)
+ENV HOME /home/sld
 CMD sh /data/commands.sh
