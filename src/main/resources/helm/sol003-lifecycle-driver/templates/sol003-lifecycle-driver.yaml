@@ -53,12 +53,15 @@ spec:
   selector:
     app: sol003-lifecycle-driver
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sol003-lifecycle-driver
 spec:
   replicas: {{ .Values.app.numReplicas }}
+  selector:
+    matchLabels:
+      app: sol003-lifecycle-driver
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -87,9 +90,11 @@ spec:
           image: {{ .Values.docker.image }}:{{ .Values.docker.version }}
           imagePullPolicy: {{ .Values.docker.imagePullPolicy }}
 {{- end }}
+          {{- if or (not (.Capabilities.APIVersions.Has "security.openshift.io/v1")) (eq .Release.Namespace "kube-system") (ne (toString .Values.global.arbitraryUids) "true") }}
           securityContext:
-            # run as sld
+            # run as sld user (1000)
             runAsUser: 1000
+          {{- end }}
           ports:
           - containerPort: 8296
             protocol: TCP

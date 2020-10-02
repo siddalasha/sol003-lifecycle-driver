@@ -1,5 +1,10 @@
 ## Global settings used across all of the LM sub-charts
 global:
+  # While the driver pod can run within Openshift's restricted SCC, if
+  # another SCC is applied to the pod via a service account that doesn't support
+  # the correct runAsUser type (i.e. MustRunAsNonRoot), arbitraryUids can be
+  # disabled. Otherwise, the default value (true) shouldn't need to be updated.
+  arbitraryUids: true
 
   ## Global Docker
   ## Enable the use of a Docker Registry to pull the application Docker Image.
