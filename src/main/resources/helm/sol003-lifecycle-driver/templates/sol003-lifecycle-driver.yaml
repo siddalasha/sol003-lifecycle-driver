@@ -8,7 +8,7 @@ data:
 {{- end }}
   "alm_vnfmdriver_config_name": {{ .Values.app.config.rmName }}
   "spring_profiles_include": "prod,kubernetes"
-  "spring_profiles_active": {{ .Values.app.config.profiles }}
+  "spring_profiles_active": {{ .Values.app.config.profiles | toString | quote }}
   "LOG_FOLDER": "/var/lm/logs"
 {{- if .Values.app.config.packageRepositoryUrl }}
   "vnfmdriver_packageManagement_packageRepositoryUrl": {{ .Values.app.config.packageRepositoryUrl }}
