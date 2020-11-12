@@ -13,4 +13,4 @@
 spring:
   kafka:
     bootstrap-servers:
-      - foundation-kafka:9092
+      - alm-kafka:9092
