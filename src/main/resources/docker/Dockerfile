@@ -8,7 +8,9 @@ RUN groupadd -g 1000 -r sld \
  && chmod +x /data/*.sh \
  && mkdir /var/lm \
  # set group to 0 to allow arbitrary users in OCP to write to these directories
- && chown -R sld:0 /home/sld /var/lm /data
+ && chown -R sld:0 /home/sld /var/lm /data \
+ && chmod -R 775 /home/sld \
+ && chmod -R 775 /var/lm
 USER sld
 COPY sol003-lifecycle-driver-@project.version@.jar /data/sol003-lifecycle-driver-@project.version@.jar
 # Set HOME variable (for OCP arbitrary user)
