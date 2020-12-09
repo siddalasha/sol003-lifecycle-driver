@@ -21,11 +21,11 @@ public class ExecutionRequest {
     @ApiModelProperty(value = "Driver files")
     private String driverFiles;
     @ApiModelProperty(value = "System Properties")
-    private Map<String, PropertyValue> systemProperties = new HashMap<>();
+    private Map<String, ExecutionRequestPropertyValue> systemProperties = new HashMap<>();
     @ApiModelProperty(value = "Resource Properties")
-    private Map<String, PropertyValue> resourceProperties = new HashMap<>();
+    private Map<String, ExecutionRequestPropertyValue> resourceProperties = new HashMap<>();
     @ApiModelProperty(value = "Request Properties")
-    private Map<String, PropertyValue> requestProperties = new HashMap<>();
+    private Map<String, ExecutionRequestPropertyValue> requestProperties = new HashMap<>();
     @ApiModelProperty(value = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
     @ApiModelProperty(value = "Associated Topology")
@@ -33,8 +33,8 @@ public class ExecutionRequest {
 
     public ExecutionRequest() {}
 
-    public ExecutionRequest(String lifecycleName, String driverFiles, Map<String, PropertyValue> systemProperties,
-                            Map<String, PropertyValue> resourceProperties, Map<String, PropertyValue> requestProperties, ResourceManagerDeploymentLocation deploymentLocation,
+    public ExecutionRequest(String lifecycleName, String driverFiles, Map<String, ExecutionRequestPropertyValue> systemProperties,
+                            Map<String, ExecutionRequestPropertyValue> resourceProperties, Map<String, ExecutionRequestPropertyValue> requestProperties, ResourceManagerDeploymentLocation deploymentLocation,
                             Map<String, InternalResourceInstance> associatedTopology) {
         this.lifecycleName = lifecycleName;
         this.driverFiles = driverFiles;
@@ -61,27 +61,27 @@ public class ExecutionRequest {
         this.driverFiles = driverFiles;
     }
 
-    public Map<String, PropertyValue> getSystemProperties() {
+    public Map<String, ExecutionRequestPropertyValue> getSystemProperties() {
         return systemProperties;
     }
 
-    public void setSystemProperties(Map<String, PropertyValue> systemProperties) {
+    public void setSystemProperties(Map<String, ExecutionRequestPropertyValue> systemProperties) {
         this.systemProperties.putAll(systemProperties);
     }
 
-    public Map<String, PropertyValue> getResourceProperties() {
+    public Map<String, ExecutionRequestPropertyValue> getResourceProperties() {
         return resourceProperties;
     }
 
-    public void setResourceProperties(Map<String, PropertyValue> resourceProperties) {
+    public void setResourceProperties(Map<String, ExecutionRequestPropertyValue> resourceProperties) {
         this.resourceProperties.putAll(resourceProperties);
     }
 
-    public Map<String, PropertyValue> getRequestProperties() {
+    public Map<String, ExecutionRequestPropertyValue> getRequestProperties() {
         return requestProperties;
     }
 
-    public void setRequestProperties(Map<String, PropertyValue> requestProperties) {
+    public void setRequestProperties(Map<String, ExecutionRequestPropertyValue> requestProperties) {
         this.requestProperties.putAll(requestProperties);
     }
 
@@ -91,8 +91,8 @@ public class ExecutionRequest {
      * @return map containing resourceProperties values as simple String types
      */
     public Map<String, String> getProperties() {
-        return resourceProperties.entrySet().stream().filter(entry -> entry.getValue() instanceof StringPropertyValue)
-                                .collect(Collectors.toMap(Map.Entry::getKey, e -> ((StringPropertyValue) e.getValue()).getValue()));
+        return resourceProperties.entrySet().stream().filter(entry -> PropertyType.STRING.getValue().equals(entry.getValue().getType()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue().toString()));
     }
 
     /**
@@ -102,12 +102,12 @@ public class ExecutionRequest {
      * @throws MessageConversionException if the property exists and is of type other than StringPropertyValue
      */
     public String getStringResourceProperty(String propertyName) throws MessageConversionException {
-        PropertyValue propertyValue = resourceProperties.get(propertyName);
+        ExecutionRequestPropertyValue propertyValue = resourceProperties.get(propertyName);
         if(propertyValue != null) {
-            if( propertyValue instanceof StringPropertyValue) {
-                return ((StringPropertyValue) propertyValue).getValue();
+            if( PropertyType.STRING.getValue().equals(propertyValue.getType()) ) {
+                return (String) propertyValue.getValue();
             } else {
-                throw new MessageConversionException(String.format("Expecting requestProperty of type StringPropertyValue but found %s", propertyValue.getClass().getSimpleName()));
+                throw new MessageConversionException(String.format("Expecting requestProperty of type %s but found %s", PropertyType.STRING.getValue(), propertyValue.getType()));
             }
         } else {
             return null;

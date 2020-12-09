@@ -8,15 +8,17 @@ public class LogSafeProperties {
 
     public static final String OBFUSCATED_VALUE = "######";
 
-    public static Map<String, String> getLogSafeProperties(final Map<String, PropertyValue> properties) {
+    public static Map<String, String> getLogSafeProperties(
+            final Map<String, ? extends ExecutionRequestPropertyValue> properties) {
         return properties != null ? properties.entrySet().stream()
-                                              .map(entry -> {
-                                                  if (entry.getValue().getType() == PropertyType.KEY) {
-                                                      final KeyPropertyValue keyPropertyValue = (KeyPropertyValue) entry.getValue();
-                                                      keyPropertyValue.setPrivateKey(OBFUSCATED_VALUE);
-                                                  }
-                                                  return new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().toString());
-                                              })
-                                              .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null;
+             .map(entry -> {
+                    ExecutionRequestPropertyValue value = entry.getValue();
+                    if (PropertyType.KEY.getValue().equals(value.getType())) {
+                        final KeyExecutionRequestPropertyValue keyPropertyValue = (KeyExecutionRequestPropertyValue) value;
+                        value = new KeyExecutionRequestPropertyValue(keyPropertyValue.getKeyName(), LogSafeProperties.OBFUSCATED_VALUE, keyPropertyValue.getPublicKey());
+                    }
+                    return new AbstractMap.SimpleEntry<>(entry.getKey(), value.toString());
+             })
+             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null;
     }
 }
