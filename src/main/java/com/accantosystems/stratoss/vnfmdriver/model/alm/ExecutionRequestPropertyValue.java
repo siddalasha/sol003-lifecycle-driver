@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public abstract class ExecutionRequestPropertyValue {
 
     // Currently the main use of this is to indicate to a Driver that this property
-    // should be treated as a Key (see KeyPropertyValue)
+    // should be treated as a Key (see KeyExecutionRequestPropertyValue)
     private String type;
 
     private Object value;
