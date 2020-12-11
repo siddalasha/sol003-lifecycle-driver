@@ -56,6 +56,7 @@ function _flattenPropertyArray(returnMap, array, prefix) {
     }
 }
 
+// ensure Java types are supported (e.g. in JSON.stringify calls) by converting to JSON types
 function handleJavaPropertyTypes(propertyValue) {
     if(propertyValue instanceof java.util.Map) {
         var JSONObject = Java.type('org.json.JSONObject')
@@ -66,7 +67,6 @@ function handleJavaPropertyTypes(propertyValue) {
         return JSON.parse(new JSONArray(propertyValue).toString())
     }
     if(propertyValue instanceof java.time.OffsetDateTime) {
-        var JSONObject = Java.type('org.json.JSONObject')
         return propertyValue.toString()
     }
     return propertyValue;
