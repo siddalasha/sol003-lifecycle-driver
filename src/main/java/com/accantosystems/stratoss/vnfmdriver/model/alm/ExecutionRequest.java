@@ -91,8 +91,9 @@ public class ExecutionRequest {
      * @return map containing resourceProperties values as simple String types
      */
     public Map<String, String> getProperties() {
-        return resourceProperties.entrySet().stream().filter(entry -> PropertyType.STRING.getValue().equals(entry.getValue().getType()))
-                                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue().toString()));
+    public Map<String, Object> getProperties() {
+        return resourceProperties.entrySet().stream().filter(entry -> !PropertyType.KEY.getValue().equals(entry.getValue().getType()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
     }
 
     /**

@@ -1,9 +1,11 @@
 package com.accantosystems.stratoss.vnfmdriver.service.impl;
 
-import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.TEST_DL_NO_AUTH;
-import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.loadZipIntoBase64String;
+import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.OffsetDateTime;
+import java.util.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,8 +13,11 @@ import org.springframework.boot.test.json.JsonContent;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.GenericExecutionRequestPropertyValue;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.PropertyType;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class JavascriptMessageConversionServiceImplTest {
 
@@ -20,7 +25,9 @@ public class JavascriptMessageConversionServiceImplTest {
 
     @BeforeClass
     public static void setUpClass() {
+
         objectMapper.findAndRegisterModules();
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Test
@@ -197,6 +204,94 @@ public class JavascriptMessageConversionServiceImplTest {
                                                                                                                              + "    }\n"
                                                                                                                              + "  ]\n"
                                                                                                                              + "}");
+    }
+
+    @Test
+    public void testGenerateInstantiateMessageWithComplexProperties() throws Exception {
+        final ExecutionRequest executionRequest = new ExecutionRequest();
+        executionRequest.setLifecycleName("Configure");
+        executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
+        executionRequest.getResourceProperties().put("vnfdId", new GenericExecutionRequestPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
+        executionRequest.getResourceProperties().put("vnfInstanceId", new GenericExecutionRequestPropertyValue("0000-0002-0000-0001"));
+        executionRequest.getResourceProperties().put("vnfInstanceName", new GenericExecutionRequestPropertyValue("HelloWorld1"));
+        executionRequest.getResourceProperties().put("vnfPkgId", new GenericExecutionRequestPropertyValue("316aa140-c99a-4a08-b8f5-8e2cb73c83e8"));
+        executionRequest.getResourceProperties().put("vnfProvider", new GenericExecutionRequestPropertyValue("ACME"));
+        executionRequest.getResourceProperties().put("vnfProductName", new GenericExecutionRequestPropertyValue("ACME-Product"));
+        executionRequest.getResourceProperties().put("vnfSoftwareVersion", new GenericExecutionRequestPropertyValue("1.0"));
+        executionRequest.getResourceProperties().put("vnfdVersion", new GenericExecutionRequestPropertyValue("1.0"));
+
+        executionRequest.getResourceProperties().put("flavourId", new GenericExecutionRequestPropertyValue("Chocolate"));
+        executionRequest.getResourceProperties().put("instantiationLevelId", new GenericExecutionRequestPropertyValue("1"));
+
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.stringProperty", new GenericExecutionRequestPropertyValue("stringvalue"));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.intProperty", new GenericExecutionRequestPropertyValue(12345, PropertyType.INTEGER.getValue()));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.floatProperty", new GenericExecutionRequestPropertyValue(0.12345, PropertyType.FLOAT.getValue()));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.booleanProperty", new GenericExecutionRequestPropertyValue(true, PropertyType.BOOLEAN.getValue()));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.timestampProperty", new GenericExecutionRequestPropertyValue(OffsetDateTime.parse("2020-12-03T18:37:13.367Z"), PropertyType.TIMESTAMP.getValue()));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.listProperty", new GenericExecutionRequestPropertyValue(Arrays.asList("listVal", 12345, 0.12345, true), PropertyType.LIST.getValue()));
+        Map<String, Object> propertyMap = new HashMap<>();
+        propertyMap.put("key1", "val1");
+        propertyMap.put("key2", 12345);
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.mapProperty", new GenericExecutionRequestPropertyValue(propertyMap, PropertyType.MAP.getValue()));
+
+        final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
+        final String message = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
+
+        assertThat(new JsonContent<>(JavascriptMessageConversionServiceImplTest.class, null, message)).isEqualToJson("{\n"
+                                                                                                                             + "  \"flavourId\": \"Chocolate\",\n"
+                                                                                                                             + "  \"instantiationLevelId\": \"1\",\n"
+                                                                                                                             + "  \"vimConnectionInfo\": [\n"
+                                                                                                                             + "    {\n"
+                                                                                                                             + "      \"listProperty\": [\"listVal\",12345,0.12345,true],\n"
+                                                                                                                             + "      \"booleanProperty\": true,\n"
+                                                                                                                             + "      \"mapProperty\": {\"key1\":\"val1\",\"key2\":12345},\n"
+                                                                                                                             + "      \"floatProperty\": 0.12345,\n"
+                                                                                                                             + "      \"stringProperty\": \"stringvalue\",\n"
+                                                                                                                             + "      \"timestampProperty\": \"2020-12-03T18:37:13.367Z\"\n"
+                                                                                                                             + "    }\n"
+                                                                                                                             + "  ]\n"
+                                                                                                                             + "}");
+    }
+
+    @Test
+    public void testGenerateInstantiateResponseMessageWithComplexProperties() throws Exception {
+        final ExecutionRequest executionRequest = new ExecutionRequest();
+        final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
+
+        String vnfInstance = loadFileIntoString("examples/VnfInstance.json");
+        Map<String, Object> vnfInstanceAsMap = objectMapper.readValue(vnfInstance, new TypeReference<Map<String, Object>>() {
+        });
+
+        Map extraPropertiesMap = new HashMap();
+        extraPropertiesMap.put("stringProperty", "stringvalue");
+        extraPropertiesMap.put("intProperty1", 12345);
+        extraPropertiesMap.put("floatProperty", 0.12345);
+        extraPropertiesMap.put("booleanProperty", true);
+        vnfInstanceAsMap.putAll(extraPropertiesMap);
+
+        vnfInstanceAsMap.put("timestampProperty", OffsetDateTime.parse("2020-12-03T18:37:13.367Z"));
+        vnfInstanceAsMap.put("listProperty", Arrays.asList("listVal", 12345, 0.12345, true));
+        Map<String, Object> propertyMap = new HashMap<>();
+        propertyMap.put("key1", "val1");
+        propertyMap.put("key2", 12345);
+        propertyMap.put("key3", 0.12345);
+        propertyMap.put("key4", true);
+        vnfInstanceAsMap.put("mapProperty", propertyMap);
+
+        String vnfInstanceWithExtraProps = objectMapper.writeValueAsString(vnfInstanceAsMap);
+
+        final Map<String, Object> extractedProperties = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceWithExtraProps);
+
+        assertThat(extractedProperties).containsAllEntriesOf(extraPropertiesMap);
+        assertThat(extractedProperties.get("timestampProperty")).isEqualTo("2020-12-03T18:37:13.367Z");
+        assertThat(extractedProperties.get("listProperty.0")).isEqualTo("listVal");
+        assertThat(extractedProperties.get("listProperty.1")).isEqualTo(12345);
+        assertThat(extractedProperties.get("listProperty.2")).isEqualTo(0.12345);
+        assertThat(extractedProperties.get("listProperty.3")).isEqualTo(true);
+        assertThat(extractedProperties.get("mapProperty.key1")).isEqualTo("val1");
+        assertThat(extractedProperties.get("mapProperty.key2")).isEqualTo(12345);
+        assertThat(extractedProperties.get("mapProperty.key3")).isEqualTo(0.12345);
+        assertThat(extractedProperties.get("mapProperty.key4")).isEqualTo(true);
     }
 
 }
