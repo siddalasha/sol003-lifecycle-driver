@@ -228,10 +228,12 @@ public class JavascriptMessageConversionServiceImplTest {
         executionRequest.getResourceProperties().put("vimConnectionInfo.0.floatProperty", new GenericExecutionRequestPropertyValue(0.12345, PropertyType.FLOAT.getValue()));
         executionRequest.getResourceProperties().put("vimConnectionInfo.0.booleanProperty", new GenericExecutionRequestPropertyValue(true, PropertyType.BOOLEAN.getValue()));
         executionRequest.getResourceProperties().put("vimConnectionInfo.0.timestampProperty", new GenericExecutionRequestPropertyValue(OffsetDateTime.parse("2020-12-03T18:37:13.367Z"), PropertyType.TIMESTAMP.getValue()));
-        executionRequest.getResourceProperties().put("vimConnectionInfo.0.listProperty", new GenericExecutionRequestPropertyValue(Arrays.asList("listVal", 12345, 0.12345, true), PropertyType.LIST.getValue()));
+        executionRequest.getResourceProperties().put("vimConnectionInfo.0.listProperty", new GenericExecutionRequestPropertyValue(Arrays.asList("listVal", 12345, 0.12345, true, OffsetDateTime.parse("2020-12-03T18:37:13.367Z")), PropertyType.LIST.getValue()));
         Map<String, Object> propertyMap = new HashMap<>();
         propertyMap.put("key1", "val1");
         propertyMap.put("key2", 12345);
+        propertyMap.put("key4", OffsetDateTime.parse("2020-12-03T18:37:13.367Z"));
+        propertyMap.put("key3", Arrays.asList("listVal", 12345, 0.12345, true));
         executionRequest.getResourceProperties().put("vimConnectionInfo.0.mapProperty", new GenericExecutionRequestPropertyValue(propertyMap, PropertyType.MAP.getValue()));
 
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
@@ -247,8 +249,8 @@ public class JavascriptMessageConversionServiceImplTest {
                                                                                                                              + "      \"floatProperty\": 0.12345,\n"
                                                                                                                              + "      \"booleanProperty\": true,\n"
                                                                                                                              + "      \"timestampProperty\": \"2020-12-03T18:37:13.367Z\",\n"
-                                                                                                                             + "      \"listProperty\": [\"listVal\",12345,0.12345,true],\n"
-                                                                                                                             + "      \"mapProperty\": {\"key1\":\"val1\",\"key2\":12345}\n"
+                                                                                                                             + "      \"listProperty\": [\"listVal\",12345,0.12345,true,\"2020-12-03T18:37:13.367Z\"],\n"
+                                                                                                                             + "      \"mapProperty\": {\"key1\":\"val1\",\"key2\":12345,\"key3\":[\"listVal\",12345,0.12345,true],\"key4\":\"2020-12-03T18:37:13.367Z\"}\n"
                                                                                                                              + "    }\n"
                                                                                                                              + "  ]\n"
                                                                                                                              + "}");
