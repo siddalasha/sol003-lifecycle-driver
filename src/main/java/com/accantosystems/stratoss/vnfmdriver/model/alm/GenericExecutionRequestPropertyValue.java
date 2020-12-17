@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * DriverPropertyDeserializer can deserialize into an instance for all non-key
  * types
  */
-@JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public class GenericExecutionRequestPropertyValue extends ExecutionRequestPropertyValue {
