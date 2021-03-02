@@ -1,6 +1,6 @@
 # Adding a SOL003-compliant VNFM as a Deployment Location in ALM
 
-The deployment location for the target VNFM can be added in the Stratoss LM UI, supplying the following information for infrastructure properties.
+The deployment location for the target VNFM can be added in the TNC-O UI, supplying the following information for infrastructure properties.
 
 ###### Example of JSON structure for Deployment Location
 ```jsonc
