@@ -10,15 +10,15 @@ function addProperty(message, propertyName, propertyValue) {
                 messageObject[propertyNamePart] = [];
             }
         } else if (i == (propertyNameParts.length - 1)) {
-            messageObject[propertyNamePart] = propertyValue;
+            messageObject[propertyNamePart] = handleJavaPropertyTypes(propertyValue);
         }
-        messageObject = messageObject[propertyNamePart];
+        messageObject = handleJavaPropertyTypes(messageObject[propertyNamePart]);
     }
 }
 
 function setPropertyIfNotNull(sourceMap, targetObject, propertyName) {
     if (sourceMap[propertyName] !== null) {
-        targetObject[propertyName] = sourceMap[propertyName];
+        targetObject[propertyName] = handleJavaPropertyTypes(sourceMap[propertyName]);
     }
 }
 
@@ -54,4 +54,20 @@ function _flattenPropertyArray(returnMap, array, prefix) {
             returnMap[prefix + i] = propertyValue;
         }
     }
+}
+
+// ensure Java types are supported (e.g. in JSON.stringify calls) by converting to JSON types
+function handleJavaPropertyTypes(propertyValue) {
+    if(propertyValue instanceof java.util.Map) {
+        var JSONObject = Java.type('org.json.JSONObject')
+        return JSON.parse(new JSONObject(propertyValue).toString())
+    }
+    if(propertyValue instanceof java.util.List) {
+        var JSONArray = Java.type('org.json.JSONArray')
+        return JSON.parse(new JSONArray(propertyValue).toString())
+    }
+    if(propertyValue instanceof java.time.OffsetDateTime) {
+        return propertyValue.toString()
+    }
+    return propertyValue;
 }

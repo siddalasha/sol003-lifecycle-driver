@@ -42,7 +42,7 @@ public class LifecycleManagementService {
                 // Send message to VNFM
                 final String vnfInstanceResponse = vnfLifecycleManagementDriver.createVnfInstance(executionRequest.getDeploymentLocation(), createVnfRequest);
                 // Convert response into properties to be returned to ALM
-                final Map<String, String> outputs = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceResponse);
+                final Map<String, Object> outputs = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceResponse);
 
                 final String requestId = UUID.randomUUID().toString();
                 // Delay sending the asynchronous response (from a different thread) as this method needs to complete first (to send the response back to Brent)

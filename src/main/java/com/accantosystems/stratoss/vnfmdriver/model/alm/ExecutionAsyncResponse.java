@@ -21,7 +21,7 @@ public class ExecutionAsyncResponse {
     @ApiModelProperty(value = "Failure Details")
     private FailureDetails failureDetails;
     @ApiModelProperty(value = "Outputs")
-    private final Map<String, String> outputs = new HashMap<>();
+    private final Map<String, Object> outputs = new HashMap<>();
     @ApiModelProperty(value = "Associated Resource Instance Topology")
     private final Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
     @ApiModelProperty(value = "Timestamp")
@@ -30,7 +30,7 @@ public class ExecutionAsyncResponse {
     public ExecutionAsyncResponse() {}
 
     public ExecutionAsyncResponse(String requestId, ExecutionStatus status, FailureDetails failureDetails,
-                                  Map<String, String> outputs, Map<String, InternalResourceInstance> associatedTopology) {
+                                  Map<String, Object> outputs, Map<String, InternalResourceInstance> associatedTopology) {
         this.requestId = requestId;
         this.status = status;
         this.failureDetails = failureDetails;
@@ -62,11 +62,11 @@ public class ExecutionAsyncResponse {
         this.failureDetails = failureDetails;
     }
 
-    public Map<String, String> getOutputs() {
+    public Map<String, Object> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(Map<String, String> outputs) {
+    public void setOutputs(Map<String, Object> outputs) {
         this.outputs.putAll(outputs);
     }
 

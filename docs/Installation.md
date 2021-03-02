@@ -17,10 +17,16 @@ helm install sol003-lifecycle-driver-<version>.tgz --name sol003-lifecycle-drive
 
 Use lmctl for onboard the driver into LM. For full details on how to install or use lmctl, refer to its documentation.
 
-The following command will onboard the VNFM Driver into an LM environment called 'dev01':
+The following command will onboard the VNFM Driver into a TNC-O (< 1.3) environment called 'dev01':
 
 ```bash
 lmctl lifecycledriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
+```
+
+For TNC-O 1.3 or greater, use the folowing command:
+
+```bash
+lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
 ```
 
 **NOTES**:
