@@ -34,7 +34,7 @@ vnfmdriver:
     lcmOpOccPollingTopic: lcm_op_occ_polling_requests
     lifecycleResponsesTopic: lm_vnfc_lifecycle_execution_events
   packageManagement:
-    enabled: false
+    enabled: true
     imageArtifactFilter: Files/Images
     # url should be in the form 'http://hostname/path/{vnfPackageId}'
     packageRepositoryUrl:  
@@ -50,18 +50,18 @@ ribbon:
   ReadTimeout: 20000
   ConnectTimeout: 20000
 
-ishtar:
+package-management:
   ribbon:
     listOfServers: ishtar:8280
     IsSecure: true
 
-endpoints.routes.sensitive: false
-
 zuul:
+  prefix:
   # sensitiveHeaders deliberately empty to forward all headers
   sensitive-headers:
   routes:
     package-management:
-      path: /vnfpkgm/v1/vnf_packages/**
-      serviceId: ishtar
-      stripPrefix: false
+      path: /vnfpkgm/v2/vnf_packages/**
+      url: /api/etsi/vnfpkgm/v2/vnf_packages
+      serviceId: package-management
+      stripPrefix: true

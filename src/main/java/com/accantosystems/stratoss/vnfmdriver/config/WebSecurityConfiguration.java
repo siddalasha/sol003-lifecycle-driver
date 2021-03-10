@@ -25,29 +25,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry config =
-                http.csrf().disable()
+        http.csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/vnflcm/**")
-                    .hasRole("USER")
-                    .antMatchers("/grant/**")
-                    .hasRole("USER").antMatchers("/management/**").hasRole("USER");
-
-        if (vnfmDriverProperties.getPackageManagement().isEnabled()) {
-            config = config.antMatchers("/vnfpkgm/**").hasRole("USER");
-        }
-
-        config.anyRequest().denyAll()
-              .and()
-              .httpBasic();
+                    .antMatchers("/vnflcm/**").hasRole("USER")
+                    .antMatchers("/grant/**").hasRole("USER")
+                    .antMatchers("/vnfpkgm/v1/**").hasRole("USER")
+                    .antMatchers("/management/**").hasRole("USER")
+                    .anyRequest().denyAll()
+                    .and()
+                    .httpBasic();
     }
 
     @Override
     public void configure(WebSecurity web) {
-        WebSecurity.IgnoredRequestConfigurer config = web.ignoring().antMatchers("/api/**", "/management/health");
-        if (!vnfmDriverProperties.getPackageManagement().isEnabled()) {
-            config = config.antMatchers("/vnfpkgm/**");
-        }
+        web.ignoring().antMatchers("/api/**", "/management/health", "/vnfpkgm/v2/**");
     }
 
     @Bean
