@@ -34,6 +34,7 @@ vnfmdriver:
     lcmOpOccPollingTopic: lcm_op_occ_polling_requests
     lifecycleResponsesTopic: lm_vnfc_lifecycle_execution_events
   packageManagement:
+    enabled: false
     imageArtifactFilter: Files/Images
     # url should be in the form 'http://hostname/path/{vnfPackageId}'
     packageRepositoryUrl:  
@@ -41,3 +42,26 @@ vnfmdriver:
     automatic: true
     provider:
       url:
+
+ribbon:
+  eureka:
+    enabled: true
+  # Set timeout on Zuul proxy to 20 seconds
+  ReadTimeout: 20000
+  ConnectTimeout: 20000
+
+ishtar:
+  ribbon:
+    listOfServers: ishtar:8280
+    IsSecure: true
+
+endpoints.routes.sensitive: false
+
+zuul:
+  # sensitiveHeaders deliberately empty to forward all headers
+  sensitive-headers:
+  routes:
+    package-management:
+      path: /vnfpkgm/v1/vnf_packages/**
+      serviceId: ishtar
+      stripPrefix: false

@@ -1,11 +1,13 @@
 package com.accantosystems.stratoss.vnfmdriver.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -14,22 +16,38 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private final VNFMDriverProperties vnfmDriverProperties;
+
+    @Autowired
+    public WebSecurityConfiguration(VNFMDriverProperties vnfmDriverProperties) {
+        this.vnfmDriverProperties = vnfmDriverProperties;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .authorizeRequests()
-            .antMatchers("/vnflcm/**").hasRole("USER")
-            .antMatchers("/grant/**").hasRole("USER")
-            .antMatchers("/vnfpkgm/**").hasRole("USER")
-            .antMatchers("/management/**").hasRole("USER")
-            .anyRequest().denyAll()
-            .and()
-            .httpBasic();
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry config =
+                http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers("/vnflcm/**")
+                    .hasRole("USER")
+                    .antMatchers("/grant/**")
+                    .hasRole("USER").antMatchers("/management/**").hasRole("USER");
+
+        if (vnfmDriverProperties.getPackageManagement().isEnabled()) {
+            config = config.antMatchers("/vnfpkgm/**").hasRole("USER");
+        }
+
+        config.anyRequest().denyAll()
+              .and()
+              .httpBasic();
     }
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/api/**", "/management/health");
+        WebSecurity.IgnoredRequestConfigurer config = web.ignoring().antMatchers("/api/**", "/management/health");
+        if (!vnfmDriverProperties.getPackageManagement().isEnabled()) {
+            config = config.antMatchers("/vnfpkgm/**");
+        }
     }
 
     @Bean
