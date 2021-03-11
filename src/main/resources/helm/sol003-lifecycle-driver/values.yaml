@@ -56,7 +56,10 @@ app:
     ## Environment Options
     ## Add environment variables to the pods
     # env: 
-    
+
+  ## secret containing client certificates that are to be trusted
+  certificateSecret:
+
   ## Probe configuration for checking Application availability
   livenessProbe:
     failureThreshold: 3
