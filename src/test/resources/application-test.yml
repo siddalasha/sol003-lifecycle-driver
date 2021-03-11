@@ -24,14 +24,6 @@ vnfmdriver:
       authentication:
         type: NONE
 
-ribbon:
-  eureka:
-    enabled: false
-
-zuul:
-  routes:
-    package-management:
-
 spring:
   jackson:
     serialization:
