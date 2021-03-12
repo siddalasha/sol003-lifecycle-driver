@@ -10,12 +10,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.core.env.Environment;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(VNFMDriverProperties.class)
+@EnableZuulProxy
 public class VNFMDriverApplication {
     private static final Logger log = LoggerFactory.getLogger(VNFMDriverApplication.class);
 

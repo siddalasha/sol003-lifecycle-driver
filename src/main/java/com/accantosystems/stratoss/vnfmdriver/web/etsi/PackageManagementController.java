@@ -9,6 +9,7 @@ import org.etsi.sol003.packagemanagement.VnfPkgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController("PackageManagementController")
 @RequestMapping("/vnfpkgm/v1/vnf_packages")
+@ConditionalOnProperty(value = "vnfmdriver.packageManagement.enabled", matchIfMissing  = false)
 public class PackageManagementController {
 
     private final static Logger logger = LoggerFactory.getLogger(PackageManagementController.class);

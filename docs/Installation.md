@@ -2,9 +2,10 @@
 
 ## Helm Install of Driver
 
-Prior to installing the driver, it may be necessary to configure the source for VNF Packages. See [Configuring VNF Package Location](ConfiguringVNFPackageLocation.md)
-
-Prior to installing the driver, it may be necessary to configure the Kafka host and create mandatory topics. See [Configuring Kafka](ConfiguringKafka.md)
+Prior to installing the driver, it may be necessary to:
+ - configure the source for VNF Packages. See [Configuring VNF Package Location](ConfiguringVNFPackageLocation.md)
+ - configure the Kafka host and create mandatory topics. See [Configuring Kafka](ConfiguringKafka.md)
+ - configure a secret containing trusted client certificates. See [Configuring Certificates](ConfiguringCertificates.md)
 
 
 Download the Helm chart for the required version of the VNFM Driver. Run the following command to install the Helm chart with the default values:
