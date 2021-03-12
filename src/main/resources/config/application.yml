@@ -46,8 +46,9 @@ vnfmdriver:
 ribbon:
   eureka:
     enabled: true
-  # Set timeout on Zuul proxy to 20 seconds
-  ReadTimeout: 20000
+  # Set read timeout on Zuul proxy to 30 minutes
+  ReadTimeout: 1800000
+  # Set connect timeout on Zuul proxy to 20 seconds
   ConnectTimeout: 20000
 
 package-management:
