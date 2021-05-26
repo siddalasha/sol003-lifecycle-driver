@@ -144,6 +144,7 @@ public class VNFMDriverProperties {
     }
 
     public static class PackageManagement {
+        boolean enabled;
         private String packageRepositoryUrl;
         private String imageArtifactFilter;
         private RepositoryType repositoryType = RepositoryType.NEXUS;
@@ -152,6 +153,14 @@ public class VNFMDriverProperties {
         private String vnfPkgInfoSuffix = ".pkgInfo";
         private String vnfPkgSuffix = ".zip";
         private final Map<String, String> authenticationProperties = new HashMap<>();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
 
         public String getPackageRepositoryUrl() {
             return packageRepositoryUrl;

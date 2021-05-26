@@ -13,4 +13,4 @@
 spring:
   kafka:
     bootstrap-servers:
-      - alm-kafka:9092
+      - iaf-system-kafka-bootstrap:9092

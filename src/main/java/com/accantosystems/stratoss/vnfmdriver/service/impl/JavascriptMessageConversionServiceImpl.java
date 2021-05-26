@@ -10,7 +10,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.accantosystems.stratoss.vnfmdriver.model.alm.StringPropertyValue;
 import org.apache.commons.io.IOUtils;
 import org.etsi.ifa011.VnfDescriptor;
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
+import com.accantosystems.stratoss.vnfmdriver.model.alm.GenericExecutionRequestPropertyValue;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionException;
 import com.accantosystems.stratoss.vnfmdriver.service.MessageConversionService;
 import com.accantosystems.stratoss.vnfmdriver.utils.FileUtils;
@@ -68,7 +68,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
         }
     }
 
-    @Override public Map<String, String> extractPropertiesFromMessage(String messageType, ExecutionRequest executionRequest, String message) throws MessageConversionException {
+    @Override public Map<String, Object> extractPropertiesFromMessage(String messageType, ExecutionRequest executionRequest, String message) throws MessageConversionException {
         final String script = getScriptFromExecutionRequest(executionRequest, messageType);
         final ScriptEngine scriptEngine = getScriptEngine();
 
@@ -77,7 +77,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
             final Bindings bindings = scriptEngine.createBindings();
             bindings.put("message", message);
             bindings.put("logger", logger);
-            final Map<String, String> outputs = new HashMap<>();
+            final Map<String, Object> outputs = new HashMap<>();
             bindings.put("outputs", outputs);
 
             scriptEngine.eval(script, bindings);
@@ -102,7 +102,7 @@ public class JavascriptMessageConversionServiceImpl implements MessageConversion
 
         if (scriptContents == null) {
             // If we can't find it in the zip file, try searching in out default locations
-            String interfaceVersion = ((StringPropertyValue)executionRequest.getResourceProperties().getOrDefault("interfaceVersion", new StringPropertyValue(DEFAULT_ETSI_SOL003_VERSION))).getValue();
+            String interfaceVersion =  ((GenericExecutionRequestPropertyValue)executionRequest.getResourceProperties().getOrDefault("interfaceVersion", new GenericExecutionRequestPropertyValue(DEFAULT_ETSI_SOL003_VERSION))).getValue().toString();
             try (InputStream inputStream = JavascriptMessageConversionServiceImpl.class.getResourceAsStream("/" + SCRIPTS_PATH + interfaceVersion + "/" + fullScriptName)) {
                 if (inputStream != null) {
                     scriptContents = IOUtils.toString(inputStream, Charset.defaultCharset());
