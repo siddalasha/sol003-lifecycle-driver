@@ -86,6 +86,7 @@ public class LifecycleNotificationControllerTest {
         assertThat(asyncResponse).isNotNull();
         assertThat(asyncResponse.getRequestId()).isEqualTo("8dbe6621-f6b9-49ba-878b-26803f107f27");
         assertThat(asyncResponse.getStatus()).isEqualTo(ExecutionStatus.FAILED);
+        assertThat(asyncResponse.getVersion()).isEqualTo("1.0.0");
         assertThat(asyncResponse.getFailureDetails()).isNotNull();
         assertThat(asyncResponse.getFailureDetails().getFailureCode()).isEqualTo(FailureDetails.FailureCode.INTERNAL_ERROR);
         assertThat(asyncResponse.getFailureDetails().getDescription()).isEqualTo("Error instantiating VNF");
