@@ -29,7 +29,7 @@
 
     <properties>
         <argLine>-Djava.security.egd=file:/dev/./urandom</argLine>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <docker-maven-plugin.version>1.0.0</docker-maven-plugin.version>
         <docker.directory>docker-ready</docker.directory>
         <docker.registry>https://hub.docker.com</docker.registry>
