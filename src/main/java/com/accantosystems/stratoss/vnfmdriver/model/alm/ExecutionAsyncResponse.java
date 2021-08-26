@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import static com.accantosystems.stratoss.vnfmdriver.utils.Constants.KAFKA_MESSAGE_VERSION;
+
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel(description = "Details returned when an async lifecycle execution request is accepted")
@@ -26,6 +28,8 @@ public class ExecutionAsyncResponse {
     private final Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
     @ApiModelProperty(value = "Timestamp")
     private Long timestamp;
+    @ApiModelProperty(value = "version")
+    private String version = KAFKA_MESSAGE_VERSION;
 
     public ExecutionAsyncResponse() {}
 
@@ -52,6 +56,10 @@ public class ExecutionAsyncResponse {
 
     public void setStatus(ExecutionStatus status) {
         this.status = status;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public FailureDetails getFailureDetails() {
@@ -87,6 +95,7 @@ public class ExecutionAsyncResponse {
         return "ExecutionAsyncResponse{" +
                 "requestId='" + requestId + '\'' +
                 ", status=" + status +
+                ", version=" + version +
                 ", failureDetails=" + failureDetails +
                 ", associatedTopology=" + associatedTopology +
                 // don't print outputs (because they may contain private keys)
