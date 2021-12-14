@@ -18,18 +18,23 @@ Then perform the release from the `master` branch. This ensures the `master` bra
 
 ## 3. Build and Release (on master)
 
-Run the following command:
+Run the following command (the `dev` profile ensures extra log statements are available in the built code):
 ```
 ./mvnw clean package -Pdev,docker,helm
 ```
 
 This should produce 2 artifacts:
-- a locally built docker file, e.g. `ibmcom/sol003-lifecycle-driver:0.2.0`
-- a helm chart in the directory `target/helm/repo`
+- a locally built docker image, e.g. `ibmcom/sol003-lifecycle-driver:0.2.0`
+- a helm chart, e.g. `sol003-lifecycle-driver-0.2.0.tgz`
 
 Verify the docker image has been produced by running
-```dtd
+```
 docker image ls
+```
+
+Verify that a helm chart is built in the `target/helm/repo` directory, e.g.
+```
+ls target/helm/repo
 ```
 
 ## 4. Release artifacts
