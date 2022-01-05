@@ -229,7 +229,7 @@ public class PackageManagementControllerTest {
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
                                          .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, Resource.class, vnfPkgId);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
 
         // Check when Accept type of text/plain but multiple vnfds found within the package
         when(packageManagementService.getVnfdAsYaml(eq(vnfPkgId))).thenThrow(new UnexpectedPackageContentsException("Unexpected package contents"));
@@ -237,7 +237,7 @@ public class PackageManagementControllerTest {
         httpEntity = new HttpEntity<>(headers);
         responseEntity = testRestTemplate.withBasicAuth("user", "password")
                                          .exchange(PACKAGE_MANAGEMENT_VNFD_ENDPOINT, HttpMethod.GET, httpEntity, String.class, vnfPkgId);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
