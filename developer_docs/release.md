@@ -16,7 +16,12 @@ Then perform the release from the `master` branch. This ensures the `master` bra
 
 > Note: do NOT delete the `develop` branch
 
-## 3. Build and Release (on master)
+## 3. Build and Release (on master)  
+
+> Note: Make sure to pull-in the latest and correct tag required for the openjdk image locally before preparing the release build.  
+> e.g  
+> You can find the openjdk image details here: https://github.com/IBM/sol003-lifecycle-driver/blob/master/src/main/resources/docker/Dockerfile#L1-L2  
+> `docker pull openjdk:8u302-jre`
 
 Run the following command (the `dev` profile ensures extra log statements are available in the built code):
 ```
