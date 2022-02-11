@@ -8,7 +8,13 @@ Ensure there is a milestone created for the release at: [https://github.com/IBM/
 
 Also ensure all issues going into this release are assigned to this milestone. **Move any issues from unreleased milestones into this release if the code has been merged**
 
-## 2. Merge Develop to Master
+## 2. Update CHANGELOG (on develop)
+
+Update the `CHANGELOG.md` file with a list of issues fixed by this release (see other items in this file to get an idea of the desired format).
+
+Commit and push these changes.
+
+## 3. Merge Develop to Master
 
 Development work is normally carried out on the `develop` branch. Merge this branch to `master`, by creating a PR.
 
@@ -16,7 +22,7 @@ Then perform the release from the `master` branch. This ensures the `master` bra
 
 > Note: do NOT delete the `develop` branch
 
-## 3. Build and Release (on master)  
+## 4. Build and Release (on master)  
 
 > Note: Make sure to pull-in the latest and correct tag required for the openjdk image locally before preparing the release build.  
 > e.g  
@@ -42,7 +48,7 @@ Verify that a helm chart is built in the `target/helm/repo` directory, e.g.
 ls target/helm/repo
 ```
 
-## 4. Release artifacts
+## 5. Release artifacts
 
 The Docker image not been pushed by the previous build step so must be done manually, e.g.
 ```
@@ -58,7 +64,7 @@ Complete the following:
 - Add release notes in the description of the release. Look at previous releases to see the format. Usually, we will list the issues fixed.
 - Attach the Helm chart `tgz` file produced by `mvnw` command in the `target/helm/repo` directory
 
-## 5. Cleanup
+## 6. Cleanup
 
 - Close the Milestone for this release on [Github](https://github.com/IBM/sol003-lifecycle-driver/milestones)
 - Create a new Milestone for next release (if one does not exist).
