@@ -1,5 +1,7 @@
 package org.etsi.sol003.lifecyclemanagement;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -22,5 +24,7 @@ public class CreateVnfRequest {
     private String vnfInstanceName;
     @ApiModelProperty(name = "VNF Instance Description", notes = "Human-readable description of the VNF instance to be created.")
     private String vnfInstanceDescription;
+    @ApiModelProperty(name = "meta data", notes = "If present, this attribute provides additional initial values,overriding those obtained from the VNFD, for the \"metadata\" attribute in \"VnfInstance\".")
+    private Map<String, String> metadata;
 
 }
