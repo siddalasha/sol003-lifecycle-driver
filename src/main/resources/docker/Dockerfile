@@ -12,7 +12,8 @@ RUN groupadd -g 1000 -r sld \
  && chmod -R 775 /home/sld \
  && chmod -R 775 /var/lm
 RUN apt update -y \
- && apt upgrade -y
+ && apt upgrade -y \
+ && rm -rf /var/lib/apt/lists/*
 USER sld
 COPY sol003-lifecycle-driver-@project.version@.jar /data/sol003-lifecycle-driver-@project.version@.jar
 # Set HOME variable (for OCP arbitrary user)
