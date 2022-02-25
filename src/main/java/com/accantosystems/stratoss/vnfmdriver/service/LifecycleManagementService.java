@@ -36,7 +36,7 @@ public class LifecycleManagementService {
         logger.info("Processing execution request");
 
         try {
-            if ("Install".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+            if ("Create".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Generate CreateVnfRequest message
                 final String createVnfRequest = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
                 // Send message to VNFM
@@ -50,7 +50,7 @@ public class LifecycleManagementService {
 
                 // Send response back to ALM
                 return new ExecutionAcceptedResponse(requestId);
-            } else if ("Configure".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+            } else if ("Install".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Instantiate
                 final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
                 final String instantiateVnfRequest = messageConversionService.generateMessageFromRequest("InstantiateVnfRequest", executionRequest);
@@ -97,6 +97,13 @@ public class LifecycleManagementService {
                 final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
                 final String healVnfRequest = messageConversionService.generateMessageFromRequest("HealVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.healVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, healVnfRequest);
+                return new ExecutionAcceptedResponse(requestId);
+            } else if ("Delete".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // Delete
+                final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
+                vnfLifecycleManagementDriver.deleteVnfInstance(executionRequest.getDeploymentLocation(), vnfInstanceId);
+                final String requestId = UUID.randomUUID().toString();
+                externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap()), properties.getExecutionResponseDelay());
                 return new ExecutionAcceptedResponse(requestId);
             } else {
                 throw new IllegalArgumentException(String.format("Requested transition [%s] is not supported by this lifecycle driver", executionRequest.getLifecycleName()));
