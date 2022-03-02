@@ -31,7 +31,7 @@ public class LifecycleManagementServiceTest {
         when(mockDriver.createVnfInstance(any(), any())).thenReturn(loadFileIntoString("examples/VnfInstance.json"));
 
         final ExecutionRequest executionRequest = new ExecutionRequest();
-        executionRequest.setLifecycleName("Install");
+        executionRequest.setLifecycleName("Create");
         executionRequest.setDeploymentLocation(TEST_DL_NO_AUTH);
         executionRequest.getResourceProperties().put("vnfdId", new GenericExecutionRequestPropertyValue("fa2343af-2a81-4e84-a667-e40662e5ed93"));
         executionRequest.getResourceProperties().put("vnfInstanceName", new GenericExecutionRequestPropertyValue("CSCF-1"));
