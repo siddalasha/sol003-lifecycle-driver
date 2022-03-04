@@ -5,7 +5,7 @@ logger.debug('Generating InstantiateVnfRequest message for ETSI SOL003 v3.5.1');
 load('classpath:scripts/lib.js');
 
 // Create the message object to be returned
-var message = {extVirtualLinks: [], extManagedVirtualLinks: [], vimConnectionInfo: [], additionalParams: {}, extensions: {}};
+var message = {extVirtualLinks: [], extManagedVirtualLinks: [], vimConnectionInfo: {}, additionalParams: {}, extensions: {}};
 
 // Set the standard message properties
 // The flavourId is required, the other fields are optional
@@ -15,7 +15,7 @@ setPropertyIfNotNull(executionRequest.properties, message, 'localizationLanguage
 setPropertyIfNotNull(executionRequest.properties, message, 'extensions');
 
 for (var key in executionRequest.getProperties()) {
-    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.') || key.startsWith('extensions.')) {
+    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.')) {
         // print('Got property [' + key + '], value = [' + executionRequest.properties[key] + ']');
         addProperty(message, key, executionRequest.properties[key]);
     }

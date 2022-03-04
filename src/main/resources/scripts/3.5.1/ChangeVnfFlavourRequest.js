@@ -16,7 +16,7 @@ setPropertyIfNotNull(executionRequest.properties, message, 'extensions');
 setPropertyIfNotNull(executionRequest.properties, message, 'vnfConfigurableProperties');
 
 for (var key in executionRequest.getProperties()) {
-    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.') || key.startsWith('extensions.') || key.startsWith('vnfConfigurableProperties.')) {
+    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.')) {
         // print('Got property [' + key + '], value = [' + executionRequest.properties[key] + ']');
         addProperty(message, key, executionRequest.properties[key]);
     }
