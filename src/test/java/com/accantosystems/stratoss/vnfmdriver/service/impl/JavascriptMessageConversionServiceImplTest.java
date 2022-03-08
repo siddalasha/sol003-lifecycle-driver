@@ -186,8 +186,8 @@ public class JavascriptMessageConversionServiceImplTest {
                                                                                                                              + "      ]\n"
                                                                                                                              + "    }\n"
                                                                                                                              + "  ],\n"
-                                                                                                                             + "  \"vimConnectionInfo\": [\n"
-                                                                                                                             + "    {\n"
+                                                                                                                             + "  \"vimConnectionInfo\": {\n"
+                                                                                                                             + "    \"0\": {\n"
                                                                                                                              + "      \"id\": \"4408b119-eb54-11e7-bae0-fa163eb90b5c\",\n"
                                                                                                                              + "      \"vimId\": \"vim1\",\n"
                                                                                                                              + "      \"vimType\": \"Openstack\",\n"
@@ -202,7 +202,7 @@ public class JavascriptMessageConversionServiceImplTest {
                                                                                                                              + "        }\n"
                                                                                                                              + "      }\n"
                                                                                                                              + "    }\n"
-                                                                                                                             + "  ]\n"
+                                                                                                                             + "  }\n"
                                                                                                                              + "}");
     }
 
@@ -242,8 +242,8 @@ public class JavascriptMessageConversionServiceImplTest {
         assertThat(new JsonContent<>(JavascriptMessageConversionServiceImplTest.class, null, message)).isEqualToJson("{\n"
                                                                                                                              + "  \"flavourId\": \"Chocolate\",\n"
                                                                                                                              + "  \"instantiationLevelId\": \"1\",\n"
-                                                                                                                             + "  \"vimConnectionInfo\": [\n"
-                                                                                                                             + "    {\n"
+                                                                                                                             + "  \"vimConnectionInfo\": {\n"
+                                                                                                                             + "    \"0\": {\n"
                                                                                                                              + "      \"stringProperty\": \"stringvalue\",\n"
                                                                                                                              + "      \"intProperty\": 12345,\n"
                                                                                                                              + "      \"floatProperty\": 0.12345,\n"
@@ -252,7 +252,7 @@ public class JavascriptMessageConversionServiceImplTest {
                                                                                                                              + "      \"listProperty\": [\"listVal\",12345,0.12345,true,\"2020-12-03T18:37:13.367Z\"],\n"
                                                                                                                              + "      \"mapProperty\": {\"key1\":\"val1\",\"key2\":12345,\"key3\":[\"listVal\",12345,0.12345,true],\"key4\":\"2020-12-03T18:37:13.367Z\"}\n"
                                                                                                                              + "    }\n"
-                                                                                                                             + "  ]\n"
+                                                                                                                             + "  }\n"
                                                                                                                              + "}");
     }
 
