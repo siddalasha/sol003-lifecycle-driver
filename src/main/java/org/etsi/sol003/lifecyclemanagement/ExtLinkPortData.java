@@ -22,5 +22,7 @@ public class ExtLinkPortData {
     private String id;
     @ApiModelProperty(name = "Resource Handle", required = true, notes = "Reference to the virtualised resource realizing this link port.")
     private ResourceHandle resourceHandle;
+    @ApiModelProperty(name = "Trunk Resource Id", notes = "Identifier of the trunk resource in the VIM. Shall be present if the present link port corresponds to the parent port that the trunk resource is associated with.")
+    private String trunkResourceId;
 
 }

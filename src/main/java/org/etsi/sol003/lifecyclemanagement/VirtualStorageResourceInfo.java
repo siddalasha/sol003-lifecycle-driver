@@ -24,8 +24,12 @@ public class VirtualStorageResourceInfo {
     private String id;
     @ApiModelProperty(name = "Virtual Storage Descriptor Id", required = true, notes = "Identifier of the VirtualStorageDesc in the VNFD.")
     private String virtualStorageDescId;
+    @ApiModelProperty(name = "VnfdId", notes = "Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
+    private String vnfdId;
     @ApiModelProperty(name = "Storage Resource", required = true, notes = "Reference to the VirtualStorage resource.")
     private ResourceHandle storageResource;
+    @ApiModelProperty(name = "ZoneId", notes = "The identifier of the resource zone, as managed by the resource management layer (typically, the VIM), where the referenced VirtualStorage resource is placed. Shall be provided if this information is available from the VIM.")
+    private String zoneId;
     @ApiModelProperty(name = "Reservation Id", notes = "The reservation identifier applicable to the resource. It shall be present when an applicable reservation exists.")
     private String reservationId;
     @ApiModelProperty(name = "Metadata", notes = "Metadata about this resource.")

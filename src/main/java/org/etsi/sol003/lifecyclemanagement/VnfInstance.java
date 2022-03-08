@@ -44,7 +44,7 @@ public class VnfInstance {
     @ApiModelProperty(name = "VNF Configurable Properties", notes = "Current values of the configurable properties of the VNF instance.")
     private Map<String, String> vnfConfigurableProperties;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance. This attribute shall only be supported and present if VNF-related resource management in direct mode is applicable.")
-    private List<VimConnectionInfo> vimConnectionInfo;
+    private Map<String,VimConnectionInfo> vimConnectionInfo;
     @ApiModelProperty(name = "Instantiation State", required = true, notes = "The instantiation state of the VNF.")
     private InstantiationState instantiationState;
     @ApiModelProperty(name = "Instantiated VNF Information", notes = "Information specific to an instantiated VNF instance. This attribute shall be present if the instantiateState attribute value is INSTANTIATED.")
@@ -69,8 +69,12 @@ public class VnfInstance {
         private VnfOperationalStateType vnfState;
         @ApiModelProperty(name = "Scale Status", notes = "Scale status of the VNF, one entry per aspect. Represents for every scaling aspect how \"big\" the VNF has been scaled w.r.t. that aspect.")
         private List<ScaleInfo> scaleStatus;
+        @ApiModelProperty(name = "Max Scale Levels", notes = "Maximum allowed scale levels of the VNF, one entry per aspect.")
+        private List<ScaleInfo> maxScaleLevels;
         @ApiModelProperty(name = "External Connection Point Information", required = true, notes = "Information about the external CPs exposed by the VNF instance.")
         private List<VnfInstance.ExtCpInfo> extCpInfo;
+        @ApiModelProperty(name = "vip CP Info", required = true, notes = "Information about the external CPs exposed by the VNF instance.")
+        private List<VnfInstance.VipCpInfo> vipCpInfo;
         @ApiModelProperty(name = "External Virtual Link Information", notes = "Information about the external VLs the VNF instance is connected to.")
         private List<ExtVirtualLinkInfo> extVirtualLinkInfo;
         @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about the externally-managed internal VLs of the VNF instance.")
@@ -85,6 +89,10 @@ public class VnfInstance {
         private List<VnfVirtualLinkResourceInfo> vnfVirtualLinkResourceInfo;
         @ApiModelProperty(name = "Virtual Storage Resource Information", notes = "Information about the virtualised storage resources used as storage for the VNF instance.")
         private List<VirtualStorageResourceInfo> virtualStorageResourceInfo;
+        @ApiModelProperty(name = "Metadata", notes = "Additional VNF-specific attributes that provide metadata describing the VNF instance.")
+        private Map<String, String> metadata;
+        @ApiModelProperty(name = "Extensions", notes = "Additional VNF-specific attributes that affect the lifecycle management of this VNF instance.")
+        private Map<String, String> extensions;
 
     }
 
@@ -131,6 +139,32 @@ public class VnfInstance {
         private Link operate;
         @ApiModelProperty(name = "changeExtConn", notes = "Link to the \"change_ext_conn\" task resource, if the related operation is possible based on the current status of this VNF instance resource (i.e. VNF instance is in INSTANTIATED state).")
         private Link changeExtConn;
+        @ApiModelProperty(name = "createSnapshot", notes = "Link to the \"Create VNF snapshot task\" task resource, if the related operation is possible based on the current status of this VNF instance resource (i.e. VNF instance is in INSTANTIATED state).")
+        private Link createSnapshot;
+        @ApiModelProperty(name = "revertToSnapshot", notes = "Link to the \"Revert to VNF snapshot task\"  resource, if the related operation is possible based on the current status of this VNF instance resource (i.e. VNF instance is in INSTANTIATED state).")
+        private Link revertToSnapshot;
+
+    }
+    @Data
+    @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @ApiModel(description = "Information about related to virtual IP (VIP) CP.")
+    public static class VipCpInfo {
+
+        @ApiModelProperty(name = "cp Instance Id", required = true, notes = "Identifier of this VIP CP instance and of this VipCpInfo information element.")
+        private String cpInstanceId;
+        @ApiModelProperty(name = "External CPD Id", required = true, notes = "Identifier of the VIP Connection Point Descriptor, VipCpd, in the VNFD.")
+        private String cpdId;
+        @ApiModelProperty(name = "vnfExtCpId",notes = "When the VIP CP is exposed as external CP of the VNF, the identifier of this external VNF CP instance.")
+        private String vnfExtCpId;
+        @ApiModelProperty(name = "CP Protocol Information", notes = "Protocol information for this CP. There shall be one cpProtocolInfo for layer 3. There may be one cpProtocolInfo for layer 2.")
+        private List<CpProtocolInfo> cpProtocolInfo;
+        @ApiModelProperty(name = "Associated Vnfc CpIds", notes = "Identifiers of the VnfcCps that share the virtual IP addresse allocated to the VIP CP instance.")
+        private List<String> associatedVnfcCpIds;
+        @ApiModelProperty(name = "VNF  Link Port Id", notes = "Identifier of the \"VnfLinkPortInfo\" structure in the \"VnfVirtualLinkResourceInfo\" or \"ExtManagedVirtualLinkInfo\" structure. Shall be present if the CP is associated to a link port on an internal VL.")
+        private String vnfLinkPortId;
+        @ApiModelProperty(name = "Metadata", notes = "Metadata about this VIP CP.")
+        private Map<String, String> metadata;
 
     }
 }

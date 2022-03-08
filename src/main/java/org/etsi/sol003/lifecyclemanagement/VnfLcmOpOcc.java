@@ -52,7 +52,7 @@ public class VnfLcmOpOcc {
      *   • TERMINATE: TerminateVnfRequest
      *   • MODIFY_INFO: VnfInfoModifications
      */
-    @ApiModelProperty(name = "Operation Parameters", required = true, notes = "Input parameters of the LCM operation. This attribute shall be formatted according to the request data type of the related LCM operation.")
+    @ApiModelProperty(name = "Operation Parameters", notes = "Input parameters of the LCM operation. This attribute shall be formatted according to the request data type of the related LCM operation.")
     private Object operationParams;
     @ApiModelProperty(name = "Cancel Pending", required = true, notes = "If the VNF LCM operation occurrence is in \"STARTING\", \"PROCESSING\" or \"ROLLING_BACK\" state and the operation is being cancelled, this attribute shall be set to true. Otherwise, it shall be set to false.")
     @JsonProperty("isCancelPending")
@@ -65,8 +65,18 @@ public class VnfLcmOpOcc {
     private ResourceChanges resourceChanges;
     @ApiModelProperty(name = "Changed Information", notes = "Information about the changed VNF instance information, including VNF configurable properties, if applicable.")
     private VnfInfoModificationRequest changedInfo;
+    @ApiModelProperty(name = "affected VIP CPs", notes = "Information about virtual IP CP instances that were affected during the execution of the lifecycle management operation.")
+    private List<AffectedVipCp> affectedVipCps;
     @ApiModelProperty(name = "Changed External Connectivity", notes = "Information about changed external connectivity, if applicable.")
     private List<ExtVirtualLinkInfo> changedExtConnectivity;
+    @ApiModelProperty(name = "Modifications Triggered By VnfPkgChange", notes = "Information about performed changes of \"VnfInstance\" attributes triggered by changing the current VNF package, if applicable. Shall be absent if the \"operation\" attribute is different from \"CHANGE_VNFPKG\".")
+    private ModificationsTriggeredByVnfPkgChange modificationsTriggeredByVnfPkgChange;
+    @ApiModelProperty(name = "vnf Snapshot Info Id", notes = "Identifier of the \"Individual VNF snapshot\" resource. Shall be present if applicable to the type of LCM operation, i.e. if the value of the \"operation\" attribute is either \"CREATE_SNAPSHOT\" or \"REVERT_TO_SNAPSHOT\".")
+    private String vnfSnapshotInfoId;
+    @ApiModelProperty(name = "lcm Coordinations", notes = "This attribute contains information about  LCM coordination actions (see clause 10 in ETSI GS NFV-SOL 002 [i.2]) related to this LCM operation occurrence.")
+    private List<LcmCoordinations> lcmCoordinations;
+    @ApiModelProperty(name = "rejectedLcmCoordinationss", notes = "This attribute contains information about LCM coordination actions (see clause 10 in ETSI GS NFV-SOL 002 [i.2]) that were rejected by 503 error which means they can be tried again after a delay.")
+    private List<RejectedLcmCoordinations> rejectedLcmCoordinations;
     @ApiModelProperty(name = "Links", required = true, notes = "Links to resources related to this resource.")
     @JsonProperty("_links")
     private Links links;
@@ -91,6 +101,8 @@ public class VnfLcmOpOcc {
         private Link rollback;
         @ApiModelProperty(name = "fail", notes = "Link to the task resource that represents the \"fail\" operation for this VNF LCM operation occurrence, if declaring as failed is currently allowed.")
         private Link fail;
+        @ApiModelProperty(name = "vnfSnapshot", notes = "Link to the VNF snapshot resource, if the VNF LCM operation occurrence is related to a VNF snapshot. Shall be present if operation=\"CREATE_SNAPSHOT\" or operation=\"REVERT_TO_SNAPSHOT\".")
+        private Link vnfSnapshot;
 
     }
 
@@ -104,9 +116,65 @@ public class VnfLcmOpOcc {
         private List<AffectedVnfc> affectedVnfcs;
         @ApiModelProperty(name = "Affected Virtual Links", notes = "Information about VL instances that were affected during the lifecycle operation.")
         private List<AffectedVirtualLink> affectedVirtualLinks;
+        @ApiModelProperty(name = "Affected ExtLink Links", notes = "Information about external VNF link ports that were affected during the lifecycle operation.")
+        private List<AffectedVirtualLink> affectedExtLinkPorts;
         @ApiModelProperty(name = "Affected Virtual Storage", notes = "Information about virtualised storage instances that were affected during the lifecycle operation.")
         private List<AffectedVirtualStorage> affectedVirtualStorages;
 
+    }
+
+    @Data
+    @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @ApiModel(description = "Information about LCM coordination actions (see clause 10 in ETSI GS NFV-SOL 002 [i.2]) related to this LCM operation occurrence.")
+    public static class LcmCoordinations {
+
+        @ApiModelProperty(name = "Id", required = true, notes = "Identifier of this coordination action.")
+        private String id;
+        @ApiModelProperty(name = "Coordination Action Name", required = true, notes = "Indicator of the actual coordination action.")
+        private String coordinationActionName; 
+        @ApiModelProperty(name = "Coordination Result",  notes = "The result of executing the coordination action which also implies the action to be performed by the VNFM as the result of this coordination.")
+        private LcmCoordResultType coordinationResult;
+        @ApiModelProperty(name = "Start Time", required = true, notes = "The time when the VNFM has received the confirmation that the coordination action has been started.")
+        private OffsetDateTime startTime;
+        @ApiModelProperty(name = "End Time",  notes = "The time when the VNFM has received the confirmation that the coordination action has finished or has been cancelled, or the time when a coordination action has timed out.")
+        private OffsetDateTime endTime;
+        @ApiModelProperty(name = "delay",  notes = "The end of the delay period. This attribute shall be present if the last known HTTP response related to this coordination has contained a \"Retry-After\" header, and shall be absent otherwise.")
+        private OffsetDateTime delay;
+
+
+
+    }
+
+    @Data
+    @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @ApiModel(description = "This attribute contains information about LCM coordination actions (see clause 10 in ETSI GS NFV-SOL 002 [i.2]) that were rejected by 503 error which means they can be tried again after a delay.")
+    public static class RejectedLcmCoordinations {
+
+        @ApiModelProperty(name = "Coordination Action Name", required = true, notes = "Indicator of the actual coordination action.")
+        private String coordinationActionName; 
+        @ApiModelProperty(name = "Rejection Time", required = true, notes = "The time when the VNFM has received the 503 response  that rejects the actual coordination.")
+        private OffsetDateTime rejectionTime;
+        @ApiModelProperty(name = "Endpoint Type", required = true, notes = "The endpoint type used by this coordination action.")
+        private EndpointType endpointType;
+        @ApiModelProperty(name = "delay", required = true, notes = "The end of the delay period. as calculated from the startTime and \"Retry-After\" header.")
+        private OffsetDateTime delay;
+        @ApiModelProperty(name = "Warnings",  notes = "Warning messages that were generated while the operation was executing.If the operation has included LCM coordination actions and these have resulted in warnings, such warnings should be added to this attribute.")
+        private List<String> warnings;
+
+        public enum EndpointType {
+
+            /*
+              * coordination with other operation supporting management systems (e.g. EM)
+            */
+            MGMT, 
+            /*
+              * coordination with the VNF instance
+            */
+            VNF
+        }
+        
     }
 
 }

@@ -19,8 +19,10 @@ import lombok.Data;
 @ApiModel(description = "Represents information about a network address that has been assigned.")
 public class IpOverEthernetAddressInfo {
 
-    @ApiModelProperty(name = "MAC Address", required = true, notes = "Assigned MAC address.")
+    @ApiModelProperty(name = "MAC Address",  notes = "MAC address, if assigned.")
     private String macAddress;
+    @ApiModelProperty(name = "Segmentation Id", notes = "Identification of the network segment to which the CP instance connects to.")
+    private String segmentationId;
     @ApiModelProperty(name = "IP Addresses", notes = "Addresses assigned to the CP instance. Each entry represents IP addresses assigned by fixed or dynamic IP address assignment per subnet.")
     private List<IpAddress> ipAddresses;
 

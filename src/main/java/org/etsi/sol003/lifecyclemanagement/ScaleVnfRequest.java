@@ -20,7 +20,7 @@ public class ScaleVnfRequest {
 
     @ApiModelProperty(name = "Scale Type", required = true, notes = "Indicates the type of the scale operation requested.")
     private ScaleType type;
-    @ApiModelProperty(name = "Scaling Aspect Id", notes = "Identifier of the scaling aspect.")
+    @ApiModelProperty(name = "Scaling Aspect Id",required = true, notes = "Identifier of the scaling aspect.")
     private String aspectId;
     @ApiModelProperty(name = "Number of Scaling Steps", notes = "Number of scaling steps to be executed as part of this Scale VNF operation. It shall be a positive number and the default value shall be 1.")
     private Integer numberOfSteps;
