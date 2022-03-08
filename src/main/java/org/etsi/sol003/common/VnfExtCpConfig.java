@@ -1,6 +1,5 @@
 package org.etsi.sol003.common;
 
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -27,7 +26,7 @@ public class VnfExtCpConfig {
     private String cpInstanceId;
     @ApiModelProperty(name = "Link Port Id", notes = "Identifier of a pre-configured link port to which the external CP will be associated.")
     private String linkPortId;
-    @ApiModelProperty(name = "CP Protocol Configuration", notes = "Parameters for configuring the network protocols on the link port that connects the CP to a VL.")
-    private List<CpProtocolData> cpProtocolData;
+    @ApiModelProperty(name = "Create ExtLink Port", notes = "Indicates to the VNFM the need to create a dedicated link port for the external CP.")
+    private Boolean createExtLinkPort;
 
 }

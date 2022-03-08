@@ -18,8 +18,6 @@ import lombok.Data;
 @ApiModel(description = "Represents parameters needed to connect to a VIM for managing the resources of a VNF instance.")
 public class VimConnectionInfo {
 
-    @ApiModelProperty(name = "VIM Connection Id", required = true, notes = "The identifier of the VIM Connection. This identifier is managed by the NFVO.")
-    private String id;
     @ApiModelProperty(name = "VIM Instance Id", notes = "The identifier of the VIM instance. This identifier is managed by the NFVO.")
     private String vimId;
     @ApiModelProperty(name = "VIM Type", required = true, notes = "Discriminator for the different types of the VIM information.")
