@@ -70,7 +70,7 @@ public class JavascriptMessageConversionServiceImplTest {
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final String message = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
 
-        assertThat(message).isEqualTo("{\"additionalParams\":{},\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
+        assertThat(message).isEqualTo("{\"additionalParams\":{},\"metadata\":{},\"vnfdId\":\"xyz-xyz-xyz-xyz\",\"vnfInstanceName\":\"Install\",\"vnfInstanceDescription\":\"testing testing 123\"}");
     }
 
     @Test
