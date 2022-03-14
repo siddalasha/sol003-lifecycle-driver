@@ -37,6 +37,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateS
  *                 <li>/heal</li>
  *                 <li>/change_ext_conn</li>
  *                 <li>/terminate</li>
+ *                 <li>/change_vnfpkg</li>
  *             </ul></li>
  *         </ul></li>
  *     </ul></li>
@@ -307,6 +308,26 @@ public class VNFLifecycleManagementDriver {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "terminate", terminateVnfRequest);
     }
 
+     /**
+     * Submits an operation to the VNFM to change  the current VNF package on which a VNF instance is based
+     *
+     * <ul>
+     *     <li>Precondition: VNF instance in INSTANTIATED state</li>
+     *     <li>Sends a {@link ChangeCurrentVnfPkgRequest} via HTTP POST to /vnf_instances/{vnfInstanceId}/change_vnfpkg</li>
+     *     <li>Gets 202 Accepted response with Location header to the {@link VnfLcmOpOcc} record</li>
+     *     <li>Postcondition: VNF instance still in INSTANTIATED state and  the current VNF package of the VNF is changed</li>
+     * </ul>
+     *
+     * @param deploymentLocation              deployment location
+     * @param vnfInstanceId                   Identifier for the {@link VnfInstance} to perform the operation on
+     * @param changeCurrentVnfPkgRequest request information
+     * @return newly created {@link VnfLcmOpOcc} record identifier
+     * @throws SOL003ResponseException if there are any errors creating the operation request
+     */
+    public String changeCurrentVnfPkg(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String changeCurrentVnfPkgRequest) throws SOL003ResponseException {
+        return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "change_vnfpkg", changeCurrentVnfPkgRequest);
+    }
+    
     /**
      * Submits an operation to the VNFM on an existing VNF instance
      *
