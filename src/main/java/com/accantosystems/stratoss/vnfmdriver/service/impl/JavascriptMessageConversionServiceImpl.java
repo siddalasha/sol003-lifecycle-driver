@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JavascriptMessageConversionServiceImpl implements MessageConversionService {
 
     private static final Logger logger = LoggerFactory.getLogger(JavascriptMessageConversionServiceImpl.class);
-    private static final String DEFAULT_ETSI_SOL003_VERSION = "2.4.1";
+    private static final String DEFAULT_ETSI_SOL003_VERSION = "3.5.1";
     private static final String SCRIPTS_PATH = "scripts/";
 
     private final ObjectMapper objectMapper;

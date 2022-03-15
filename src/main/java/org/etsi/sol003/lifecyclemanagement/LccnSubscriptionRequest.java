@@ -24,5 +24,7 @@ public class LccnSubscriptionRequest {
     private String callbackUri;
     @ApiModelProperty(name = "Authentication Parameters", notes = "Authentication parameters to configure the use of Authorization when sending notifications corresponding to this subscription. This attribute shall only be present if the subscriber requires authorization of notifications")
     private SubscriptionAuthentication authentication;
+    @ApiModelProperty(name = "Verbosity",  notes = "This attribute signals the verbosity of LCM operation occurrence notifications.If it is not present, it shall default to the value \"FULL\".")
+    private LcmOpOccNotificationVerbosityType verbosity;
 
 }

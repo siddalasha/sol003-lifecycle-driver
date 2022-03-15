@@ -48,6 +48,21 @@ public enum LcmOperationType {
     /**
      * Represents the "Modify VNF Information" LCM operation.
      */
-    MODIFY_INFO
+    MODIFY_INFO,
+
+     /**
+     * Represents the "Create VNF Snapshot" LCM operation.
+     */
+    CREATE_SNAPSHOT,
+
+     /**
+     * Represents the "Revert To VNF Snapshot" LCM operation.
+     */
+    REVERT_TO_SNAPSHOT,
+
+     /**
+     * Represents the "Change current VNF package" LCM operation.
+     */
+    CHANGE_VNFPKG
 
 }

@@ -22,8 +22,12 @@ public class IpOverEthernetAddressData {
 
     @ApiModelProperty(name = "MAC Address", notes = "MAC address. If this attribute is not present, it shall be chosen by the VIM.")
     private String macAddress;
+    @ApiModelProperty(name = "Segmentation Type", notes = "Specifies the encapsulation type for the traffics coming in and out of the trunk subport.")
+    private SegmentationType segmentationType;
+    @ApiModelProperty(name = "Segmentation Id", notes = "Identification of the network segment to which the CP instance connects to.")
+    private String segmentationId;
     @ApiModelProperty(name = "IP Addresses", required = true, notes = "List of IP addresses to assign to the CP instance. If this attribute is not present, no IP address shall be assigned.")
-    private IpAddress ipAddresses;
+    private List<IpAddress> ipAddresses;
 
     /**
      * Represents IP address data for fixed or dynamic IP address assignment per subnet.
@@ -50,5 +54,16 @@ public class IpOverEthernetAddressData {
         }
 
     }
+    public enum SegmentationType {
+        /**
+         * the subport uses VLAN as encapsulation type.
+         */
+         VLAN,
+
+         /**
+         * the subport gets its segmentation type from the network it is connected to.
+         */
+         INHERIT
+   }
 
 }

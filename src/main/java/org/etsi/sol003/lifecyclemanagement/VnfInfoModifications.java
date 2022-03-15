@@ -36,9 +36,7 @@ public class VnfInfoModifications {
     @ApiModelProperty(name = "Extensions", notes = "If present, this attribute signals modifications of the \"extensions\" attribute in \"VnfInstance\".")
     private Map<String, String> extensions;
     @ApiModelProperty(name = "VIM Connection Information", notes = "If present, this attribute signals modifications of certain entries in the \"vimConnectionInfo\" attribute array in \"VnfInstance\".")
-    private VimConnectionInfo vimConnectionInfo;
-    @ApiModelProperty(name = "VNF Package Id", notes = "If present, this attribute signals modifications of the \"vnfPkgId\" attribute in \"VnfInstance\".")
-    private String vnfPkgId;
+    private Map<String,VimConnectionInfo> vimConnectionInfo;
     @ApiModelProperty(name = "VNF Descriptor Id", notes = "If present, this attribute signals modifications of the \"vnfdId\" attribute in \"VnfInstance\".")
     private String vnfdId;
     @ApiModelProperty(name = "VNF Provider", notes = "If present, this attribute signals modifications of the \"vnfProvider\" attribute in \"VnfInstance\".")

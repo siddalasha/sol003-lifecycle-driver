@@ -1,6 +1,6 @@
 package org.etsi.sol003.lifecyclemanagement;
 
-import org.etsi.sol003.common.Link;
+import org.etsi.sol003.common.NotificationLink;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,10 +19,10 @@ import lombok.Data;
 public class LccnLinks {
 
     @ApiModelProperty(name = "vnfInstance", required = true, notes = "Link to the resource representing the VNF instance to which the notified change applies.")
-    private Link vnfInstance;
+    private NotificationLink vnfInstance;
     @ApiModelProperty(name = "subscription", required = true, notes = "Link to the related subscription.")
-    private Link subscription;
+    private NotificationLink subscription;
     @ApiModelProperty(name = "vnfLcmOpOcc", notes = "Link to the VNF lifecycle management operation occurrence that this notification is related to. Shall be present if there is a related lifecycle operation occurrence.")
-    private Link vnfLcmOpOcc;
+    private NotificationLink vnfLcmOpOcc;
 
 }

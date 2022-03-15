@@ -3,6 +3,7 @@ package org.etsi.sol003.lifecyclemanagement;
 import java.util.List;
 
 import org.etsi.sol003.common.ResourceHandle;
+import org.etsi.sol003.common.VnfExtCpData;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,5 +27,7 @@ public class ExtVirtualLinkInfo {
     private ResourceHandle resourceHandle;
     @ApiModelProperty(name = "Link Ports", notes = "Link ports of this VL.")
     private List<ExtLinkPortInfo> extLinkPorts;
+    @ApiModelProperty(name = "Current VnfExtCpData", required = true, notes = "Allows the API consumer to read the current CP configuration information for the connection of external CPs to the external virtual link.")
+    private List<VnfExtCpData> currentVnfExtCpData;
 
 }

@@ -25,6 +25,8 @@ public class LccnSubscription {
     private LifecycleChangeNotificationsFilter filter;
     @ApiModelProperty(name = "Callback URI", required = true, dataType = "URI", notes = "The URI of the endpoint to send the notification to.")
     private String callbackUri;
+    @ApiModelProperty(name = "Verbosity", required = true, notes = "This attribute signals the verbosity of LCM operation occurrence notifications.")
+    private LcmOpOccNotificationVerbosityType verbosity;
     @ApiModelProperty(name = "Links", required = true, notes = "Links to resources related to this resource.")
     @JsonProperty("_links")
     private Links links;

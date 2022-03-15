@@ -1,6 +1,6 @@
 package org.etsi.sol003.common;
 
-import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,6 +21,6 @@ public class VnfExtCpData {
     @ApiModelProperty(name = "CPD Id", required = true, notes = "The identifier of the CPD in the VNFD.")
     private String cpdId;
     @ApiModelProperty(name = "CP Configuration", required = true, notes = "List of instance data that need to be configured on the CP instances created from the respective CPD.")
-    private List<VnfExtCpConfig> cpConfig;
+    private Map<String,VnfExtCpConfig> cpConfig;
 
 }
