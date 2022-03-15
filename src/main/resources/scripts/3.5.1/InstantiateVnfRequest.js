@@ -12,10 +12,9 @@ var message = {extVirtualLinks: [], extManagedVirtualLinks: [], vimConnectionInf
 setPropertyIfNotNull(executionRequest.properties, message, 'flavourId');
 setPropertyIfNotNull(executionRequest.properties, message, 'instantiationLevelId');
 setPropertyIfNotNull(executionRequest.properties, message, 'localizationLanguage');
-setPropertyIfNotNull(executionRequest.properties, message, 'extensions');
 
 for (var key in executionRequest.getProperties()) {
-    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.')) {
+    if (key.startsWith('additionalParams.') || key.startsWith('extVirtualLinks.') || key.startsWith('extManagedVirtualLinks.') || key.startsWith('vimConnectionInfo.') || key.startsWith('extensions.')) {
         // print('Got property [' + key + '], value = [' + executionRequest.properties[key] + ']');
         addProperty(message, key, executionRequest.properties[key]);
     }
