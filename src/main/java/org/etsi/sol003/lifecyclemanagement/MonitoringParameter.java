@@ -1,6 +1,5 @@
 package org.etsi.sol003.lifecyclemanagement;
 
-import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,11 +19,12 @@ public class MonitoringParameter {
 
     @ApiModelProperty(name = "Id", required = true, notes = "Identifier of the monitoring parameter defined in the VNFD.")
     private String id;
+    @ApiModelProperty(name = "VnfdId", notes = "Identifier of the VNFD. Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
+    private String vnfdId;
     @ApiModelProperty(name = "Name", notes = "Human readable name of the monitoring parameter, as defined in the VNFD.")
     private String name;
-    @ApiModelProperty(name = "Value", required = true, notes = "Value of the monitoring parameter known to the VNFM (e.g. obtained for autoscaling purposes).")
-    private String value;
-    @ApiModelProperty(name = "Timestamp", required = true, notes = "Represents the point in time when the measurement has been performed, as known to the VNFM.")
-    private OffsetDateTime timeStamp;
+    @ApiModelProperty(name = "Performance Metric", required = true, notes = "Performance metric that is monitored. This attribute shall contain the related \"Measurement Name\" value")
+     private String performanceMetric;
+
 
 }

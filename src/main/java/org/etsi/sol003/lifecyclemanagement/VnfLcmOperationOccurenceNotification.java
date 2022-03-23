@@ -44,18 +44,26 @@ public class VnfLcmOperationOccurenceNotification implements LifecycleManagement
     @ApiModelProperty(name = "Automatic Invocation", required = true, notes = "Set to true if this VNF LCM operation occurrence has been triggered by an automated procedure inside the VNFM (i.e. ScaleVnf / ScaleVnfToLevel triggered by auto-scale, or HealVnf triggered by auto-heal). Set to false otherwise.")
     @JsonProperty("isAutomaticInvocation")
     private boolean automaticInvocation;
+    @ApiModelProperty(name = "Verbosity",  notes = "This attribute signals the verbosity of LCM operation occurrence notifications.If it is not present, it shall default to the value \"FULL\".")
+    private LcmOpOccNotificationVerbosityType verbosity;
     @ApiModelProperty(name = "VNF Lifecycle Management Operation Occurrence Id", required = true, notes = "The identifier of the VNF lifecycle management operation occurrence associated to the notification.")
     private String vnfLcmOpOccId;
     @ApiModelProperty(name = "Affected VNFCs", notes = "Information about VNFC instances that were affected during the lifecycle operation.")
     private List<AffectedVnfc> affectedVnfcs;
     @ApiModelProperty(name = "Affected Virtual Links", notes = "Information about VL instances that were affected during the lifecycle operation.")
     private List<AffectedVirtualLink> affectedVirtualLinks;
+    @ApiModelProperty(name = "Affected ExtLink Port", notes = "Information about external VNF link ports that were affected during the lifecycle operation.")
+    private List<AffectedExtLinkPort> affectedExtLinkPorts;
     @ApiModelProperty(name = "Affected Virtual Storage", notes = "Information about virtualised storage instances that were affected during the lifecycle operation.")
     private List<AffectedVirtualStorage> affectedVirtualStorages;
     @ApiModelProperty(name = "Changed Information", notes = "Information about the changed VNF instance information, including changed VNF configurable properties. Shall be present if the \"notificationStatus\" is set to \"RESULT\" and the operation has performed any changes to VNF instance information, including VNF configurable properties. Shall be absent otherwise.")
     private VnfInfoModificationRequest changedInfo;
+    @ApiModelProperty(name = "Affected Vip Cp", notes = "Information about virtual IP CP instances that were affected during the execution of the lifecycle management operation, if this notification represents the result of a lifecycle management operation occurrence. Shall be present if the \"notificationStatus\" is set to \"RESULT\".")
+    private List<AffectedVipCp> affectedVipCps;
     @ApiModelProperty(name = "Changed External Connectivity", notes = "Information about changed external connectivity, if this notification represents the result of a lifecycle operation occurrence. Shall be present if the \"notificationStatus\" is set to \"RESULT\" and the \"operation\" is set to \"CHANGE_EXT_CONN\". Shall be absent otherwise.")
     private List<ExtVirtualLinkInfo> changedExtConnectivity;
+    @ApiModelProperty(name = "Modifications Triggered By VnfPkg Change", notes = "Information about performed changes of \"VnfInstance\" attributes triggered by changing the current VNF package. Shall be present if the \"notificationStatus\" is set to \"RESULT\".")
+    private ModificationsTriggeredByVnfPkgChange modificationsTriggeredByVnfPkgChange;
     @ApiModelProperty(name = "Error", notes = "Details of the latest error, if one has occurred during executing the LCM operation. Shall be present if the \"operationState\" attribute is \"FAILED_TEMP\" or \"FAILED\", and shall be absent otherwise.")
     private ProblemDetails error;
     @ApiModelProperty(name = "Links", required = true, notes = "Links to resources related to this notification.")

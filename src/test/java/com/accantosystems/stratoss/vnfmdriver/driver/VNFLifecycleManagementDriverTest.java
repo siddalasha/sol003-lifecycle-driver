@@ -510,4 +510,20 @@ public class VNFLifecycleManagementDriverTest {
         driver.deleteLifecycleSubscription(TEST_DL_NO_AUTH, TEST_LCCN_SUBSCRIPTION_ID);
     }
 
+    @Test
+    public void testChangeCurrentVnfPkg() throws Exception {
+        final MockRestServiceServer server = MockRestServiceServer.bindTo(authenticatedRestTemplateService.getRestTemplate(TEST_DL_NO_AUTH)).build();
+
+        server.expect(requestTo(TEST_SERVER_BASE_URL + VNF_INSTANCE_ENDPOINT + "/" + TEST_VNF_INSTANCE_ID + "/change_vnfpkg"))
+              .andExpect(method(HttpMethod.POST))
+              .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+              .andRespond(withStatus(HttpStatus.ACCEPTED).location(URI.create(TEST_SERVER_BASE_URL + LCM_OP_OCC_ENDPOINT + "/" + TEST_VNF_LCM_OP_OCC_ID)));
+
+        final String changeCurrentVnfPkgRequest = loadFileIntoString("examples/ChangeCurrentVnfPkgRequest.json");
+
+        final String vnfLcmOpOccId = driver.changeCurrentVnfPkg(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, changeCurrentVnfPkgRequest);
+    
+        assertThat(vnfLcmOpOccId).isEqualTo(TEST_VNF_LCM_OP_OCC_ID);
+    }
+
 }

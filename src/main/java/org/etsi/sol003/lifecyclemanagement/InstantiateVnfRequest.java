@@ -32,10 +32,13 @@ public class InstantiateVnfRequest {
     @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about internal VLs that are managed by other entities than the VNFM.")
     private List<ExtManagedVirtualLinkData> extManagedVirtualLinks;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external / externally-managed virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
-    private List<VimConnectionInfo> vimConnectionInfo;
+    private Map<String,VimConnectionInfo> vimConnectionInfo;
     @ApiModelProperty(name = "Localization Language", notes = "Localization language of the VNF to be instantiated. The value shall comply with the format defined in IETF RFC 5646.")
     private String localizationLanguage;
     @ApiModelProperty(name = "Additional Parameters", notes = "Additional input parameters for the instantiation process, specific to the VNF being instantiated, as declared in the VNFD as part of \"InstantiateVnfOpConfig\".")
     private Map<String, String> additionalParams;
+    @ApiModelProperty(name = "Extensions", notes = "If present, this attribute provides modifications to the default values, as obtained from the VNFD, of the\"extensions\" attribute in \"VnfInstance\".")
+    private Map<String, String> extensions;
+
 
 }

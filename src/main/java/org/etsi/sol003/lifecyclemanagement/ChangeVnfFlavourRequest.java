@@ -32,8 +32,12 @@ public class ChangeVnfFlavourRequest {
     @ApiModelProperty(name = "External Managed Virtual Link Information", notes = "Information about internal VLs that are managed by the NFVO.")
     private List<ExtManagedVirtualLinkData> extManagedVirtualLinks;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external / externally-managed virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
-    private List<VimConnectionInfo> vimConnectionInfo;
+    private Map<String,VimConnectionInfo> vimConnectionInfo;
     @ApiModelProperty(name = "Additional Parameters", notes = "Additional input parameters for the flavour change process, specific to the VNF being modified, as declared in the VNFD as part of \"ChangeVnfFlavourOpConfig\".")
     private Map<String, String> additionalParams;
+    @ApiModelProperty(name = "Extensions", notes = "If present, this attribute provides modifications to the values of the \"extensions\" attribute in \"VnfInstance\".")
+    private Map<String, String> extensions;
+    @ApiModelProperty(name = "VNF Configurable Properties", notes = "If present, this attribute provides modifications to the values of the \"vnfConfigurableProperties\" attribute in \"VnfInstance\".")
+    private Map<String, String> vnfConfigurableProperties;
 
 }

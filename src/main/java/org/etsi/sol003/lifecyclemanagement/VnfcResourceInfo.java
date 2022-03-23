@@ -25,8 +25,12 @@ public class VnfcResourceInfo {
     private String id;
     @ApiModelProperty(name = "VDU Id", required = true, notes = "Reference to the applicable VDU in the VNFD.")
     private String vduId;
+    @ApiModelProperty(name = "VnfdId", notes = "Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
+    private String vnfdId;
     @ApiModelProperty(name = "Compute Resource", required = true, notes = "Reference to the VirtualCompute resource.")
     private ResourceHandle computeResource;
+    @ApiModelProperty(name = "ZoneId", notes = "The identifier of the resource zone, as managed by the resource management layer (typically, the VIM), where the referenced VirtualStorage resource is placed. Shall be provided if this information is available from the VIM.")
+    private String zoneId;
     @ApiModelProperty(name = "Storage Resource Ids", notes = "References to the VirtualStorage resources. The value refers to a VirtualStorageResourceInfo item in the VnfInstance.")
     private List<String> storageResourceIds;
     @ApiModelProperty(name = "Reservation Id", notes = "The reservation identifier applicable to the resource. It shall be present when an applicable reservation exists.")
@@ -52,9 +56,13 @@ public class VnfcResourceInfo {
         @ApiModelProperty(name = "VNF External Connection Point Id", notes = "When the VNFC CP is exposed as external CP of the VNF, the identifier of this external VNF CP.")
         private String vnfExtCpId;
         @ApiModelProperty(name = "Connection Point Protocol Information", notes = "Network protocol information for this CP.")
-        private CpProtocolInfo cpProtocolInfo;
+        private List<CpProtocolInfo> cpProtocolInfo;
         @ApiModelProperty(name = "VNF Link Port Id", notes = "Identifier of the \"vnfLinkPorts\" structure in the \"vnfVirtualLinkResourceInfo\" structure. Shall be present if the CP is associated to a link port.")
         private String vnfLinkPortId;
+        @ApiModelProperty(name = "Parent Cp Id", notes = "Identifier of another VNFC CP instance that corresponds to the parent port of a trunk that the present VNFC CP instance participates in.")
+        private String parentCpId;
+        @ApiModelProperty(name = "Metadata", notes = "Metadata about this CP.")
+        private Map<String, String> metadata;
 
     }
 

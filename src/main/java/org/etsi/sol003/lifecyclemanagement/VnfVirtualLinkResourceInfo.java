@@ -25,8 +25,12 @@ public class VnfVirtualLinkResourceInfo {
     private String id;
     @ApiModelProperty(name = "Virtual Link Descriptor Id", required = true, notes = "Identifier of the VNF Virtual Link Descriptor (VLD) in the VNFD.")
     private String vnfVirtualLinkDescId;
+    @ApiModelProperty(name = "VnfdId", notes = "Shall be present in case the value differs from the vnfdId attribute of the VnfInstance (e.g. during a \"Change current VNF package\" operation or due to its final failure).")
+    private String vnfdId;
     @ApiModelProperty(name = "Network Resource", required = true, notes = "Reference to the VirtualNetwork resource.")
     private ResourceHandle networkResource;
+    @ApiModelProperty(name = "ZoneId", notes = "The identifier of the resource zone, as managed by the resource management layer (typically, the VIM), where the referenced VirtualStorage resource is placed. Shall be provided if this information is available from the VIM.")
+    private String zoneId;
     @ApiModelProperty(name = "Reservation Id", notes = "The reservation identifier applicable to the resource. It shall be present when an applicable reservation exists.")
     private String reservationId;
     @ApiModelProperty(name = "VNFC Link Ports", notes = "Links ports of this VL. Shall be present when the linkPort is used for external connectivity by the VNF (refer to VnfLinkPort). May be present otherwise.")

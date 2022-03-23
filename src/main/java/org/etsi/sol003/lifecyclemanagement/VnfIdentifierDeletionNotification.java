@@ -26,7 +26,7 @@ public class VnfIdentifierDeletionNotification implements LifecycleManagementNot
     private String id;
     @ApiModelProperty(name = "Notification Type", required = true, notes = "Discriminator for the different notification types. Shall be set to \"VnfIdentifierDeletionNotification\" for this notification type.")
     private final String notificationType = TYPE;
-    @ApiModelProperty(name = "Subscription Id", notes = "Identifier of the subscription that this notification relates to.")
+    @ApiModelProperty(name = "Subscription Id", required = true, notes = "Identifier of the subscription that this notification relates to.")
     private String subscriptionId;
     @ApiModelProperty(name = "Notification Time", required = true, notes = "Date-time of the generation of the notification.")
     private OffsetDateTime timeStamp;

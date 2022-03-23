@@ -25,7 +25,7 @@ public class ChangeExtVnfConnectivityRequest {
     @ApiModelProperty(name = "External Virtual Link Information", required = true, notes = "Information about external VLs to change (e.g. connect the VNF to).")
     private List<ExtVirtualLinkData> extVirtualLinks;
     @ApiModelProperty(name = "VIM Connection Information", notes = "Information about VIM connections to be used for managing the resources for the VNF instance, or refer to external virtual links. This attribute shall only be supported and may be present if VNF-related resource management in direct mode is applicable.")
-    private List<VimConnectionInfo> vimConnectionInfo;
+    private Map<String,VimConnectionInfo> vimConnectionInfo;
     @ApiModelProperty(name = "Additional Parameters", notes = "Additional parameters passed by the NFVO as input to the process, specific to the VNF of which the external connectivity is changed, as declared in the VNFD as part of \" ChangeExtVnfConnectivityOpConfig\".")
     private Map<String, String> additionalParams;
 
