@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.2.7](https://github.com/IBM/sol003-lifecycle-driver/tree/0.2.7) (2022-03-21)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.2.6...0.2.7)
+
+**Implemented enhancements:**
+
+- Uplifted to ETSI Sol003 version 3.5.1
+- Vulnerability fixes
+
+**Fixed bugs:**
+
+**Documentation:**
+
 ## [0.2.6](https://github.com/IBM/sol003-lifecycle-driver/tree/0.2.6) (2022-02-09)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.2.5...0.2.6)
 
