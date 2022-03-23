@@ -105,7 +105,14 @@ public class LifecycleManagementService {
                 final String requestId = UUID.randomUUID().toString();
                 externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap()), properties.getExecutionResponseDelay());
                 return new ExecutionAcceptedResponse(requestId);
-            } else {
+            } else if ("Upgrade".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // ChangeCurrentVNFPackage
+                final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
+                final String changeCurrentVnfPkgRequest = messageConversionService.generateMessageFromRequest("ChangeCurrentVnfPkgRequest", executionRequest);
+                final String requestId = vnfLifecycleManagementDriver.changeCurrentVnfPkg(executionRequest.getDeploymentLocation(), vnfInstanceId, changeCurrentVnfPkgRequest);
+                return new ExecutionAcceptedResponse(requestId);
+            }
+             else {
                 throw new IllegalArgumentException(String.format("Requested transition [%s] is not supported by this lifecycle driver", executionRequest.getLifecycleName()));
             }
         } catch (MessageConversionException e) {
