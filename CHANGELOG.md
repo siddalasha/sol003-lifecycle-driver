@@ -6,6 +6,7 @@
 **Implemented enhancements:**
 
 - Uplifted to ETSI Sol003 version 3.5.1
+- Implemened new API /change_vnfpkg 
 - Vulnerability fixes
 
 **Fixed bugs:**
