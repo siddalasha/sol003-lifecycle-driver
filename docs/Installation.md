@@ -11,23 +11,17 @@ Prior to installing the driver, it may be necessary to:
 Download the Helm chart for the required version of the VNFM Driver. Run the following command to install the Helm chart with the default values:
 
 ```bash
-helm install sol003-lifecycle-driver-<version>.tgz --name sol003-lifecycle-driver
+helm install -g sol003-lifecycle-driver-<version>.tgz
 ```
 
 ## Onboarding Driver into LM
 
 Use lmctl for onboard the driver into LM. For full details on how to install or use lmctl, refer to its documentation.
 
-The following command will onboard the VNFM Driver into a TNC-O (< 1.3) environment called 'dev01':
+The following command will onboard the VNFM Driver into into CP4NA environment called 'dev01':
 
 ```bash
 lmctl lifecycledriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
-```
-
-For TNC-O 1.3 or greater, use the folowing command:
-
-```bash
-lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
 ```
 
 **NOTES**:
