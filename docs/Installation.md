@@ -11,7 +11,7 @@ Prior to installing the driver, it may be necessary to:
 Download the Helm chart for the required version of the VNFM Driver. Run the following command to install the Helm chart with the default values:
 
 ```bash
-helm install sol003-lifecycle-driver sol003-lifecycle-driver<version>.tgz
+helm install sol003-lifecycle-driver sol003-lifecycle-driver-<version>.tgz
 ```
 
 ## Onboarding Driver into LM
