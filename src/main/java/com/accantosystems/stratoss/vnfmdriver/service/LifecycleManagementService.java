@@ -74,8 +74,8 @@ public class LifecycleManagementService {
                 final String terminateVnfRequest = messageConversionService.generateMessageFromRequest("TerminateVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.terminateVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, terminateVnfRequest);
                 return new ExecutionAcceptedResponse(requestId);
-            } else if ("Scale".equalsIgnoreCase(executionRequest.getLifecycleName())) {
-                // Scale
+            } else if ("ScaleToLevel".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                // ScaleToLevel
                 final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
                 final String scaleVnfRequest = messageConversionService.generateMessageFromRequest("ScaleVnfRequest", executionRequest);
                 final String requestId = vnfLifecycleManagementDriver.scaleVnf(executionRequest.getDeploymentLocation(), vnfInstanceId, scaleVnfRequest);
