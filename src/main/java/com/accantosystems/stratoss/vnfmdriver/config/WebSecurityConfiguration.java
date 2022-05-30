@@ -38,7 +38,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/api/**", "/management/health", "/vnfpkgm/v2/**");
+        web.ignoring().antMatchers("/api/**", "/management/health", "/management/info", "/vnfpkgm/v2/**");
     }
 
     @Bean

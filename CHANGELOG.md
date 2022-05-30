@@ -1,6 +1,19 @@
 # Change Log
 
-## [0.3.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.2.7) (2022-03-23)
+## [0.3.1](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.1) (2022-05-30)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.0...0.3.1)
+
+**Implemented enhancements:**
+
+- Modified Kafka Instance Name from iaf-system-kafka-bootstrap to cp4na-o-events-kafka-bootstrap
+- Changed lifecycle name from Scale to ScaleToLevel 
+- Vulnerability fixes
+
+**Fixed bugs:**
+
+**Documentation:**
+
+## [0.3.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.0) (2022-03-23)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.2.6...0.3.0)
 
 **Implemented enhancements:**
