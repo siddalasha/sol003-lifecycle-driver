@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.3.2](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.2) (2022-07-19)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.1...0.3.2)
+
+**Implemented enhancements:**
+
+- Vulnerability fixes
+
 ## [0.3.1](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.1) (2022-05-30)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.0...0.3.1)
 
