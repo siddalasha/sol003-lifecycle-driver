@@ -59,7 +59,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID);
 
         assertThat(vnfInstanceResponse).isNotNull();
     }
@@ -78,7 +78,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_BASIC_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_BASIC_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID);
 
         assertThat(vnfInstanceResponse).isNotNull();
     }
@@ -104,7 +104,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_OAUTH2_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_OAUTH2_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID);
 
         assertThat(vnfInstanceResponse).isNotNull();
     }
@@ -129,7 +129,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_SESSION_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_SESSION_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID);
 
         assertThat(vnfInstanceResponse).isNotNull();
     }
@@ -146,7 +146,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -164,7 +164,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -182,7 +182,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest), SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -201,7 +201,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest);
+        final String vnfInstanceResponse = driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID);
 
         assertThat(vnfInstanceResponse).isNotNull();
     }
@@ -217,7 +217,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest))
+        assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest,TEST_VNF_DRIVER_INSTANCE_ID))
                 .isInstanceOf(SOL003ResponseException.class)
                 .hasMessage("Invalid status code [301 MOVED_PERMANENTLY] received");
     }
@@ -233,7 +233,7 @@ public class VNFLifecycleManagementDriverTest {
 
         final String createVnfRequest = loadFileIntoString("examples/CreateVnfRequest.json");
 
-        assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest))
+        assertThatThrownBy(() -> driver.createVnfInstance(TEST_DL_NO_AUTH, createVnfRequest, TEST_VNF_DRIVER_INSTANCE_ID))
                 .isInstanceOf(SOL003ResponseException.class)
                 .hasMessage("No response body");
     }
@@ -246,7 +246,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(method(HttpMethod.DELETE))
               .andRespond(withNoContent());
 
-        driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID);
+        driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, TEST_VNF_DRIVER_INSTANCE_ID);
     }
 
     @Test
@@ -257,7 +257,7 @@ public class VNFLifecycleManagementDriverTest {
               .andExpect(method(HttpMethod.DELETE))
               .andRespond(withStatus(HttpStatus.NOT_FOUND));
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID), SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, TEST_VNF_DRIVER_INSTANCE_ID), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -273,7 +273,7 @@ public class VNFLifecycleManagementDriverTest {
               .andRespond(withServerError().body(loadFileIntoString("examples/ProblemDetails.json"))
                                            .contentType(MediaType.APPLICATION_JSON));
 
-        SOL003ResponseException exception = catchThrowableOfType(() -> driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID), SOL003ResponseException.class);
+        SOL003ResponseException exception = catchThrowableOfType(() -> driver.deleteVnfInstance(TEST_DL_NO_AUTH, TEST_VNF_INSTANCE_ID, TEST_VNF_DRIVER_INSTANCE_ID), SOL003ResponseException.class);
 
         assertThat(exception.getProblemDetails()).isNotNull();
         assertThat(exception.getProblemDetails().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());

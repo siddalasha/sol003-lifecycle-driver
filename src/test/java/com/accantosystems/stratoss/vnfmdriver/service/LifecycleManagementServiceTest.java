@@ -28,7 +28,7 @@ public class LifecycleManagementServiceTest {
         final MessageConversionService messageConversionService = new JavascriptMessageConversionServiceImpl(objectMapper);
         final LifecycleManagementService lifecycleManagementService = new LifecycleManagementService(mockDriver, messageConversionService, mockExternalMessagingService, new VNFMDriverProperties());
 
-        when(mockDriver.createVnfInstance(any(), any())).thenReturn(loadFileIntoString("examples/VnfInstance.json"));
+        when(mockDriver.createVnfInstance(any(), any(), any())).thenReturn(loadFileIntoString("examples/VnfInstance.json"));
 
         final ExecutionRequest executionRequest = new ExecutionRequest();
         executionRequest.setLifecycleName("Create");
