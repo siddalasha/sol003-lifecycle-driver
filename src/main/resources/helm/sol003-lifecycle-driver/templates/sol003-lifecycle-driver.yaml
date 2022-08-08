@@ -125,7 +125,7 @@ spec:
             name: certificates
 {{- end }}
           - name: {{ .Values.app.config.security.ssl.secret.name }}
-            mountPath: /var/sol003driver/certs
+            mountPath: /var/sol003lifecycledriver/certs
           - name: {{ .Values.global.security.certificates.keystore.secretName }}
             mountPath: /var/lm/keystore
       volumes:

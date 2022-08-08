@@ -16,5 +16,5 @@ CERTKEY=$CERTDIR/tls.key
 CERT=$CERTDIR/tls.crt
 
 cd ${alm_vnfmdriver_directory}
-openssl pkcs12 -export -inkey $CERTKEY -in $CERT -out $KEYSTORE -password pass:password -name "sol003-driver"
+openssl pkcs12 -export -inkey $CERTKEY -in $CERT -out $KEYSTORE -password pass:password -name "sol003-lifecycle-driver"
 java $TS_OPTION $JVM_OPTIONS -jar /data/sol003-lifecycle-driver-@project.version@.jar

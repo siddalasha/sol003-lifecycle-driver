@@ -64,8 +64,8 @@ app:
         enabled: True
         secret:
           generate: True
-          name: sol003-driver-tls
-          commonName: sol003-driver
+          name: sol003-lifecycle-driver-tls
+          commonName: sol003-lifecycle-driver
 
   ## secret containing client certificates that are to be trusted
   certificateSecret:
