@@ -1,7 +1,12 @@
 package com.accantosystems.stratoss.vnfmdriver.model;
 
 public enum MessageType {
-    request,
-    response,
-    message
+    REQUEST,
+    RESPONSE,
+    MESSAGE;
+
+    @Override
+    public String toString() {
+        return this.name().toLowerCase();
+    }
 }
