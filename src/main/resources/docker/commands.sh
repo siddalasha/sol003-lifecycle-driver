@@ -11,7 +11,7 @@ done
 
 KEYSTOREDIR=/var/lm/keystore
 KEYSTORE=$KEYSTOREDIR/keystore.p12
-CERTDIR=/var/sol003driver/certs
+CERTDIR=/var/sol003lifecycledriver/certs
 CERTKEY=$CERTDIR/tls.key
 CERT=$CERTDIR/tls.crt
 
