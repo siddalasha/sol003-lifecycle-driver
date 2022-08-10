@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.3.3](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.3) (2022-08-10)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.2...0.3.3)
+
+**Implemented enhancements:**
+
+- Enabled Request Response Logging with CorrelationId, ContentType and Payload
+
 ## [0.3.2](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.2) (2022-07-19)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.1...0.3.2)
 
