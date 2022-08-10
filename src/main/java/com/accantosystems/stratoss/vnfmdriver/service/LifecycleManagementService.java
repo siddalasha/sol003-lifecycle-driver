@@ -37,14 +37,14 @@ public class LifecycleManagementService {
 
         try {
             if ("Create".equalsIgnoreCase(executionRequest.getLifecycleName())) {
+                final String requestId = UUID.randomUUID().toString();
                 // Generate CreateVnfRequest message
                 final String createVnfRequest = messageConversionService.generateMessageFromRequest("CreateVnfRequest", executionRequest);
                 // Send message to VNFM
-                final String vnfInstanceResponse = vnfLifecycleManagementDriver.createVnfInstance(executionRequest.getDeploymentLocation(), createVnfRequest);
+                final String vnfInstanceResponse = vnfLifecycleManagementDriver.createVnfInstance(executionRequest.getDeploymentLocation(), createVnfRequest, requestId);
                 // Convert response into properties to be returned to ALM
                 final Map<String, Object> outputs = messageConversionService.extractPropertiesFromMessage("VnfInstance", executionRequest, vnfInstanceResponse);
 
-                final String requestId = UUID.randomUUID().toString();
                 // Delay sending the asynchronous response (from a different thread) as this method needs to complete first (to send the response back to Brent)
                 externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, outputs, Collections.emptyMap()), properties.getExecutionResponseDelay());
 
@@ -100,9 +100,9 @@ public class LifecycleManagementService {
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Delete".equalsIgnoreCase(executionRequest.getLifecycleName())) {
                 // Delete
-                final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
-                vnfLifecycleManagementDriver.deleteVnfInstance(executionRequest.getDeploymentLocation(), vnfInstanceId);
                 final String requestId = UUID.randomUUID().toString();
+                final String vnfInstanceId = executionRequest.getStringResourceProperty("vnfInstanceId");
+                vnfLifecycleManagementDriver.deleteVnfInstance(executionRequest.getDeploymentLocation(), vnfInstanceId, requestId);
                 externalMessagingService.sendDelayedExecutionAsyncResponse(new ExecutionAsyncResponse(requestId, ExecutionStatus.COMPLETE, null, Collections.emptyMap(), Collections.emptyMap()), properties.getExecutionResponseDelay());
                 return new ExecutionAcceptedResponse(requestId);
             } else if ("Upgrade".equalsIgnoreCase(executionRequest.getLifecycleName())) {
