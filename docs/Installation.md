@@ -21,7 +21,7 @@ Use lmctl for onboard the driver into LM. For full details on how to install or 
 The following command will onboard the VNFM Driver into into CP4NA environment called 'dev01':
 
 ```bash
-lmctl lifecycledriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
+lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
 ```
 
 **NOTES**:

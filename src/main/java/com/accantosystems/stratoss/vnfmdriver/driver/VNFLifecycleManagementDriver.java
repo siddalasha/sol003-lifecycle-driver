@@ -6,7 +6,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import com.accantosystems.stratoss.common.utils.LoggingUtils;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageDirection;
+import com.accantosystems.stratoss.vnfmdriver.model.MessageType;
 import org.etsi.sol003.lifecyclemanagement.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,14 +97,15 @@ public class VNFLifecycleManagementDriver {
      * @return newly created {@link VnfInstance} record
      * @throws SOL003ResponseException if there are any errors creating the VNF instance
      */
-    public String createVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String createVnfRequest) throws SOL003ResponseException {
+    public String createVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String createVnfRequest, final String driverrequestid) throws SOL003ResponseException {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES;
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<String> requestEntity = new HttpEntity<>(createVnfRequest, headers);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(createVnfRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getRequestProtocolMetaData(url) ,driverrequestid);
         final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
-
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(), MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getProtocolMetaData(url,responseEntity),driverrequestid);
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
         return responseEntity.getBody();
@@ -121,15 +126,16 @@ public class VNFLifecycleManagementDriver {
      * @param vnfInstanceId      Identifier of the {@link VnfInstance} record to delete
      * @throws SOL003ResponseException if there are any errors deleting the VNF instance
      */
-    public void deleteVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId) throws SOL003ResponseException {
+    public void deleteVnfInstance(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String driverrequestid) throws SOL003ResponseException {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/{vnfInstanceId}";
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("vnfInstanceId", vnfInstanceId);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getRequestProtocolMetaData(url) ,driverrequestid);
         final ResponseEntity<Void> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
-
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getProtocolMetaData(url,responseEntity),driverrequestid);
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
 
@@ -308,7 +314,7 @@ public class VNFLifecycleManagementDriver {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "terminate", terminateVnfRequest);
     }
 
-     /**
+    /**
      * Submits an operation to the VNFM to change  the current VNF package on which a VNF instance is based
      *
      * <ul>
@@ -327,7 +333,7 @@ public class VNFLifecycleManagementDriver {
     public String changeCurrentVnfPkg(final ResourceManagerDeploymentLocation deploymentLocation, final String vnfInstanceId, final String changeCurrentVnfPkgRequest) throws SOL003ResponseException {
         return callVnfLcmOperation(deploymentLocation, vnfInstanceId, "change_vnfpkg", changeCurrentVnfPkgRequest);
     }
-    
+
     /**
      * Submits an operation to the VNFM on an existing VNF instance
      *
@@ -348,9 +354,9 @@ public class VNFLifecycleManagementDriver {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_VNF_INSTANCES + "/" + vnfInstanceId + "/" + operationName;
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<String> requestEntity = new HttpEntity<>(operationRequest, headers);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(operationRequest, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getRequestProtocolMetaData(url) ,null);
         final ResponseEntity<String> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.POST, requestEntity, String.class);
-
         checkResponseEntityMatches(responseEntity, HttpStatus.ACCEPTED, false);
         // "Location" header contains URI of the created VnfLcmOpOcc record
         final URI location = responseEntity.getHeaders().getLocation();
@@ -358,7 +364,9 @@ public class VNFLifecycleManagementDriver {
             throw new SOL003ResponseException("No Location header found");
         }
         // Return the VnfLcmOpOccId, which is the last part of the path
-        return location.getPath().substring(location.getPath().lastIndexOf("/") + 1);
+        final String requestId = location.getPath().substring(location.getPath().lastIndexOf("/") + 1);
+        LoggingUtils.logEnabledMDC(responseEntity.getBody(),MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getProtocolMetaData(url,responseEntity),uuid.toString());
+        return requestId;
     }
 
     /**
@@ -422,10 +430,11 @@ public class VNFLifecycleManagementDriver {
         final String url = deploymentLocation.getProperties().get(VNFM_SERVER_URL) + API_CONTEXT_ROOT + API_PREFIX_SUBSCRIPTIONS;
         final HttpHeaders headers = getHttpHeaders(deploymentLocation);
         final HttpEntity<LccnSubscriptionRequest> requestEntity = new HttpEntity<>(lccnSubscriptionRequest, headers);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(lccnSubscriptionRequest.toString(),MessageType.REQUEST, MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getRequestProtocolMetaData(url) ,uuid.toString());
         final ResponseEntity<LccnSubscription> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation)
-                                                                                                .exchange(url, HttpMethod.POST, requestEntity, LccnSubscription.class);
-
+                .exchange(url, HttpMethod.POST, requestEntity, LccnSubscription.class);
+        LoggingUtils.logEnabledMDC(responseEntity.getBody().toString(),MessageType.RESPONSE, MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getProtocolMetaData(url,responseEntity),uuid.toString());
         // "Location" header also includes URI of the created instance
         checkResponseEntityMatches(responseEntity, HttpStatus.CREATED, true);
         return responseEntity.getBody();
@@ -482,9 +491,10 @@ public class VNFLifecycleManagementDriver {
         final HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
         final Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("subscriptionId", subscriptionId);
-
+        UUID uuid = UUID.randomUUID();
+        LoggingUtils.logEnabledMDC(null, MessageType.REQUEST,MessageDirection.SENT, uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getRequestProtocolMetaData(url) ,uuid.toString());
         final ResponseEntity<Void> responseEntity = authenticatedRestTemplateService.getRestTemplate(deploymentLocation).exchange(url, HttpMethod.DELETE, requestEntity, Void.class, uriVariables);
-
+        LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.RECEIVED,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "http",getProtocolMetaData(url,responseEntity),uuid.toString());
         checkResponseEntityMatches(responseEntity, HttpStatus.NO_CONTENT, false);
     }
 
@@ -521,6 +531,25 @@ public class VNFLifecycleManagementDriver {
         } else if (!containsResponseBody && responseEntity.getBody() != null) {
             throw new SOL003ResponseException("No response body expected");
         }
+    }
+
+    Map<String,Object> getProtocolMetaData(String url,ResponseEntity responseEntity){
+
+        Map<String,Object> protocolMetadata=new HashMap<>();
+
+        protocolMetadata.put("status",responseEntity.getStatusCode());
+        protocolMetadata.put("status_code",responseEntity.getStatusCodeValue());
+        protocolMetadata.put("url",url);
+
+        return protocolMetadata;
+
+    }
+
+    Map<String,Object> getRequestProtocolMetaData(String url){
+
+        Map<String,Object> protocolMetadata=new HashMap<>();
+        protocolMetadata.put("url",url);
+        return protocolMetadata;
     }
 
 }
