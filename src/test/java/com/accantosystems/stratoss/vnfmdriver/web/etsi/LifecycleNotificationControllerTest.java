@@ -27,7 +27,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 @ActiveProfiles({ "test" })
 public class LifecycleNotificationControllerTest {
 
-    public static final String NOTIFICATIONS_ENDPOINT = "/vnflcm/v1/notifications";
+    public static final String NOTIFICATIONS_ENDPOINT = "/vnflcm/v2/notifications";
 
     @Autowired private TestRestTemplate testRestTemplate;
     @MockBean private ExternalMessagingService externalMessagingService;
