@@ -34,7 +34,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateS
 @AutoConfigureWireMock(port = 0)
 public class VNFLifecycleManagementDriverTest {
 
-    private static final String BASE_API_ROOT = "/vnflcm/v1";
+    private static final String BASE_API_ROOT = "/vnflcm/v2";
     private static final String VNF_INSTANCE_ENDPOINT = BASE_API_ROOT + "/vnf_instances";
     private static final String LCM_OP_OCC_ENDPOINT = BASE_API_ROOT + "/vnf_lcm_op_occs";
     private static final String SUBSCRIPTIONS_ENDPOINT = BASE_API_ROOT + "/subscriptions";

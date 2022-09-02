@@ -23,7 +23,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 import io.swagger.annotations.ApiOperation;
 
 @RestController("LifecycleNotificationController")
-@RequestMapping("/vnflcm/v1/notifications")
+@RequestMapping("/vnflcm/v2/notifications")
 public class LifecycleNotificationController {
 
     private final static Logger logger = LoggerFactory.getLogger(LifecycleNotificationController.class);
