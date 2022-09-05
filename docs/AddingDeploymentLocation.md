@@ -61,10 +61,10 @@ In order for the driver to receive lifecycle notifications from the VNFM, the fo
 
 ```bash
 curl -X POST \
-  https://vnfm-address:port/vnflcm/v1/subscriptions \
+  http://vnfm-address:port/vnflcm/v2/subscriptions \
   -H 'Content-Type: application/json' \
   -d '{
-    "callbackUri" : "http://sol003-lifecycle-driver:8296/vnflcm/v1/notifications",
+    "callbackUri" : "https://sol003-lifecycle-driver:8296/vnflcm/v2/notifications",
     "filter" : {
       "notificationTypes" : [ "VnfLcmOperationOccurrenceNotification" ],
       "operationStates" : [ "COMPLETED", "FAILED", "FAILED_TEMP", "ROLLED_BACK" ]
