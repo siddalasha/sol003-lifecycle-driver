@@ -9,8 +9,9 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 
 import org.etsi.sol003.common.ProblemDetails;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+/*import org.junit.Test;
+import org.junit.runner.RunWith;*/
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,7 +30,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.alm.FindReferenceResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.web.ErrorInfo;
 import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class LifecycleControllerTest {

@@ -13,8 +13,9 @@ import java.util.UUID;
 
 import org.etsi.sol003.common.ProblemDetails;
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+/*import org.junit.Test;
+import org.junit.runner.RunWith*/;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,7 +36,7 @@ import com.accantosystems.stratoss.vnfmdriver.test.TestConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class PackageManagementControllerTest {

@@ -12,9 +12,11 @@ import java.util.UUID;
 import org.etsi.sol003.common.ProblemDetails;
 import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
-import org.junit.Before;
+/*import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.runner.RunWith;*/
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -28,7 +30,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.GrantCreationResponse;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantRejectedException;
 import com.accantosystems.stratoss.vnfmdriver.service.GrantService;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class GrantControllerTest {
@@ -41,7 +43,7 @@ public class GrantControllerTest {
     @MockBean
     private GrantService grantService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
     }

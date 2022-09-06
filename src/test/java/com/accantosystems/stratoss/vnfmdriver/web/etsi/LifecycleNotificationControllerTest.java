@@ -5,8 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+/*import org.junit.Test;
+import org.junit.runner.RunWith;*/
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +23,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.alm.FailureDetails;
 import org.etsi.sol003.common.ProblemDetails;
 import com.accantosystems.stratoss.vnfmdriver.service.ExternalMessagingService;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class LifecycleNotificationControllerTest {

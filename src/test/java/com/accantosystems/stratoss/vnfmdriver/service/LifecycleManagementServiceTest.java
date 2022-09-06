@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import org.junit.Test;
+//import org.junit.Test;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.VNFLifecycleManagementDriver;
@@ -16,6 +16,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.GenericExecutionRequestPropertyValue;
 import com.accantosystems.stratoss.vnfmdriver.service.impl.JavascriptMessageConversionServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 public class LifecycleManagementServiceTest {
 
