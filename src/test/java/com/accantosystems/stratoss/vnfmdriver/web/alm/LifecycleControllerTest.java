@@ -13,6 +13,7 @@ import org.etsi.sol003.common.ProblemDetails;
 import org.junit.runner.RunWith;*/
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -31,6 +32,7 @@ import com.accantosystems.stratoss.vnfmdriver.model.web.ErrorInfo;
 import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
 
 //@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc(addFilters=false)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class LifecycleControllerTest {
