@@ -59,7 +59,7 @@
         <spring-beans.version>5.3.21</spring-beans.version>
         <spring-core.version>5.3.21</spring-core.version>
         <springfox.version>3.0.0</springfox.version>
-        <tomcat.version>9.0.63</tomcat.version>
+        <!-- <tomcat.version>9.0.63</tomcat.version> -->
         <wiremock.version>2.2.8.RELEASE</wiremock.version>
     </properties>
 
@@ -68,7 +68,11 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.31</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
