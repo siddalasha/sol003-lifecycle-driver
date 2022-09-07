@@ -9,8 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 
 import org.etsi.sol003.common.ProblemDetails;
-/*import org.junit.Test;
-import org.junit.runner.RunWith;*/
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.accantosystems.stratoss.vnfmdriver.driver.SOL003ResponseException;
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionAcceptedResponse;
@@ -31,7 +28,6 @@ import com.accantosystems.stratoss.vnfmdriver.model.alm.FindReferenceResponse;
 import com.accantosystems.stratoss.vnfmdriver.model.web.ErrorInfo;
 import com.accantosystems.stratoss.vnfmdriver.service.LifecycleManagementService;
 
-//@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(addFilters=false)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })

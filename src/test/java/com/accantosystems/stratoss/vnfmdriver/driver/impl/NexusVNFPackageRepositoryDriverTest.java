@@ -13,8 +13,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.util.List;
 
 import org.etsi.sol003.packagemanagement.VnfPkgInfo;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +21,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverConstants;
@@ -37,7 +34,6 @@ import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateS
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 
-//@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class NexusVNFPackageRepositoryDriverTest {

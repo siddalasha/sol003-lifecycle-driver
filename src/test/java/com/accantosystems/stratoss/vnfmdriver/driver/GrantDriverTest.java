@@ -9,10 +9,6 @@ import java.net.URI;
 
 import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
-//import org.junit.Rule;
-//import org.junit.Test;
-//import org.junit.rules.TestName;
-//import org.junit.runner.RunWith;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -27,7 +23,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.accantosystems.stratoss.vnfmdriver.model.GrantCreationResponse;
 
-//@RunWith(SpringRunner.class)
 @RestClientTest({ GrantDriver.class, GrantResponseErrorHandler.class })
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("test")
@@ -38,9 +33,6 @@ public class GrantDriverTest {
 
     @Autowired
     private GrantDriver grantDriver;
-
-    //@Rule
-    //public TestName testName = new TestName();
 
     @Test
     public void testRequestGrantSync() throws Exception {
