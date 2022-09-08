@@ -39,7 +39,7 @@ Create certificates for the route.
 ```bash
 openssl req -newkey rsa:2048 -keyout route-tls.key -x509 -days 365 -out route-tls.crt -nodes
 ```
-*Note: Use Common Name as ```sol003-lifecycle-driver.apps.<cluster-name>.<domain-name>``` while creating certificates.*
+**NOTES**: Use Common Name as ```sol003-lifecycle-driver.apps.<cluster-name>.<domain-name>``` while creating certificates.
 
 Get CA certificate from secret.
 
