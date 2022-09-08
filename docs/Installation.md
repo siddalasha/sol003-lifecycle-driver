@@ -34,11 +34,12 @@ lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296
 
 A route need to be created to access VNFM driver externally. In this example we are using reencrypt route.
 
-Create certificates for the route. Use Common Name as ```sol003-lifecycle-driver.apps.<cluster-name>.<domain-name>``` while creating certificates.
+Create certificates for the route.
 
 ```bash
 openssl req -newkey rsa:2048 -keyout route-tls.key -x509 -days 365 -out route-tls.crt -nodes
 ```
+*Note: Use Common Name as ```sol003-lifecycle-driver.apps.<cluster-name>.<domain-name>``` while creating certificates.*
 
 Get CA certificate from secret.
 
