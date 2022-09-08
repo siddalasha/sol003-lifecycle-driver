@@ -30,26 +30,26 @@ The following command will onboard the VNFM Driver into into CP4NA environment c
 lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01 --certificate sol003-lifecycle-tls.pem
 ```
 
-##Create route for sol003
+## Create route for sol003
 
 A route need to be created to access VNFM driver externally. In this example we are using reencrypt route.
 
-Create certificates for the route. Use Common Name as "sol003-lifecycle-driver.apps.<cluster name>.cp.fyre.ibm.com" while creating certs.
+Create certificates for the route. Use Common Name as sol003-lifecycle-driver.apps.cluster-name.cp.fyre.ibm.com while creating certs.
 
 ```bash
 openssl req -newkey rsa:2048 -keyout route-tls.key -x509 -days 365 -out route-tls.crt -nodes
 ```
 
-Get CA cert from secret
+Get CA cert from secret.
 
 ```bash
 oc get secret sol003-lifecycle-driver-tls -o 'go-template={{index .data "ca.crt"}}' | base64 -d > sol003-ca.crt
 ```
 
-Create route
+Create route.
 
 ```bash
-oc create route reencrypt --service=sol003-lifecycle-driver --cert=route-tls.crt --key=route-tls.key --dest-ca-cert=sol003-ca.crt --hostname=sol003-lifecycle-driver.apps.<cluster name>.cp.fyre.ibm.com
+oc create route reencrypt --service=sol003-lifecycle-driver --cert=route-tls.crt --key=route-tls.key --dest-ca-cert=sol003-ca.crt --hostname=sol003-lifecycle-driver.apps.cluster-name.cp.fyre.ibm.com
 ```
 
 
