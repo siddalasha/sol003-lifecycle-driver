@@ -18,11 +18,40 @@ helm install sol003-lifecycle-driver sol003-lifecycle-driver-<version>.tgz
 
 Use lmctl for onboard the driver into LM. For full details on how to install or use lmctl, refer to its documentation.
 
+Sol003 certificate which is in secret sol003-lifecycle-driver-tls need to be used while onboarding VNFM driver. Following command can be used to obtain sol003 certificate.
+
+```bash
+oc get secret sol003-lifecycle-driver-tls -o 'go-template={{index .data "tls.crt"}}' | base64 -d > sol003-lifecycle-tls.pem
+```
+
 The following command will onboard the VNFM Driver into into CP4NA environment called 'dev01':
 
 ```bash
-lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01
+lmctl resourcedriver add --type sol003 --url http://sol003-lifecycle-driver:8296 dev01 --certificate sol003-lifecycle-tls.pem
 ```
+
+##Create route for sol003
+
+A route need to be created to access VNFM driver externally. In this example we are using reencrypt route.
+
+Create certificates for the route. Use Common Name as "sol003-lifecycle-driver.apps.<cluster name>.cp.fyre.ibm.com" while creating certs.
+
+```bash
+openssl req -newkey rsa:2048 -keyout route-tls.key -x509 -days 365 -out route-tls.crt -nodes
+```
+
+Get CA cert from secret
+
+```bash
+oc get secret sol003-lifecycle-driver-tls -o 'go-template={{index .data "ca.crt"}}' | base64 -d > sol003-ca.crt
+```
+
+Create route
+
+```bash
+oc create route reencrypt --service=sol003-lifecycle-driver --cert=route-tls.crt --key=route-tls.key --dest-ca-cert=sol003-ca.crt --hostname=sol003-lifecycle-driver.apps.<cluster name>.cp.fyre.ibm.com
+```
+
 
 **NOTES**:
 - The above example assumes lmctl has been configured with an environment called 'dev01'. Replace this environment name accordingly
