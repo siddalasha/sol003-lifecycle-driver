@@ -27,7 +27,7 @@ import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateS
  * Endpoints expected to be found under the following structure
  *
  * <ul>
- *     <li>{apiRoot}/vnflcm/v1
+ *     <li>{apiRoot}/vnflcm/v2
  *     <li><ul>
  *         <li>/vnf_instances</li>
  *         <li><ul>
@@ -70,7 +70,7 @@ public class VNFLifecycleManagementDriver {
 
     private final static Logger logger = LoggerFactory.getLogger(VNFLifecycleManagementDriver.class);
 
-    private final static String API_CONTEXT_ROOT = "/vnflcm/v1";
+    private final static String API_CONTEXT_ROOT = "/vnflcm/v2";
     private final static String API_PREFIX_VNF_INSTANCES = "/vnf_instances";
     private final static String API_PREFIX_OP_OCCURRENCES = "/vnf_lcm_op_occs";
     private final static String API_PREFIX_SUBSCRIPTIONS = "/subscriptions";

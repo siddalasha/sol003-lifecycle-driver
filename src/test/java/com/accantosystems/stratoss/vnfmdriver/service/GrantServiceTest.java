@@ -11,13 +11,11 @@ import java.util.UUID;
 import org.etsi.sol003.granting.Grant;
 import org.etsi.sol003.granting.GrantRequest;
 import org.etsi.sol003.lifecyclemanagement.LcmOperationType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.accantosystems.stratoss.vnfmdriver.config.VNFMDriverProperties;
 import com.accantosystems.stratoss.vnfmdriver.driver.GrantDriver;
@@ -25,7 +23,6 @@ import com.accantosystems.stratoss.vnfmdriver.driver.GrantProviderException;
 import com.accantosystems.stratoss.vnfmdriver.model.GrantCreationResponse;
 import com.accantosystems.stratoss.vnfmdriver.web.etsi.BadRequestException;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ "test" })
 public class GrantServiceTest {

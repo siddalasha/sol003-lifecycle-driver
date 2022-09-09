@@ -12,10 +12,7 @@ import java.net.URI;
 
 import org.etsi.sol003.lifecyclemanagement.LccnSubscription;
 import org.etsi.sol003.lifecyclemanagement.LccnSubscriptionRequest;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -29,12 +26,11 @@ import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.accantosystems.stratoss.vnfmdriver.service.AuthenticatedRestTemplateService;
 
-@RunWith(SpringRunner.class)
 @RestClientTest({ VNFLifecycleManagementDriver.class, SOL003ResponseErrorHandler.class, AuthenticatedRestTemplateService.class })
 @AutoConfigureWireMock(port = 0)
 public class VNFLifecycleManagementDriverTest {
 
-    private static final String BASE_API_ROOT = "/vnflcm/v1";
+    private static final String BASE_API_ROOT = "/vnflcm/v2";
     private static final String VNF_INSTANCE_ENDPOINT = BASE_API_ROOT + "/vnf_instances";
     private static final String LCM_OP_OCC_ENDPOINT = BASE_API_ROOT + "/vnf_lcm_op_occs";
     private static final String SUBSCRIPTIONS_ENDPOINT = BASE_API_ROOT + "/subscriptions";
@@ -43,8 +39,6 @@ public class VNFLifecycleManagementDriverTest {
     @Autowired private AuthenticatedRestTemplateService authenticatedRestTemplateService;
 
     @Value("${wiremock.server.port}") private int wiremockServerPort;
-
-    @Rule public TestName testName = new TestName();
 
     @Test
     public void testCreateVnfInstance() throws Exception {

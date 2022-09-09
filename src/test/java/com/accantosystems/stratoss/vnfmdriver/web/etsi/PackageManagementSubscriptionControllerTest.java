@@ -9,7 +9,7 @@ import org.etsi.sol003.packagemanagement.PackageOperationalStateType;
 import org.etsi.sol003.packagemanagement.PkgmNotificationsFilter;
 import org.etsi.sol003.packagemanagement.PkgmSubscription;
 import org.etsi.sol003.packagemanagement.PkgmSubscriptionRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;

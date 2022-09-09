@@ -1,6 +1,24 @@
 # Change Log
 
-## [0.4.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.3.3) (2022-08-10)
+## [0.5.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.5.0) (2022-09-09)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.4.1...0.5.0)
+
+**Implemented enhancements:**
+
+- Enable SSL on sol003 driver
+- Add documentation for SSL feature
+- Use Keystore password from the secret cp4na-o-keystore
+- API major version change as per spec 3.5.1
+- Security vulnerabilities fixes
+
+## [0.4.1](https://github.com/IBM/sol003-lifecycle-driver/tree/0.4.1) (2022-08-22)
+[Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.4.0...0.4.1)
+
+**Implemented enhancements:**
+
+- Java version changed to 1.8 for CP4NA 2.3.x versions
+
+## [0.4.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.4.0) (2022-08-10)
 [Full Changelog](https://github.com/IBM/sol003-lifecycle-driver/compare/0.3.2...0.4.0)
 
 **Implemented enhancements:**

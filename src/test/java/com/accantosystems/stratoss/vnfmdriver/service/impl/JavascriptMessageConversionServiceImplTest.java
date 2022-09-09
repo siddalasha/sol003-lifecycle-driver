@@ -6,9 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.json.JsonContent;
 
 import com.accantosystems.stratoss.vnfmdriver.model.alm.ExecutionRequest;
@@ -23,7 +22,7 @@ public class JavascriptMessageConversionServiceImplTest {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
 
         objectMapper.findAndRegisterModules();
