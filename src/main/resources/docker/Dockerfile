@@ -1,5 +1,5 @@
 ARG JDK_IMAGE=ibm-semeru-runtimes
-ARG JDK_VERSION=open-11-jre
+ARG JDK_VERSION=open-11-jre-focal
 FROM ${JDK_IMAGE}:${JDK_VERSION}
 ENV JVM_OPTIONS=-Xmx256m
 COPY *.sh /data/
