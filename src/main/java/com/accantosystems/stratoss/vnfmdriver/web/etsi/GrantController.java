@@ -51,7 +51,10 @@ public class GrantController {
 
         final ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
         URI location = uriBuilder.path(GRANT_LOCATION).buildAndExpand(grantCreationResponse.getGrantId()).toUri();
-        LoggingUtils.logEnabledMDC(grantCreationResponse.getGrant() != null ? grantCreationResponse.getGrant().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",null,null);
+        if(grantCreationResponse != null)
+            LoggingUtils.logEnabledMDC(grantCreationResponse.getGrant() != null ? grantCreationResponse.getGrant().toString() : null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",null,null);
+        else
+            LoggingUtils.logEnabledMDC(null, MessageType.RESPONSE,MessageDirection.SENT,uuid.toString(),MediaType.APPLICATION_JSON.toString(), "https",null,null);
 
         if (grantCreationResponse.getGrant() != null) {
             return ResponseEntity.created(location).body(grantCreationResponse.getGrant());
