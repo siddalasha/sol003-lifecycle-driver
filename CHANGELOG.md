@@ -6,7 +6,7 @@
 **Implemented enhancements:**
 
 - Add driverrequestid in log for operations API call
-- Add logging message in Grant lifecycle
+- Add logging message in grant request
 - Security vulnerabilities fixes
 
 ## [0.5.0](https://github.com/IBM/sol003-lifecycle-driver/tree/0.5.0) (2022-09-09)
