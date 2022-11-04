@@ -3,19 +3,19 @@ package com.accantosystems.stratoss.vnfmdriver.model.alm;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(description = "Request to find a reference")
+@Schema(description = "Request to find a reference")
 public class FindReferenceRequest {
 
-    @ApiModelProperty(value = "Instance Name")
+    @Schema(name = "Instance Name")
     private String instanceName;
-    @ApiModelProperty(value = "Deployment Location")
+    @Schema(name = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
-    @ApiModelProperty(value = "driverFiles")
+    @Schema(name = "driverFiles")
     private String driverFiles;
 
     public FindReferenceRequest() {}
