@@ -16,7 +16,7 @@ public class AvailabilityControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    //@Test
+    @Test
     public void testAvailability() throws Exception {
         mvc.perform(get("/api").accept(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())

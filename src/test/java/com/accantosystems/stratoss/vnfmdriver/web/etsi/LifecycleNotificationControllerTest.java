@@ -3,9 +3,10 @@ package com.accantosystems.stratoss.vnfmdriver.web.etsi;
 import static com.accantosystems.stratoss.vnfmdriver.test.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.times;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,7 +39,7 @@ public class LifecycleNotificationControllerTest {
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        //verifyZeroInteractions(externalMessagingService);
+        verify(externalMessagingService, times(0)).sendExecutionAsyncResponse(Mockito.any());
     }
 
     @Test
@@ -114,7 +115,7 @@ public class LifecycleNotificationControllerTest {
 
     @Test
     public void testReceiveNotificationNoAuthentication() {
-        final ResponseEntity<String> responseEntity = testRestTemplate.postForEntity(NOTIFICATIONS_ENDPOINT, EMPTY_JSON, String.class);
+        final ResponseEntity<ProblemDetails> responseEntity = testRestTemplate.postForEntity(NOTIFICATIONS_ENDPOINT, EMPTY_JSON, ProblemDetails.class);
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
