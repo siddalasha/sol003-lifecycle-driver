@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Details returned when a lifecycle execution request is accepted")
 public class ExecutionAcceptedResponse {
 
-    @Schema(name = "Request ID")
+    @Schema(description = "Request ID")
     private String requestId;
 
     public ExecutionAcceptedResponse() {}

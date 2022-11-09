@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Request to find a reference")
 public class FindReferenceRequest {
 
-    @Schema(name = "Instance Name")
+    @Schema(description = "Instance Name")
     private String instanceName;
-    @Schema(name = "Deployment Location")
+    @Schema(description = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
-    @Schema(name = "driverFiles")
+    @Schema(description = "driverFiles")
     private String driverFiles;
 
     public FindReferenceRequest() {}

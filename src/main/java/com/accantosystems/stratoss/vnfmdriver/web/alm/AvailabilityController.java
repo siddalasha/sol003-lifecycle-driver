@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 public class AvailabilityController {
 
     @GetMapping
-    @Operation(operationId = "Test Availability", description = "Returns a string indicating the current health and availability of the driver")
+    @Operation(summary = "Test Availability", description = "Returns a string indicating the current health and availability of the driver")
     public ResponseEntity<String> testAvailability() {
         return ResponseEntity.ok("OK");
     }

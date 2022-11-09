@@ -31,7 +31,7 @@ public class PackageManagementSubscriptionController {
     private final Map<String, PkgmSubscription> localSubscriptionCache = new ConcurrentHashMap<>();
 
     @PostMapping()
-    @Operation(operationId = "Create New Subscription", description = "Creates a new subscription for packages")
+    @Operation(summary = "Create New Subscription", description = "Creates a new subscription for packages")
     public ResponseEntity<PkgmSubscription> createNewSubscription(PkgmSubscriptionRequest subscriptionRequest, HttpServletRequest servletRequest) {
         final String newSubscriptionId = UUID.randomUUID().toString();
         try (BufferedReader messageReader = servletRequest.getReader()) {
@@ -53,7 +53,7 @@ public class PackageManagementSubscriptionController {
     }
 
     @GetMapping(path = "/{subscriptionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(operationId = "Reads the information of an individual Subscription", description = "This resource represents an individual Subscription. The client can use this resource to read information of the Subscription.")
+    @Operation(summary = "Reads the information of an individual Subscription", description = "This resource represents an individual Subscription. The client can use this resource to read information of the Subscription.")
     public ResponseEntity<PkgmSubscription> getSubscription(@PathVariable String subscriptionId) {
         logger.info("Received request to retrieve Package Management Subscription [{}]", subscriptionId);
         return localSubscriptionCache.containsKey(subscriptionId) ? ResponseEntity.ok(localSubscriptionCache.get(subscriptionId)) : ResponseEntity.notFound().build();

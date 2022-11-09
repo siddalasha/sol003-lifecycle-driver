@@ -1,12 +1,11 @@
 package com.accantosystems.stratoss.vnfmdriver.config;
 
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.servers.Server;
+
 
 /**
  * Springfox Swagger configuration.
@@ -38,8 +37,12 @@ public class SwaggerConfiguration {
      * @return the Swagger Springfox configuration
      */
     @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI().info(new Info().title(appName).description(appDescription)
-                .version(appVersion)).addServersItem(new Server().url(serverUrl));
+    public OpenApiCustomiser openApiCustomiser() {
+        return openApi -> {
+            openApi.getPaths().values().forEach(pathItem ->
+            pathItem.readOperations());;
+        };
     }
+        
 }
+    

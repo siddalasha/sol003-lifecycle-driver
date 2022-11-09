@@ -15,19 +15,19 @@ import static com.accantosystems.stratoss.vnfmdriver.utils.Constants.KAFKA_MESSA
 @Schema(description = "Details returned when an async lifecycle execution request is accepted")
 public class ExecutionAsyncResponse {
 
-    @Schema(name = "Request ID")
+    @Schema(description = "Request ID")
     private String requestId;
-    @Schema(name = "Status")
+    @Schema(description = "Status")
     private ExecutionStatus status;
-    @Schema(name = "Failure Details")
+    @Schema(description = "Failure Details")
     private FailureDetails failureDetails;
-    @Schema(name = "Outputs")
+    @Schema(description = "Outputs")
     private final Map<String, Object> outputs = new HashMap<>();
-    @Schema(name = "Associated Resource Instance Topology")
+    @Schema(description = "Associated Resource Instance Topology")
     private final Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
-    @Schema(name = "Timestamp")
+    @Schema(description = "Timestamp")
     private Long timestamp;
-    @Schema(name = "version")
+    @Schema(description = "version")
     private String version = KAFKA_MESSAGE_VERSION;
 
     public ExecutionAsyncResponse() {}

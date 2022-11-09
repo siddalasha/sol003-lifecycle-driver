@@ -16,19 +16,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Request used to execute lifecycle")
 public class ExecutionRequest {
 
-    @Schema(name = "Lifecycle Name")
+    @Schema(description = "Lifecycle Name")
     private String lifecycleName;
-    @Schema(name = "Driver files")
+    @Schema(description = "Driver files")
     private String driverFiles;
-    @Schema(name = "System Properties")
+    @Schema(description = "System Properties")
     private Map<String, ExecutionRequestPropertyValue> systemProperties = new HashMap<>();
-    @Schema(name = "Resource Properties")
+    @Schema(description = "Resource Properties")
     private Map<String, ExecutionRequestPropertyValue> resourceProperties = new HashMap<>();
-    @Schema(name = "Request Properties")
+    @Schema(description = "Request Properties")
     private Map<String, ExecutionRequestPropertyValue> requestProperties = new HashMap<>();
-    @Schema(name = "Deployment Location")
+    @Schema(description = "Deployment Location")
     private ResourceManagerDeploymentLocation deploymentLocation;
-    @Schema(name = "Associated Topology")
+    @Schema(description = "Associated Topology")
     private Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
 
     public ExecutionRequest() {}

@@ -39,7 +39,7 @@ public class LifecycleController {
     }
 
     @PostMapping("/lifecycle/execute")
-    @Operation(operationId = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
+    @Operation( summary = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> executeLifecycle(@RequestBody ExecutionRequest executionRequest, HttpServletRequest servletRequest) throws MessageConversionException {
         try (BufferedReader messageReader = servletRequest.getReader()) {
             String rawMessage = messageReader.lines().collect(Collectors.joining("\n"));
@@ -53,7 +53,7 @@ public class LifecycleController {
     }
 
     @PostMapping("/references/find")
-    @Operation(operationId = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
+    @Operation(summary = "Execute a lifecycle against a VNFM", description = "Initiates a lifecycle against a VNF, managed by a VNFM")
     public ResponseEntity<ExecutionAcceptedResponse> findReference(@RequestBody FindReferenceRequest findReferenceRequest, HttpServletRequest servletRequest) throws MessageConversionException, NotImplementedException {
         throw new NotImplementedException("Find References API is not implemented");
     }

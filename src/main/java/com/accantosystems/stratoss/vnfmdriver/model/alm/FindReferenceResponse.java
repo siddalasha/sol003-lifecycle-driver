@@ -14,13 +14,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Find reference response")
 public class FindReferenceResponse {
 
-    @Schema(name = "Associated Topology")
+    @Schema(description = "Associated Topology")
     private Map<String, InternalResourceInstance> associatedTopology = new HashMap<>();
 
-    @Schema(name = "LM resource id")
+    @Schema(description = "LM resource id")
     private String resourceId;
 
-    @Schema(name = "Outputs")
+    @Schema(description = "Outputs")
     private Map<String, String> outputs = new HashMap<>();
 
     public FindReferenceResponse() {}

@@ -44,7 +44,7 @@ public class GrantController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(operationId = "Requests a grant for a particular VNF lifecycle operation.")
+    @Operation(summary = "Requests a grant for a particular VNF lifecycle operation.")
     public ResponseEntity<Grant> requestGrant(@RequestBody GrantRequest grantRequest) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant request:\n{}", grantRequest);
         UUID uuid = UUID.randomUUID();
@@ -63,7 +63,7 @@ public class GrantController {
     }
 
     @GetMapping(path = { "/{grantId}" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(operationId = "Reads a grant", description = "Returns a previously created grant resource if a granting decision has been made.")
+    @Operation(summary = "Reads a grant", description = "Returns a previously created grant resource if a granting decision has been made.")
     public ResponseEntity<Grant> getGrant(@PathVariable String grantId) throws GrantRejectedException, GrantProviderException {
         logger.info("Received grant fetch for id [{}]", grantId);
         UUID uuid = UUID.randomUUID();

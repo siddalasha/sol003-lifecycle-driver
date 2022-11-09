@@ -17,7 +17,7 @@ import lombok.Data;
 @Schema(description = "Represents subscription filter criteria to match VNF products.")
 public class VnfProductFilter {
 
-    @io.swagger.v3.oas.annotations.media.Schema(name = "VNF Product Name", required = true, description = "Name of the VNF product to match.")
+    @Schema(name = "VNF Product Name", required = true, description = "Name of the VNF product to match.")
     private String vnfProductName;
     @Schema(name = "Version Filters", description = "If present, match VNF instances that belong to VNF products with certain versions and a certain product name, from one particular provider.")
     private List<VnfSoftwareVersionFilter> versions;
