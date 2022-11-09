@@ -60,7 +60,7 @@ public class PackageManagementSubscriptionController {
     }
 
     @DeleteMapping(path = "/{subscriptionId}")
-    @Operation(operationId = "Removes an individual Subscription", description = "The client can use this delete an individual Subscription.")
+    @Operation(summary = "Removes an individual Subscription", description = "The client can use this delete an individual Subscription.")
     public ResponseEntity<Void> deleteSubscription(@PathVariable String subscriptionId) {
         logger.info("Received request to remove Package Management Subscription [{}]", subscriptionId);
         return localSubscriptionCache.remove(subscriptionId) != null ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
