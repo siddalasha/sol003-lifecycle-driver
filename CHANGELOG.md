@@ -5,7 +5,7 @@
 
 **Implemented enhancements:**
 
-- Disabled spring unwanted security debug log
+- Disable spring unwanted security debug log
 - Security Vulnerability Fixes
 
 ## [0.5.2](https://github.com/IBM/sol003-lifecycle-driver/tree/0.5.2) (2022-11-21)
